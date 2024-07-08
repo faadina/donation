@@ -9,8 +9,9 @@
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome CSS-->
     <link href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <!-- SweetAlert CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
-    <link href="css/sb-admin.css" rel="stylesheet">
     <style>
         /* Custom CSS for centering sidebar links */
         .navbar-sidenav .nav-link {
@@ -20,93 +21,186 @@
         .card {
             margin-top: 50px; /* Adjust as per your design */
         }
+        /* Custom CSS for profile sidebar */
+        .sidebar-profile .nav-link {
+            padding: 10px 20px; /* Adjust padding as needed */
+            text-align: left; /* Adjust alignment */
+        }
+        .sidebar-profile .nav-item {
+            margin-bottom: 10px; /* Adjust spacing between items */
+        }
+        /* Custom CSS for positioning profile sidebar */
+        .sidebar-profile {
+            position: fixed;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #f8f9fa; /* Adjust background color */
+            padding-top: 60px; /* Adjust top padding */
+            overflow-x: hidden;
+            border-right: 1px solid #dee2e6; /* Add a border for separation */
+            margin-top:100px;
+        }
+        .content-wrapper {
+            margin-left: 250px; /* Adjust to match sidebar width */
+            padding: 20px; /* Adjust padding as needed */
+        }
+        /* Adjust top navigation to align with content */
+        .navbar-nav.ml-auto.justify-content-center {
+            margin-left: auto;
+            margin-right: 0px; /* Adjust to match sidebar width */
+        }
+        /* Custom CSS for profile image */
+        .profile-image {
+            text-align: center;
+            margin-bottom: 20px;
+
+        }
+        .profile-image img {
+            width: 80px; /* Adjust image width */
+            height: 80px; /* Adjust image height */
+            border-radius: 50%; /* Make it circular */
+        }
     </style>
 </head>
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
-        <a class="navbar-brand" href="index.php">Start Bootstrap</a>
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarResponsive">
-            <!-- Sidebar -->
-            <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
-                <!-- Dashboard -->
-                <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
-                    <a class="nav-link" href="index.php">
-                        <i class="fa fa-fw fa-dashboard"></i>
-                        <span class="nav-link-text">Dashboard</span>
-                    </a>
-                </li>
-                <!-- Other menu items -->
-                <!-- Adjust as per your requirement -->
-            </ul>
-            <!-- Sidebar Toggle -->
-            <ul class="navbar-nav sidenav-toggler">
-                <li class="nav-item">
-                    <a class="nav-link text-center" id="sidenavToggler">
-                        <i class="fa fa-fw fa-angle-left"></i>
-                    </a>
-                </li>
-            </ul>
-            <!-- Top Navigation -->
-            <ul class="navbar-nav ml-auto justify-content-center">
-                <!-- Messages Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-fw fa-envelope"></i>
-                        <span class="d-lg-none">Messages
-                            <span class="badge badge-pill badge-primary">12 New</span>
-                        </span>
-                        <span class="indicator text-primary d-none d-lg-block">
-                            <i class="fa fa-fw fa-circle"></i>
-                        </span>
-                    </a>
-                    <!-- Messages Dropdown - Adjust as per your needs -->
-                    <div class="dropdown-menu" aria-labelledby="messagesDropdown">
-                        <!-- Messages content -->
-                    </div>
-                </li>
-                <!-- Alerts Dropdown -->
-                <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fa fa-fw fa-bell"></i>
-                        <span class="d-lg-none">Alerts
-                            <span class="badge badge-pill badge-warning">6 New</span>
-                        </span>
-                        <span class="indicator text-warning d-none d-lg-block">
-                            <i class="fa fa-fw fa-circle"></i>
-                        </span>
-                    </a>
-                    <!-- Alerts Dropdown - Adjust as per your needs -->
-                    <div class="dropdown-menu" aria-labelledby="alertsDropdown">
-                        <!-- Alerts content -->
-                    </div>
-                </li>
-                <li class="nav-item mr-lg-3 mt-3 mt-lg-2"> <!-- Add mt-1 and mt-lg-0 for margin top -->
-    <form class="form-inline my-2 my-lg-0">
-        <div class="input-group">
-            <input class="form-control" type="text" placeholder="Search for...">
-            <span class="input-group-append">
-                <button class="btn btn-primary" type="button">
-                    <i class="fa fa-search"></i>
-                </button>
-            </span>
+    <!-- Profile Sidebar -->
+    <div class="sidebar-profile">
+        <div class="profile-image">
+            <img src="image/profilePicStaff.png" alt="Profile Image">
         </div>
-    </form>
-</li>
-                <!-- Logout Button -->
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="modal" data-target="#exampleModal">
-                        <i class="fa fa-fw fa-sign-out"></i>Logout
-                    </a>
-                </li>
-            </ul>
-        </div>
-    </nav>
-    <!-- Page Content -->
+        <ul class="navbar-nav">
+            <!-- Welcome Message -->
+            <li class="nav-item">
+                <div class="nav-link">
+                    <span>Welcome, User!</span>
+                </div>
+            </li>
+            <!-- User Profile -->
+            <li class="nav-item" data-toggle="tooltip" data-placement="right" title="User Profile">
+                <a class="nav-link" href="#">
+                    <i class="fa fa-fw fa-user"></i>
+                    <span class="nav-link-text">My Profile</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
     <div class="content-wrapper">
+        <!-- Navigation -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" id="mainNav">
+            <a class="navbar-brand" href="index.php">Madrasah Tarbiyyah</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <!-- Main Sidebar -->
+                <ul class="navbar-nav navbar-sidenav" id="exampleAccordion">
+                    <!-- Dashboard -->
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Dashboard">
+                        <a class="nav-link" href="index.php">
+                            <i class="fa fa-fw fa-dashboard"></i>
+                            <span class="nav-link-text">Dashboard</span>
+                        </a>
+                    </li>
+                    <!-- Staff-specific sidebar items -->
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Manage Donors">
+                        <a class="nav-link" href="#">
+                            <i class="fa fa-fw fa-users"></i>
+                            <span class="nav-link-text">Manage Donors</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Manage Staff">
+                        <a class="nav-link" href="#">
+                            <i class="fa fa-fw fa-user"></i>
+                            <span class="nav-link-text">Manage Staff</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Manage Allocations">
+                        <a class="nav-link" href="#">
+                            <i class="fa fa-fw fa-tasks"></i>
+                            <span class="nav-link-text">Manage Allocations</span>
+                        </a>
+                    </li>
+                    <li class="nav-item" data-toggle="tooltip" data-placement="right" title="Manage Donations">
+                        <a class="nav-link" href="#">
+                            <i class="fa fa-fw fa-money"></i>
+                            <span class="nav-link-text">Manage Donations</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Sidebar Toggle -->
+                <ul class="navbar-nav sidenav-toggler">
+                    <li class="nav-item">
+                        <a class="nav-link text-center" id="sidenavToggler">
+                            <i class="fa fa-fw fa-angle-left"></i>
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- Top Navigation -->
+                <ul class="navbar-nav ml-auto justify-content-center">
+                    <!-- Messages Dropdown -->
+                    <li class="nav-item dropdown ml-auto"> <!-- Adjusted ml-lg-2 for right margin -->
+    <a class="nav-link dropdown-toggle mr-lg-2" id="messagesDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-fw fa-envelope"></i>
+        <span class="d-lg-none">Messages
+            <span class="badge badge-pill badge-primary">12 New</span>
+        </span>
+        <span class="indicator text-primary d-none d-lg-block">
+            <i class="fa fa-fw fa-circle"></i>
+        </span>
+    </a>
+    <!-- Messages Dropdown Menu -->
+    <div class="dropdown-menu" aria-labelledby="messagesDropdown">
+        <!-- Messages content -->
+    </div>
+</li>
+
+                    <!-- Alerts Dropdown -->
+                    <li class="nav-item dropdown ml-lg-2"> <!-- Adjusted ml-lg-2 for right margin -->
+    <a class="nav-link dropdown-toggle mr-lg-2" id="alertsDropdown" href="#" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <i class="fa fa-fw fa-bell"></i>
+        <span class="d-lg-none">Alerts
+            <span class="badge badge-pill badge-warning">6 New</span>
+        </span>
+        <span class="indicator text-warning d-none d-lg-block">
+            <i class="fa fa-fw fa-circle"></i>
+        </span>
+    </a>
+    <!-- Alerts Dropdown Menu -->
+    <div class="dropdown-menu" aria-labelledby="alertsDropdown">
+        <!-- Alerts content -->
+    </div>
+</li>
+
+                    <li class="nav-item mr-lg-0 mt-3 mt-lg-2"> <!-- Add mt-1 and mt-lg-0 for margin top -->
+                    <form class="form-inline my-2 my-lg-0 ml-auto"> <!-- Adjusted ml-auto for right alignment -->
+    <div class="input-group">
+        <input class="form-control" type="text" placeholder="Search for...">
+        <span class="input-group-append">
+            <button class="btn btn-primary" type="button" id="searchButton">
+                <i class="fa fa-search"></i>
+            </button>
+        </span>
+    </div>
+</form>
+                    </li>
+                    <!-- Logout Button -->
+                    <li class="nav-item ml-lg-2"> <!-- Adjusted ml-lg-2 for right margin -->
+    <a class="nav-link" id="logoutButton">
+        <i class="fa fa-fw fa-sign-out"></i>Logout
+    </a>
+</li>
+
+                </ul>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
         <div class="container-fluid">
             <!-- Breadcrumbs -->
             <ol class="breadcrumb">
@@ -115,6 +209,7 @@
                 </li>
                 <li class="breadcrumb-item active">My Dashboard</li>
             </ol>
+
             <!-- Content Cards -->
             <div class="row">
                 <!-- Donor Details -->
@@ -123,32 +218,33 @@
                         <div class="card-body">
                             <h2 class="card-title">Donor Details</h2>
                             <ul class="list-group">
+                                <!-- PHP code for displaying donor details -->
                                 <?php
-                                // Fetching and displaying donor details
-                                $servername = "localhost";
-                                $username = "root";
-                                $password = "";
-                                $dbname = "donationdb";
 
+                                include'db.php';
                                 $conn = new mysqli($servername, $username, $password, $dbname);
 
                                 if ($conn->connect_error) {
                                     die("Connection failed: " . $conn->connect_error);
                                 }
 
-                                $sql_donors = "SELECT * FROM Donor";
-                                $result_donors = $conn->query($sql_donors);
+                                $sql = "SELECT * FROM donor";
+                                $result = $conn->query($sql);
 
-                                if ($result_donors->num_rows > 0) {
-                                    while($row = $result_donors->fetch_assoc()) {
-                                        echo '<li class="list-group-item">' . htmlspecialchars($row["donorName"]) . ' - ' . htmlspecialchars($row["donorEmail"]) . '</li>';
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                                        echo $row["donor_name"];
+                                        echo '<span class="badge badge-primary badge-pill">';
+                                        echo $row["donation_amount"];
+                                        echo '</span></li>';
                                     }
                                 } else {
-                                    echo '<li class="list-group-item">No donors found</li>';
+                                    echo "0 results";
                                 }
-
                                 $conn->close();
                                 ?>
+                                <!-- End PHP code -->
                             </ul>
                         </div>
                     </div>
@@ -159,33 +255,37 @@
                         <div class="card-body">
                             <h2 class="card-title">Staff Details</h2>
                             <ul class="list-group">
+                                <!-- PHP code for displaying staff details -->
                                 <?php
-                                // Fetching and displaying staff details
                                 $conn = new mysqli($servername, $username, $password, $dbname);
 
                                 if ($conn->connect_error) {
                                     die("Connection failed: " . $conn->connect_error);
                                 }
 
-                                $sql_staff = "SELECT * FROM Staff";
-                                $result_staff = $conn->query($sql_staff);
+                                $sql = "SELECT * FROM staff";
+                                $result = $conn->query($sql);
 
-                                if ($result_staff->num_rows > 0) {
-                                    while($row = $result_staff->fetch_assoc()) {
-                                        echo '<li class="list-group-item">' . htmlspecialchars($row["staffName"]) . ' - ' . htmlspecialchars($row["staffEmail"]) . '</li>';
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                                        echo $row["staff_name"];
+                                        echo '<span class="badge badge-primary badge-pill">';
+                                        echo $row["role"];
+                                        echo '</span></li>';
                                     }
                                 } else {
-                                    echo '<li class="list-group-item">No staff found</li>';
+                                    echo "0 results";
                                 }
-
                                 $conn->close();
                                 ?>
+                                <!-- End PHP code -->
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-            <!-- Allocation and Donation -->
+            <!-- Allocation and Donation Details -->
             <div class="row">
                 <!-- Allocation Details -->
                 <div class="col-md-6">
@@ -193,27 +293,29 @@
                         <div class="card-body">
                             <h2 class="card-title">Allocation Details</h2>
                             <ul class="list-group">
+                                <!-- PHP code for displaying allocation details -->
                                 <?php
-                                // Fetching and displaying allocation details
                                 $conn = new mysqli($servername, $username, $password, $dbname);
 
                                 if ($conn->connect_error) {
                                     die("Connection failed: " . $conn->connect_error);
                                 }
 
-                                $sql_allocations = "SELECT * FROM Allocation";
-                                $result_allocations = $conn->query($sql_allocations);
+                                $sql = "SELECT * FROM Allocation";
+                                $result = $conn->query($sql);
 
-                                if ($result_allocations->num_rows > 0) {
-                                    while($row = $result_allocations->fetch_assoc()) {
-                                        echo '<li class="list-group-item">' . htmlspecialchars($row["allocationType"]) . ' - Target: $' . htmlspecialchars($row["targetAmount"]) . '</li>';
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo '<li class="list-group-item">';
+                                        echo htmlspecialchars($row["allocationType"]) . ' - Target: $' . htmlspecialchars($row["targetAmount"]);
+                                        echo '</li>';
                                     }
                                 } else {
                                     echo '<li class="list-group-item">No allocations found</li>';
                                 }
-
                                 $conn->close();
                                 ?>
+                                <!-- End PHP code -->
                             </ul>
                         </div>
                     </div>
@@ -224,27 +326,29 @@
                         <div class="card-body">
                             <h2 class="card-title">Donation Details</h2>
                             <ul class="list-group">
+                                <!-- PHP code for displaying donation details -->
                                 <?php
-                                // Fetching and displaying donation details
                                 $conn = new mysqli($servername, $username, $password, $dbname);
 
                                 if ($conn->connect_error) {
                                     die("Connection failed: " . $conn->connect_error);
                                 }
 
-                                $sql_donations = "SELECT * FROM Donation";
-                                $result_donations = $conn->query($sql_donations);
+                                $sql = "SELECT * FROM Donation";
+                                $result = $conn->query($sql);
 
-                                if ($result_donations->num_rows > 0) {
-                                    while($row = $result_donations->fetch_assoc()) {
-                                        echo '<li class="list-group-item">Donation ID: ' . htmlspecialchars($row["donationID"]) . ' - Amount: $' . htmlspecialchars($row["donationAmount"]) . '</li>';
+                                if ($result->num_rows > 0) {
+                                    while($row = $result->fetch_assoc()) {
+                                        echo '<li class="list-group-item">Donation ID: ';
+                                        echo htmlspecialchars($row["donationID"]) . ' - Amount: $' . htmlspecialchars($row["donationAmount"]);
+                                        echo '</li>';
                                     }
                                 } else {
                                     echo '<li class="list-group-item">No donations found</li>';
                                 }
-
                                 $conn->close();
                                 ?>
+                                <!-- End PHP code -->
                             </ul>
                         </div>
                     </div>
@@ -252,41 +356,50 @@
             </div>
         </div>
         <!-- /.container-fluid -->
+
         <!-- Footer -->
         <footer class="sticky-footer">
             <div class="container">
                 <div class="text-center">
-                    <small>&copy; 2024 Your Company. All Rights Reserved.</small>
+                    <small>Copyright © Your Website 2024</small>
                 </div>
             </div>
         </footer>
+
         <!-- Scroll to Top Button -->
         <a class="scroll-to-top rounded" href="#page-top">
             <i class="fa fa-angle-up"></i>
         </a>
-        <!-- Logout Modal -->
-        <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                        <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                            <span aria-hidden="true">×</span>
-                        </button>
-                    </div>
-                    <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                    <div class="modal-footer">
-                        <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                        <a class="btn btn-primary" href="login.html">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
-    <!-- /.content-wrapper -->
+    <!-- /#wrapper -->
+
+    <!-- SweetAlert library -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.js"></script>
+
     <!-- Bootstrap core JavaScript-->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.1/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <!-- Custom Script -->
+    <script>
+        // Handle logout button click
+        document.getElementById('logoutButton').addEventListener('click', function() {
+            Swal.fire({
+                title: 'Ready to Leave?',
+                text: 'Select "Logout" below if you are ready to end your current session.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Logout'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to logout page or perform logout action
+                    window.location.href = 'login.html';
+                }
+            });
+        });
+    </script>
 </body>
 </html>
