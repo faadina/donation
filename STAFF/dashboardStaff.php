@@ -13,56 +13,69 @@
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@10.15.7/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom styles for this template-->
     <style>
-        /* Custom CSS for centering sidebar links */
-        .navbar-sidenav .nav-link {
-            text-align: center;
-        }
-        /* Custom CSS for spacing cards */
-        .card {
-            margin-top: 50px; /* Adjust as per your design */
-        }
-        /* Custom CSS for profile sidebar */
-        .sidebar-profile .nav-link {
-            padding: 10px 20px; /* Adjust padding as needed */
-            text-align: left; /* Adjust alignment */
-        }
-        .sidebar-profile .nav-item {
-            margin-bottom: 10px; /* Adjust spacing between items */
-        }
-        /* Custom CSS for positioning profile sidebar */
-        .sidebar-profile {
-            position: fixed;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 250px;
-            background-color: #f8f9fa; /* Adjust background color */
-            padding-top: 60px; /* Adjust top padding */
-            overflow-x: hidden;
-            border-right: 1px solid #dee2e6; /* Add a border for separation */
-            margin-top:100px;
-        }
-        .content-wrapper {
-            margin-left: 250px; /* Adjust to match sidebar width */
-            padding: 20px; /* Adjust padding as needed */
-        }
-        /* Adjust top navigation to align with content */
-        .navbar-nav.ml-auto.justify-content-center {
-            margin-left: auto;
-            margin-right: 0px; /* Adjust to match sidebar width */
-        }
-        /* Custom CSS for profile image */
-        .profile-image {
-            text-align: center;
-            margin-bottom: 20px;
+    /* Custom CSS for centering sidebar links */
+    .navbar-sidenav .nav-link {
+        text-align: center;
+    }
+    /* Custom CSS for spacing cards */
+    .card {
+        margin-top: 50px; /* Adjust as per your design */
+        background-color:paleturquoise; /* Add background color */
+        border: 1px solid #ddd; /* Add border for clarity */
+        border-radius: 5px; /* Rounded corners */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add shadow */
+    }
+    /* Custom CSS for profile sidebar */
+    .sidebar-profile .nav-link {
+        padding: 10px 20px; /* Adjust padding as needed */
+        text-align: left; /* Adjust alignment */
+    }
+    .sidebar-profile .nav-item {
+        margin-bottom: 10px; /* Adjust spacing between items */
+    }
+    /* Custom CSS for positioning profile sidebar */
+    .sidebar-profile {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 250px;
+        background-color: #f8f9fa; /* Adjust background color */
+        padding-top: 60px; /* Adjust top padding */
+        overflow-x: hidden;
+        border-right: 1px solid #dee2e6; /* Add a border for separation */
+        margin-top: 100px;
+    }
+    .content-wrapper {
+        margin-left: 250px; /* Adjust to match sidebar width */
+        padding: 20px; /* Adjust padding as needed */
+    }
+    /* Adjust top navigation to align with content */
+    .navbar-nav.ml-auto.justify-content-center {
+        margin-left: auto;
+        margin-right: 0px; /* Adjust to match sidebar width */
+    }
+    /* Custom CSS for profile image */
+    .profile-image {
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    .profile-image img {
+        width: 80px; /* Adjust image width */
+        height: 80px; /* Adjust image height */
+        border-radius: 50%; /* Make it circular */
+    }
 
-        }
-        .profile-image img {
-            width: 80px; /* Adjust image width */
-            height: 80px; /* Adjust image height */
-            border-radius: 50%; /* Make it circular */
-        }
-    </style>
+    /* Hover effect for cards */
+    .card {
+        transition: transform 0.3s ease;
+    }
+    .card:hover {
+        transform: scale(1.02); /* Increase size on hover */
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* Add shadow on hover */
+    }
+</style>
+
 </head>
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
     <!-- Profile Sidebar -->
@@ -210,151 +223,160 @@
                 <li class="breadcrumb-item active">My Dashboard</li>
             </ol>
 
-            <!-- Content Cards -->
             <div class="row">
-                <!-- Donor Details -->
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h2 class="card-title">Donor Details</h2>
-                            <ul class="list-group">
-                                <!-- PHP code for displaying donor details -->
-                                <?php
+    <!-- Donor Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fa fa-fw fa-user"></i> Donor
+                </h2>
+                <ul class="list-group">
+                    <!-- PHP code for displaying donor details -->
+                    <?php
+                    include 'db.php';
+                    $conn = new mysqli($servername, $username, $password, $dbname);
 
-                                include'db.php';
-                                $conn = new mysqli($servername, $username, $password, $dbname);
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
 
-                                if ($conn->connect_error) {
-                                    die("Connection failed: " . $conn->connect_error);
-                                }
+                    $sql = "SELECT * FROM donor";
+                    $result = $conn->query($sql);
 
-                                $sql = "SELECT * FROM donor";
-                                $result = $conn->query($sql);
-
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                                        echo $row["donor_name"];
-                                        echo '<span class="badge badge-primary badge-pill">';
-                                        echo $row["donation_amount"];
-                                        echo '</span></li>';
-                                    }
-                                } else {
-                                    echo "0 results";
-                                }
-                                $conn->close();
-                                ?>
-                                <!-- End PHP code -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <!-- Staff Details -->
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h2 class="card-title">Staff Details</h2>
-                            <ul class="list-group">
-                                <!-- PHP code for displaying staff details -->
-                                <?php
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                                if ($conn->connect_error) {
-                                    die("Connection failed: " . $conn->connect_error);
-                                }
-
-                                $sql = "SELECT * FROM staff";
-                                $result = $conn->query($sql);
-
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
-                                        echo $row["staff_name"];
-                                        echo '<span class="badge badge-primary badge-pill">';
-                                        echo $row["role"];
-                                        echo '</span></li>';
-                                    }
-                                } else {
-                                    echo "0 results";
-                                }
-                                $conn->close();
-                                ?>
-                                <!-- End PHP code -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Allocation and Donation Details -->
-            <div class="row">
-                <!-- Allocation Details -->
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h2 class="card-title">Allocation Details</h2>
-                            <ul class="list-group">
-                                <!-- PHP code for displaying allocation details -->
-                                <?php
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                                if ($conn->connect_error) {
-                                    die("Connection failed: " . $conn->connect_error);
-                                }
-
-                                $sql = "SELECT * FROM Allocation";
-                                $result = $conn->query($sql);
-
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        echo '<li class="list-group-item">';
-                                        echo htmlspecialchars($row["allocationType"]) . ' - Target: $' . htmlspecialchars($row["targetAmount"]);
-                                        echo '</li>';
-                                    }
-                                } else {
-                                    echo '<li class="list-group-item">No allocations found</li>';
-                                }
-                                $conn->close();
-                                ?>
-                                <!-- End PHP code -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-                <!-- Donation Details -->
-                <div class="col-md-6">
-                    <div class="card mb-3">
-                        <div class="card-body">
-                            <h2 class="card-title">Donation Details</h2>
-                            <ul class="list-group">
-                                <!-- PHP code for displaying donation details -->
-                                <?php
-                                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                                if ($conn->connect_error) {
-                                    die("Connection failed: " . $conn->connect_error);
-                                }
-
-                                $sql = "SELECT * FROM Donation";
-                                $result = $conn->query($sql);
-
-                                if ($result->num_rows > 0) {
-                                    while($row = $result->fetch_assoc()) {
-                                        echo '<li class="list-group-item">Donation ID: ';
-                                        echo htmlspecialchars($row["donationID"]) . ' - Amount: $' . htmlspecialchars($row["donationAmount"]);
-                                        echo '</li>';
-                                    }
-                                } else {
-                                    echo '<li class="list-group-item">No donations found</li>';
-                                }
-                                $conn->close();
-                                ?>
-                                <!-- End PHP code -->
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                            echo $row["donor_name"];
+                            echo '<span class="badge badge-primary badge-pill">';
+                            echo $row["donation_amount"];
+                            echo '</span></li>';
+                        }
+                    } else {
+                        echo "0 results";
+                    }
+                    $conn->close();
+                    ?>
+                    <!-- End PHP code -->
+                </ul>
             </div>
         </div>
+    </div>
+
+    <!-- Staff Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fa fa-fw fa-users"></i> Staff
+                </h2>
+                <ul class="list-group">
+                    <!-- PHP code for displaying staff details -->
+                    <?php
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT * FROM staff";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo '<li class="list-group-item d-flex justify-content-between align-items-center">';
+                            echo $row["staff_name"];
+                            echo '<span class="badge badge-primary badge-pill">';
+                            echo $row["role"];
+                            echo '</span></li>';
+                        }
+                    } else {
+                        echo "0 results";
+                    }
+                    $conn->close();
+                    ?>
+                    <!-- End PHP code -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Allocation Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fa fa-fw fa-tasks"></i> Allocation
+                </h2>
+                <ul class="list-group">
+                    <!-- PHP code for displaying allocation details -->
+                    <?php
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT * FROM Allocation";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo '<li class="list-group-item">';
+                            echo htmlspecialchars($row["allocationType"]) . ' - Target: $' . htmlspecialchars($row["targetAmount"]);
+                            echo '</li>';
+                        }
+                    } else {
+                        echo "0 results";
+                    }
+                    $conn->close();
+                    ?>
+                    <!-- End PHP code -->
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Donation Details -->
+    <div class="col-md-6">
+        <div class="card h-100">
+            <div class="card-body">
+                <h2 class="card-title">
+                    <i class="fa fa-fw fa-money"></i> Donation
+                </h2>
+                <ul class="list-group">
+                    <!-- PHP code for displaying donation details -->
+                    <?php
+                    $conn = new mysqli($servername, $username, $password, $dbname);
+
+                    if ($conn->connect_error) {
+                        die("Connection failed: " . $conn->connect_error);
+                    }
+
+                    $sql = "SELECT * FROM Donation";
+                    $result = $conn->query($sql);
+
+                    if ($result->num_rows > 0) {
+                        while($row = $result->fetch_assoc()) {
+                            echo '<li class="list-group-item">Donation ID: ';
+                            echo htmlspecialchars($row["donationID"]) . ' - Amount: $' . htmlspecialchars($row["donationAmount"]);
+                            echo '</li>';
+                        }
+                    } else {
+                        echo "0 results";
+                    }
+                    $conn->close();
+                    ?>
+                    <!-- End PHP code -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+            
         <!-- /.container-fluid -->
 
         <!-- Footer -->
