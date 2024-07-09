@@ -1,0 +1,65 @@
+-- Create Staff table
+CREATE TABLE Staff (
+    staffID INT AUTO_INCREMENT PRIMARY KEY,
+    staffName VARCHAR(255) NOT NULL,
+    staffPhoneNo VARCHAR(20),
+    staffEmail VARCHAR(255) NOT NULL,
+    staffPassword VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL
+);
+
+-- Create Donor table
+CREATE TABLE Donor (
+    donorID INT AUTO_INCREMENT PRIMARY KEY,
+    donorName VARCHAR(255) NOT NULL,
+    donorPhoneNo VARCHAR(20),
+    donorDOB DATE,
+    donorAddress TEXT,
+    donorEmail VARCHAR(255) NOT NULL,
+    donorPassword VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL
+);
+
+-- Create Manager table
+CREATE TABLE Manager (
+    managerID INT AUTO_INCREMENT PRIMARY KEY,
+    managerName VARCHAR(255) NOT NULL,
+    managerPhoneNo VARCHAR(20),
+    managerEmail VARCHAR(255) NOT NULL,
+    managerPassword VARCHAR(255) NOT NULL,
+    role VARCHAR(50) NOT NULL
+);
+
+-- Create Allocation table
+CREATE TABLE Allocation (
+    allocationID INT AUTO_INCREMENT PRIMARY KEY,
+    allocationType VARCHAR(255) NOT NULL,
+    targetAmount DECIMAL(10, 2) NOT NULL,
+    currentAmount DECIMAL(10, 2) NOT NULL
+);
+
+-- Create Donation table
+CREATE TABLE Donation (
+    donationID INT AUTO_INCREMENT PRIMARY KEY,
+    donationAmount DECIMAL(10, 2) NOT NULL,
+    donationDate DATE NOT NULL,
+    donationMethod VARCHAR(50) NOT NULL,
+    donationStatus VARCHAR(50),
+    donorID INT,
+    staffID INT,
+    allocationID INT,
+    FOREIGN KEY (donorID) REFERENCES Donor(donorID),
+    FOREIGN KEY (staffID) REFERENCES Staff(staffID),
+    FOREIGN KEY (allocationID) REFERENCES Allocation(allocationID)
+);
+
+-- Create Report table
+CREATE TABLE Report (
+    reportID INT AUTO_INCREMENT PRIMARY KEY,
+    reportType VARCHAR(255) NOT NULL,
+    reportDate DATE NOT NULL,
+    managerID INT,
+    donationID INT,
+    FOREIGN KEY (managerID) REFERENCES Manager(managerID),
+    FOREIGN KEY (donationID) REFERENCES Donation(donationID)
+);
