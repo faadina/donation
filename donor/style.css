@@ -19,18 +19,18 @@ body {
     top: 0;
     right: 0;
     left: 0;
-    height: 100px; /* Perbesar tinggi navbar */
-    padding: 25px; /* Sesuaikan padding */
-    font-size: 20px; /* Sesuaikan ukuran font */
+    height: 100px; 
+    padding: 25px; 
+    font-size: 20px; 
     display: flex;
-    align-items: center; /* Sejajarkan konten secara vertikal */
+    align-items: center;
 }
 
 .nav_side {
     margin-left: auto;
-    margin-top: 0; /* Hapus margin top */
-    display: flex; /* Gunakan flex untuk meratakan konten */
-    align-items: center; /* Sejajarkan konten secara vertikal */
+    margin-top: 0; 
+    display: flex; 
+    align-items: center; 
 }
 
 .nav_side a {
@@ -40,7 +40,7 @@ body {
     color: white;
     font-weight: bold;
     font-family: 'Trebuchet MS', sans-serif;
-    font-size: 18px; /* Perbesar ukuran font */
+    font-size: 18px; 
     display: flex;
     justify-content: center;
     align-items: center;
