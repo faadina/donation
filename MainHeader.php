@@ -15,8 +15,8 @@
     <div class="header">
         <div class="nav">
             <ul>
-                <li><a href="MainHomepage.php">Home</a></li>
-                <li><a href="About.php">About</a></li>
+                <li><a href="MainHome.php">Home</a></li>
+                <li><a href="MainAbout.php">About</a></li>
                 <li><a href="MainContact.php">Contact</a></li>
                 <li><a href="MainLogin.php">Login</a></li>
             </ul>

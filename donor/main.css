@@ -1,0 +1,112 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 0;
+}
+
+.nav {
+    background-color: #333;
+    color: white;
+    padding: 15px;
+    text-align: center;
+}
+
+.nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 15px;
+}
+
+.container {
+    max-width: 800px;
+    margin: 20px auto;
+    margin-top: 5%;
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.payment-details h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.payment-details form {
+    display: flex;
+    flex-direction: column;
+}
+
+.payment-details form label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+.payment-details form input {
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.payment-details form input[type="submit"] {
+    background-color: #28a745;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.payment-details form input[type="submit"]:hover {
+    background-color: #218838;
+}
+
+.payment-options {
+    margin-top: 30px;
+}
+
+.payment-options h3 {
+    color: #333;
+    margin-bottom: 10px;
+}
+
+.qr-code {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.qr-code img {
+    width: 200px;
+    height: 200px;
+}
+
+.qr-code p {
+    margin: 5px 0;
+}
+
+.payment-options ul {
+    list-style: none;
+    padding: 0;
+}
+
+.payment-options ul li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.payment-options ul li img {
+    width: 30px;
+    height: 30px;
+    margin-right: 10px;
+}
+
+.footer {
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 10px;
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+}
