@@ -46,7 +46,9 @@ function uploadImage($file) {
 
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $allocationID = $_POST["allocationID"];
+    // Generate a unique allocationID
+    $allocationID = generateUniqueID($conn);
+
     $allocationName = $_POST["allocationName"];
     $allocationStartDate = $_POST["allocationStartDate"];
     $allocationEndDate = $_POST["allocationEndDate"];
@@ -67,14 +69,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute SQL statement
     if ($conn->query($sql) === TRUE) {
-        echo "New record created successfully";
+        // Display the newly inserted allocationID
+        header("Location: AllocationView.php");
+        exit();
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 
+
+
+   
     $conn->close(); // Close database connection
 }
+
+// Function to generate unique allocationID based on the highest existing ID in the database
+function generateUniqueID($conn) {
+    $prefix = "A"; // Prefix for allocation IDs
+    $sql = "SELECT MAX(allocationID) AS maxID FROM Allocation WHERE allocationID LIKE 'A%'";
+    $result = $conn->query($sql);
+    
+    if ($result && $result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $maxID = $row["maxID"];
+        if ($maxID) {
+            $lastNumber = intval(substr($maxID, 1)); // Extract numeric part after prefix
+            $newNumber = $lastNumber + 1; // Increment number
+            $newID = $prefix . str_pad($newNumber, 3, "0", STR_PAD_LEFT); // Generate new ID
+        } else {
+            // If no existing records, start with the first allocation ID
+            $newID = $prefix . "001";
+        }
+    } else {
+        // Query error handling
+        $newID = $prefix . "001";
+    }
+
+    return $newID;
+}
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -88,10 +121,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="container">
         <h2 class="my-4">Create Allocation</h2>
         <form action="AllocationCreate.php" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="allocationID" class="form-label">Allocation ID</label>
-                <input type="text" class="form-control" id="allocationID" name="allocationID" required>
-            </div>
             <div class="mb-3">
                 <label for="allocationName" class="form-label">Allocation Name</label>
                 <input type="text" class="form-control" id="allocationName" name="allocationName" required>
@@ -125,6 +154,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="file" class="form-control" id="allocationImage" name="allocationImage">
             </div>
             <button type="submit" class="btn btn-primary">Create</button>
+
         </form>
     </div>
 </body>
