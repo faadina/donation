@@ -13,13 +13,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: black;
-            background-color: #607123;
-            background-image: linear-gradient(314deg, #607123 0%, #95b54c 74%);
+            background: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
             font-weight: 600;
             padding: 10px 20px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0;
+            z-index:2;
         }
 
+    
         .logo {
             height: auto;
             width: 8rem;
@@ -121,9 +124,8 @@
         <div class="nav__content">
             <nav>
                 <ul>
-                    <li><a href="DonorAbout.php" class="<?php echo ($current_page == '"DonorAbout.php') ? 'active' : ''; ?>">About</a></li>
-                    <li><a href="DonorHomepage.php" class="<?php echo ($current_page == 'DonorHomepage') ? 'active' : ''; ?>">Home</a></li>
                     <li><a href="ManagerDashboard.php" class="<?php echo ($current_page == 'ManagerDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
+                    <li><a href="StaffDetails.php" class="<?php echo ($current_page == 'StaffDetails.php') ? 'active' : ''; ?>">Staff</a></li>
                     <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
                     
                     <li class="dropdown manager-info">

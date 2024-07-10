@@ -1,5 +1,5 @@
 <?php
-require_once("dbConnect.php"); 
+require_once("dbConnect.php"); // Include your database connection file
 
 // Initialize variables
 $username = $password = $name = $birthdate = $address = $phone = $email = "";
@@ -89,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt = mysqli_prepare($conn, $sql);
         if ($stmt) {
             // Set parameters
-            $param_password = $password; // Store password as plain text
+            $param_password = md5($password); 
             $param_name = $name;
             $param_birthdate = $birthdate;
             $param_address = $address;
@@ -124,7 +124,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <title>Sign Up</title>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 <style type="text/css">
-    
     body { 
         font: 14px sans-serif; 
         background-color: whitesmoke; /* Dark Cyan Theme Background */
@@ -167,9 +166,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 </head>
 <body>
-    <?php
-    include('MainHeader.php');
-    ?>
     <div class="wrapper">
         <h2>Sign Up</h2>
         <p>Please fill this form to create an account.</p>

@@ -15,6 +15,7 @@
             background-color: #f9fcff;
             background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
             font-family: "Inter", sans-serif;
+            
         }
 
         .detailIndex {
