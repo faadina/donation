@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0">
     <link rel="stylesheet" href="donor/style.css">
-    <title>Manager</title>
+    <title>Staff</title>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
@@ -121,17 +121,15 @@
         <div class="nav__content">
             <nav>
                 <ul>
-                    <li><a href="DonorAbout.php" class="<?php echo ($current_page == '"DonorAbout.php') ? 'active' : ''; ?>">About</a></li>
-                    <li><a href="DonorHomepage.php" class="<?php echo ($current_page == 'DonorHomepage') ? 'active' : ''; ?>">Home</a></li>
-                    <li><a href="ManagerDashboard.php" class="<?php echo ($current_page == 'ManagerDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
-                    
+                    <li><a href="StaffDashboard.php" class="<?php echo ($current_page == 'StaffDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
+                    <li><a href="Allocation.php" class="<?php echo ($current_page == 'Allocation.php') ? 'active' : ''; ?>">Allocation</a></li>
+                    <li><a href="Donor.php'" class="<?php echo ($current_page == 'Donor.php') ? 'active' : ''; ?>">Donor</a></li>
                     <li class="dropdown manager-info">
                         <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: ?
+                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: ?
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
-                            <a class="dropdown-item" href="ManagerProfile.php">🗝 Profile</a>
+                            <a class="dropdown-item" href="StaffProfile.php">🗝 Profile</a>
                             <a class="dropdown-item" href="Logout.php">🗝 Log Out</a>
                         </div>
                     </li>
