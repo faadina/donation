@@ -1,6 +1,6 @@
 <?php
 $title = "Home Page";
-include 'DonorHeader.php';
+include 'MainHeader.php';
 ?>
 
 <div class="main">
@@ -10,7 +10,7 @@ include 'DonorHeader.php';
                 <span>Give a helping hand to children who NEED it!</span>
             </h2>
             <div class="btn">
-                <a href="DonorDonateAllocation.php">DONATE NOW</a>
+                <a href="MainLogin.php">JOIN US TODAY</a>
             </div>
         </div>
     </div>
@@ -24,9 +24,6 @@ include 'DonorHeader.php';
             <p>
                 Service to man is service to God. Charity Jet cares for needy children by empowering their caregivers to do their best work, with compassion, grace, integrity and excellence. Our end goal is to support children worldwide and see every child reach the potential that God has for them.
             </p>
-            <div class="side_btn">
-                <a href="MainLogin.php">JOIN US TODAY</a>
-            </div>
         </div>
 
     </div>

@@ -1,3 +1,8 @@
+<?php
+$title = "Contact Page";
+include 'MainHeader.php';
+?>
+
 <body>
     <div class="main-content d-flex justify-content-center align-items-center">
         <div class="contact-container">
