@@ -13,12 +13,13 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Allocation Records</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .image-preview {
             max-width: 100px;
             max-height: 100px;
         }
-
     </style>
 </head>
 <body>
@@ -27,7 +28,7 @@ $result = $conn->query($sql);
         <h2 class="my-4">Allocation Records</h2>
         <a href="AllocationCreate.php" class="btn btn-success">Create New Allocation</a>
         <a href="DonationView.php" class="btn btn-success">Donation</a>
-        <table class="table table-striped">
+        <table class="table table-striped mt-4">
             <thead>
                 <tr>
                     <th>ID</th>
@@ -37,26 +38,38 @@ $result = $conn->query($sql);
                     <th>STATUS</th>
                     <th>TARGET (RM)</th>
                     <th>CURRENT (RM)</th>
-                    <th colspan='3' style="text-align:center;">Action</th>
+                    <th colspan='3' style="text-align:center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        $startDate = date('d/m/y', strtotime($row["allocationStartDate"]));
-                        $endDate = date('d/m/y', strtotime($row["allocationEndDate"]));
+                        $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
+                        $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
                         echo "<tr>";
                         echo "<td>" . $row["allocationID"] . "</td>";
                         echo "<td>" . $row["allocationName"] . "</td>";
                         echo "<td>" . $startDate . "</td>";
                         echo "<td>" . $endDate . "</td>";
                         echo "<td>" . $row["allocationStatus"] . "</td>";
-                        echo "<td>" . $row["targetAmount"] . "</td>";
-                        echo "<td>" . $row["currentAmount"] . "</td>";
-                        echo "<td><a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-mini-column'>View</a></td>";
-                        echo "<td><a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary'>Update</a></td> ";
-                        echo "<td><a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to delete this allocation?\");'>Delete</a></td>";
+                        echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
+                        echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
+                        echo "<td>";
+                        echo "<a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'>";
+                        echo "<i class='bi bi-eye'></i>";
+                        echo "</a>";
+                        echo "</td>";
+                        echo "<td>";
+                        echo "<a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'>";
+                        echo "<i class='bi bi-pencil'></i>";
+                        echo "</a>";
+                        echo "</td>";
+                        echo "<td>";
+                        echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this allocation?\");'>";
+                        echo "<i class='bi bi-trash'></i>";
+                        echo "</a>";
+                        echo "</td>";
                         echo "</tr>";
                     }
                 } else {
@@ -72,3 +85,4 @@ $result = $conn->query($sql);
 <?php
 $conn->close();
 ?>
+

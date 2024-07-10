@@ -1,9 +1,7 @@
 <?php
 
-// Check if managerID is set in session
-$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; // Replace 'Unknown' with a default message or handle empty case accordingly
+$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
 
-// Check if $current_page is set, assuming it's defined somewhere in your script
 $current_page = isset($current_page) ? $current_page : '';
 
 ?>
@@ -42,9 +40,8 @@ $current_page = isset($current_page) ? $current_page : '';
 
         .logo {
             height: auto;
-            width: 8rem;
+            width: 5rem;
             margin-right: 10px;
-            filter: drop-shadow(2px 2px 3px rgb(252, 252, 252));
         }
 
         nav {
@@ -136,7 +133,7 @@ $current_page = isset($current_page) ? $current_page : '';
 
 <body>
     <div class="header">
-        <img src="images/madrasahLogo.png" class="logo" alt="Logo">
+        <img src="images/madrasahLogo1.png" class="logo" alt="Logo">
         <div class="nav__content">
             <nav>
                 <ul>
@@ -145,7 +142,7 @@ $current_page = isset($current_page) ? $current_page : '';
                     <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
                     
                     <li class="dropdown manager-info">
-                        <a style="background-color:white; border-radius:4px; color:#104854;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
+                        <a style="background-color:white; border-radius:4px; color:#104854; box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.5); border:none;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
                             <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: <?php echo $managerID; ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">

@@ -61,26 +61,19 @@ mysqli_close($conn);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: white;
-            font-family: "Inter", sans-serif;
-        }
-
         .content_section {
             margin-top: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            width: 100%;
+            width: 90%;
+            margin: 0 auto;
         }
 
         .content_section h1 {
             color: white;
             background: black;
-            width: 50%;
+            width: 80%;
             height: 40%;
             font-weight: 700;
             margin-top: 3%;
