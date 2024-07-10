@@ -1,5 +1,5 @@
 <?php
-require_once("db.php"); // Include your database connection file
+require_once("dbConnect.php"); // Include your database connection file
 
 // Initialize variables
 $username = $password = $role = $name = $birthdate  = $address = $phone = $email = "";

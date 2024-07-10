@@ -1,6 +1,6 @@
 <?php
 // Include config file
-require_once "db.php";
+require_once "dbConnect.php";
 
 // Initialize variables
 $username = $password = $user_type = "";
