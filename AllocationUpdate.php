@@ -44,6 +44,41 @@ function uploadImage($file) {
     }
 }
 
+// Initialize variables to hold current values
+$allocationID = "";
+$allocationName = "";
+$allocationStartDate = "";
+$allocationEndDate = "";
+$allocationStatus = "";
+$allocationDetails = "";
+$targetAmount = "";
+$currentAmount = "";
+$allocationImage = "";
+
+// Check if allocationID is provided via GET parameter
+if (isset($_GET['allocationID'])) {
+    $allocationID = $_GET['allocationID'];
+
+    // Fetch existing allocation details from the database
+    $sql = "SELECT * FROM Allocation WHERE allocationID = '$allocationID'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // Populate variables with current values
+        $row = $result->fetch_assoc();
+        $allocationName = $row["allocationName"];
+        $allocationStartDate = $row["allocationStartDate"];
+        $allocationEndDate = $row["allocationEndDate"];
+        $allocationStatus = $row["allocationStatus"];
+        $allocationDetails = $row["allocationDetails"];
+        $targetAmount = $row["targetAmount"];
+        $currentAmount = $row["currentAmount"];
+        $allocationImage = $row["allocationImage"];
+    } else {
+        echo "Allocation not found.";
+    }
+}
+
 // Process form submission for update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allocationID = $_POST["allocationID"];
@@ -80,7 +115,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute SQL statement
     if ($conn->query($sql) === TRUE) {
-        echo "Record updated successfully";
+        // Redirect to AllocationView.php after successful update
+        header("Location: AllocationView.php");
+        exit();
     } else {
         echo "Error updating record: " . $conn->error;
     }
@@ -103,41 +140,47 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <form action="AllocationUpdate.php" method="post" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="allocationID" class="form-label">Allocation ID</label>
-                <input type="text" class="form-control" id="allocationID" name="allocationID" required>
+                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" readonly>
             </div>
             <div class="mb-3">
                 <label for="allocationName" class="form-label">Allocation Name</label>
-                <input type="text" class="form-control" id="allocationName" name="allocationName" required>
+                <input type="text" class="form-control" id="allocationName" name="allocationName" value="<?php echo $allocationName; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="allocationStartDate" class="form-label">Allocation Start Date</label>
-                <input type="date" class="form-control" id="allocationStartDate" name="allocationStartDate" required>
+                <input type="date" class="form-control" id="allocationStartDate" name="allocationStartDate" value="<?php echo $allocationStartDate; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="allocationEndDate" class="form-label">Allocation End Date</label>
-                <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" required>
+                <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" value="<?php echo $allocationEndDate; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="allocationStatus" class="form-label">Allocation Status</label>
-                <input type="text" class="form-control" id="allocationStatus" name="allocationStatus" required>
+                <input type="text" class="form-control" id="allocationStatus" name="allocationStatus" value="<?php echo $allocationStatus; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="allocationDetails" class="form-label">Allocation Details</label>
-                <textarea class="form-control" id="allocationDetails" name="allocationDetails" required></textarea>
+                <textarea class="form-control" id="allocationDetails" name="allocationDetails" required><?php echo $allocationDetails; ?></textarea>
             </div>
             <div class="mb-3">
                 <label for="targetAmount" class="form-label">Target Amount</label>
-                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" required>
+                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" value="<?php echo $targetAmount; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="currentAmount" class="form-label">Current Amount</label>
-                <input type="number" step="0.01" class="form-control" id="currentAmount" name="currentAmount" required>
+                <input type="number" step="0.01" class="form-control" id="currentAmount" name="currentAmount" value="<?php echo $currentAmount; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="allocationImage" class="form-label">Allocation Image</label>
+                <label for="allocationImage" class="form-label">Current Allocation Image</label><br>
+                <?php if (!empty($allocationImage)) : ?>
+                    <img src="<?php echo $allocationImage; ?>" class="image-preview" alt="Current Allocation Image"><br><br>
+                <?php else : ?>
+                    No Image
+                <?php endif; ?>
                 <input type="file" class="form-control" id="allocationImage" name="allocationImage">
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
+
         </form>
     </div>
 </body>
