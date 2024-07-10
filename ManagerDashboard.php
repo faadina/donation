@@ -184,7 +184,6 @@ mysqli_close($conn);
                 <a href="reportMonthlyDonation.php" class="btn">View Report</a>
             </div>
         </div>
-        <div class="summary-box" style="background-color:#2a3f45">
     </div>
 </body>
 
