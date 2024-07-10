@@ -14,8 +14,7 @@ CREATE TABLE Donor (
     donorDOB DATE,
     donorAddress VARCHAR(255),
     donorEmail VARCHAR(100) UNIQUE NOT NULL,
-    donorPassword VARCHAR(250) NOT NULL,
-    role INT
+    donorPassword VARCHAR(250) NOT NULL
 );
 CREATE TABLE Manager (
     managerID VARCHAR(10) PRIMARY KEY NOT NULL,

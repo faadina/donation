@@ -2,15 +2,16 @@
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Function to handle file upload
-function uploadImage($file) {
+function uploadImage($file)
+{
     $targetDir = "uploads/"; // Directory where uploaded images will be stored
     $targetFile = $targetDir . basename($file["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    // Check if image file is a actual image or fake image
+    // Check if image file is an actual image or fake image
     $check = getimagesize($file["tmp_name"]);
-    if($check !== false) {
+    if ($check !== false) {
         $uploadOk = 1;
     } else {
         echo "File is not an image.";
@@ -24,8 +25,10 @@ function uploadImage($file) {
     }
 
     // Allow certain file formats
-    if($imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-    && $imageFileType != "gif" ) {
+    if (
+        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
+        && $imageFileType != "gif"
+    ) {
         echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
         $uploadOk = 0;
     }
@@ -88,8 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allocationStatus = $_POST["allocationStatus"];
     $allocationDetails = $_POST["allocationDetails"];
     $targetAmount = $_POST["targetAmount"];
-    $currentAmount = $_POST["currentAmount"];
-    
+
     // Check if an image file was uploaded
     $allocationImage = "";
     if (!empty($_FILES["allocationImage"]["name"])) {
@@ -103,8 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             allocationEndDate = '$allocationEndDate',
             allocationStatus = '$allocationStatus',
             allocationDetails = '$allocationDetails',
-            targetAmount = '$targetAmount',
-            currentAmount = '$currentAmount'";
+            targetAmount = '$targetAmount'";
 
     // Append allocationImage update if an image was uploaded
     if (!empty($allocationImage)) {
@@ -128,12 +129,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Allocation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
+
 <body>
     <div class="container">
         <h2 class="my-4">Update Allocation</h2>
@@ -155,9 +158,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" value="<?php echo $allocationEndDate; ?>" required>
             </div>
             <div class="mb-3">
-                <label for="allocationStatus" class="form-label">Allocation Status</label>
-                <input type="text" class="form-control" id="allocationStatus" name="allocationStatus" value="<?php echo $allocationStatus; ?>" required>
+                <label class="form-label">Allocation Status</label><br>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="statusActive" name="allocationStatus" value="Active" <?php echo ($allocationStatus == "Active") ? "checked" : ""; ?> required>
+                    <label class="form-check-label" for="statusActive">Active</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" id="statusInactive" name="allocationStatus" value="Inactive" <?php echo ($allocationStatus == "Inactive") ? "checked" : ""; ?> required>
+                    <label class="form-check-label" for="statusInactive">Inactive</label>
+                </div>
             </div>
+
             <div class="mb-3">
                 <label for="allocationDetails" class="form-label">Allocation Details</label>
                 <textarea class="form-control" id="allocationDetails" name="allocationDetails" required><?php echo $allocationDetails; ?></textarea>
@@ -165,10 +176,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="mb-3">
                 <label for="targetAmount" class="form-label">Target Amount</label>
                 <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" value="<?php echo $targetAmount; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="currentAmount" class="form-label">Current Amount</label>
-                <input type="number" step="0.01" class="form-control" id="currentAmount" name="currentAmount" value="<?php echo $currentAmount; ?>" required>
             </div>
             <div class="mb-3">
                 <label for="allocationImage" class="form-label">Current Allocation Image</label><br>
@@ -180,8 +187,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <input type="file" class="form-control" id="allocationImage" name="allocationImage">
             </div>
             <button type="submit" class="btn btn-primary">Update</button>
-
         </form>
     </div>
 </body>
+
 </html>

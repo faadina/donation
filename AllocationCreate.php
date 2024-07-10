@@ -8,7 +8,7 @@ function uploadImage($file) {
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
 
-    // Check if image file is a actual image or fake image
+    // Check if image file is an actual image or fake image
     $check = getimagesize($file["tmp_name"]);
     if($check !== false) {
         $uploadOk = 1;
@@ -52,10 +52,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allocationName = $_POST["allocationName"];
     $allocationStartDate = $_POST["allocationStartDate"];
     $allocationEndDate = $_POST["allocationEndDate"];
-    $allocationStatus = $_POST["allocationStatus"];
+    $allocationStatus = "Active"; // Set allocation status to Active
     $allocationDetails = $_POST["allocationDetails"];
     $targetAmount = $_POST["targetAmount"];
-    $currentAmount = $_POST["currentAmount"];
+    $currentAmount = 0; // Set initial current amount to 0
     
     // Check if an image file was uploaded
     $allocationImage = "";
@@ -75,10 +75,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
-
-
-
-   
+    
     $conn->close(); // Close database connection
 }
 
@@ -108,7 +105,6 @@ function generateUniqueID($conn) {
 }
 ?>
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -118,9 +114,7 @@ function generateUniqueID($conn) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <?php
-        include('staffHeader.php');
-    ?>
+    <?php include('staffHeader.php'); ?>
     <div class="container">
         <h2 class="my-4">Create Allocation</h2>
         <form action="AllocationCreate.php" method="post" enctype="multipart/form-data">
@@ -137,10 +131,6 @@ function generateUniqueID($conn) {
                 <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" required>
             </div>
             <div class="mb-3">
-                <label for="allocationStatus" class="form-label">Allocation Status</label>
-                <input type="text" class="form-control" id="allocationStatus" name="allocationStatus" required>
-            </div>
-            <div class="mb-3">
                 <label for="allocationDetails" class="form-label">Allocation Details</label>
                 <textarea class="form-control" id="allocationDetails" name="allocationDetails" required></textarea>
             </div>
@@ -149,15 +139,10 @@ function generateUniqueID($conn) {
                 <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" required>
             </div>
             <div class="mb-3">
-                <label for="currentAmount" class="form-label">Current Amount</label>
-                <input type="number" step="0.01" class="form-control" id="currentAmount" name="currentAmount" required>
-            </div>
-            <div class="mb-3">
                 <label for="allocationImage" class="form-label">Allocation Image</label>
                 <input type="file" class="form-control" id="allocationImage" name="allocationImage">
             </div>
             <button type="submit" class="btn btn-primary">Create</button>
-
         </form>
     </div>
 </body>
