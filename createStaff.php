@@ -1,5 +1,16 @@
 <?php
-require_once("dbConnect.php"); 
+session_start();
+
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
 
 // Initialize variables
 $staffID = $staffName = $staffPhone = $staffEmail = $staffPassword = "";
