@@ -15,7 +15,7 @@ $username = $_SESSION['username'];
 
 
 // Fetch the user details from the database
-$sql = "SELECT donorID, donorName, donorDOB, donorPhoneNo,  donorAddress,donorEmail FROM donor WHERE donorID = ?";
+$sql = "SELECT staffID, staffName, staffPhoneNo,staffEmail FROM staff WHERE staffID = ?";
 if ($stmt = mysqli_prepare($conn, $sql)) {
     // Bind variables to the prepared statement as parameters
     mysqli_stmt_bind_param($stmt, "s", $param_username);
@@ -31,11 +31,10 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         // Check if the user exists, if yes then fetch the details
         if (mysqli_stmt_num_rows($stmt) == 1) {
             // Bind result variables
-            mysqli_stmt_bind_result($stmt, $id, $name, $gender, $birthdate, $address, $phone, $email);
+            mysqli_stmt_bind_result($stmt, $id, $name, $phone, $email);
             mysqli_stmt_fetch($stmt);
 
-            // Format the birthdate to dd/mm/yyyy
-            $birthdate = date('d/m/Y', strtotime($birthdate));
+
         } else {
             // User doesn't exist
             echo "User doesn't exist.";
@@ -59,7 +58,7 @@ mysqli_close($conn);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donor Profile Information</title>
+    <title>Staff Profile Information</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -114,12 +113,17 @@ mysqli_close($conn);
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            text-align: center;
         }
 
         .content_box th {
             font-weight: 700;
-            font-size: 1.5em; /* Increased font size */
+            font-size: 1.4em; /* Increased font size */
+            padding: 10px; /* Increased padding */
+        }        
+        
+        .content_box td {
+            font-weight: 700;
+            font-size: 1.3em; /* Increased font size */
             padding: 10px; /* Increased padding */
         }
 
@@ -164,7 +168,7 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
-    <?php include('donorHeader.php'); ?>
+    <?php include('StaffHeader.php'); ?>
     <div class="content_section">
         <h1></h1>
         <h1>STAFF PROFILE INFORMATION</h1>
@@ -174,14 +178,6 @@ mysqli_close($conn);
             <tr>
                 <th>NAME</th>
                 <td>: <?php echo htmlspecialchars($name); ?></td>
-            </tr>
-            <tr>
-                <th>BIRTH OF DATE</th>
-                <td>: <?php echo htmlspecialchars($birthdate); ?></td>
-            </tr>
-            <tr>
-                <th>ADDRESS</th>
-                <td>: <?php echo htmlspecialchars($address); ?></td>
             </tr>
             <tr>
                 <th>PHONE NUMBER</th>

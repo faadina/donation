@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-/*// Check if the user is logged in, if not then redirect to login page
+// Check if the user is logged in, if not then redirect to login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: MainLogin.php");
     exit;
-}*/
+}
 
 // Include the database connection file
 require_once("dbConnect.php");
@@ -31,7 +31,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         // Check if the user exists, if yes then fetch the details
         if (mysqli_stmt_num_rows($stmt) == 1) {
             // Bind result variables
-            mysqli_stmt_bind_result($stmt, $id, $name, $gender, $birthdate, $address, $phone, $email);
+            mysqli_stmt_bind_result($stmt, $id, $name, $birthdate,  $phone,$address, $email);
             mysqli_stmt_fetch($stmt);
 
             // Format the birthdate to dd/mm/yyyy
@@ -114,12 +114,17 @@ mysqli_close($conn);
             width: 100%;
             border-collapse: collapse;
             table-layout: fixed;
-            text-align: center;
         }
 
         .content_box th {
             font-weight: 700;
-            font-size: 1.5em; /* Increased font size */
+            font-size: 1.4em; /* Increased font size */
+            padding: 10px; /* Increased padding */
+        }        
+        
+        .content_box td {
+            font-weight: 700;
+            font-size: 1.3em; /* Increased font size */
             padding: 10px; /* Increased padding */
         }
 
@@ -164,7 +169,7 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
-    <?php include('donorHeader.php'); ?>
+    <?php include('DonorHeader.php'); ?>
     <div class="content_section">
         <h1></h1>
         <h1>DONOR PROFILE INFORMATION</h1>
@@ -180,13 +185,14 @@ mysqli_close($conn);
                 <td>: <?php echo htmlspecialchars($birthdate); ?></td>
             </tr>
             <tr>
-                <th>ADDRESS</th>
-                <td>: <?php echo htmlspecialchars($address); ?></td>
-            </tr>
-            <tr>
                 <th>PHONE NUMBER</th>
                 <td>: <?php echo htmlspecialchars($phone); ?></td>
             </tr>
+            <tr>
+                <th>ADDRESS</th>
+                <td>: <?php echo htmlspecialchars($address); ?></td>
+            </tr>
+
             <tr>
                 <th>EMAIL</th>
                 <td>: <?php echo htmlspecialchars($email); ?></td>
@@ -194,7 +200,7 @@ mysqli_close($conn);
         </table>
         </div>
         <div class="buttons-container">
-            <a href="GProfileUpdate.php" class="update-button">
+            <a href="DonorProfileUpdate.php" class="update-button">
                 <img src="images/editIcon.png" alt="Edit Icon">UPDATE PROFILE
             </a>
             <br>

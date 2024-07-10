@@ -1,3 +1,14 @@
+<?php
+// Start or resume session
+session_start();
+
+// Check if managerID is set in session
+$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; // Replace 'Unknown' with a default message or handle empty case accordingly
+
+// Check if $current_page is set, assuming it's defined somewhere in your script
+$current_page = isset($current_page) ? $current_page : '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -9,15 +20,25 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+        body {
+            margin: 0; /* Remove default margin to span full width */
+            font-family: 'Inter', sans-serif; /* Use Google Font Inter */
+            background-color: whitesmoke;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: black;
-            background-color: #607123;
-            background-image: linear-gradient(314deg, #607123 0%, #95b54c 74%);
+            background: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
             font-weight: 600;
             padding: 10px 20px;
+            position: -webkit-sticky; /* Safari */
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            width: AUTO;
+            margin: 0 auto; /* Center the header */
         }
 
         .logo {
@@ -121,14 +142,13 @@
         <div class="nav__content">
             <nav>
                 <ul>
-                    <li><a href="DonorAbout.php" class="<?php echo ($current_page == '"DonorAbout.php') ? 'active' : ''; ?>">About</a></li>
-                    <li><a href="DonorHomepage.php" class="<?php echo ($current_page == 'DonorHomepage') ? 'active' : ''; ?>">Home</a></li>
                     <li><a href="ManagerDashboard.php" class="<?php echo ($current_page == 'ManagerDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
+                    <li><a href="StaffDetails.php" class="<?php echo ($current_page == 'StaffDetails.php') ? 'active' : ''; ?>">Staff</a></li>
                     <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
                     
                     <li class="dropdown manager-info">
-                        <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: ?
+                        <a style="background-color:white; border-radius:4px; color:#104854;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
+                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: <?php echo $managerID; ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
                             <a class="dropdown-item" href="ManagerProfile.php">🗝 Profile</a>
@@ -140,5 +160,4 @@
         </div>
     </div>
 </body>
-
 </html>
