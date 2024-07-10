@@ -27,6 +27,7 @@ $result = $conn->query($sql);
     ?>
     <div class="container">
         <h2 class="my-4">Allocation Records</h2>
+        <a href="AllocationCreate.php" class="btn btn-success">Create New Allocation</a>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -36,8 +37,8 @@ $result = $conn->query($sql);
                     <th>End Date</th>
                     <th>Status</th>
                     <th>Details</th>
-                    <th>Target Amount</th>
-                    <th>Current Amount</th>
+                    <th>Target Amount (RM)</th>
+                    <th>Current Amount (RM)</th>
                     <th>Image</th>
                     <th>Actions</th>
                 </tr>
@@ -63,6 +64,7 @@ $result = $conn->query($sql);
                         }
                         echo "</td>";
                         echo "<td>";
+                        echo "<a href='AllocationView.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger' >View</a>";
                         echo "<a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary'>Update</a>";
                         echo " ";
                         echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger' onclick='return confirm(\"Are you sure you want to delete this allocation?\");'>Delete</a>";
@@ -75,11 +77,10 @@ $result = $conn->query($sql);
                 ?>
             </tbody>
         </table>
-        <a href="AllocationCreate.php" class="btn btn-success">Create New Allocation</a>
     </div>
 </body>
 </html>
 
 <?php
-$conn->close(); // Close the database connection
+$conn->close(); 
 ?>
