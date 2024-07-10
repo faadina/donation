@@ -167,7 +167,7 @@ mysqli_close($conn);
     <?php include('donorHeader.php'); ?>
     <div class="content_section">
         <h1></h1>
-        <h1>DONOR PROFILE INFORMATION</h1>
+        <h1>MANAGER PROFILE INFORMATION</h1>
         <div class="content_box">
             <img src="images/userIcon.png" class="shadow-img">
             <table>
