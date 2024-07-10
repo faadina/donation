@@ -189,7 +189,7 @@ mysqli_close($conn);
         </table>
         </div>
         <div class="buttons-container">
-            <a href="GProfileUpdate.php" class="update-button">
+            <a href="ManagerProfileUpdate.php" class="update-button">
                 <img src="images/editIcon.png" alt="Edit Icon">UPDATE PROFILE
             </a>
             <br>
