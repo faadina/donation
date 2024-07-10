@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="donor/view.css">
 </head>
 <body>
     <nav class="nav">

@@ -24,6 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $birthdate = trim($_POST["birthdate"]);
     }
 
+
     // Validate address
     if (empty(trim($_POST["address"]))) {
         $address_err = "Please enter your address.";
@@ -47,6 +48,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email_err = "Invalid email format.";
     } else {
         $email = trim($_POST["email"]);
+
+        // Check if email already exists in guest table
+        $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
+        $stmt_donor = mysqli_prepare($conn, $sql_donor);
+        if ($stmt_donor) {
+            mysqli_stmt_bind_param($stmt_donor, "s", $email);
+            mysqli_stmt_execute($stmt_donor);
+            mysqli_stmt_store_result($stmt_donor);
+            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_donor);
+        } else {
+            echo "Something went wrong with the guest table query.";
+        }
+
     }
 
     // Validate username
@@ -69,6 +86,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         mysqli_stmt_close($stmt_donor);
     } else {
         echo "Something went wrong with the donor table query.";
+    }
+
     }
 
     // Validate password
@@ -139,7 +158,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         border-radius: 10px;
         box-shadow: 0px 0px 10px 0px #000000;
     }
-
     .form-control:focus {
         background-color: grey;
         color: #FFFFFF;
@@ -173,41 +191,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                <span class="help-block"><?php echo $username_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
-                <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                <span class="help-block"><?php echo $password_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Name</label>
                 <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>">
-                <span class="invalid-feedback"><?php echo $name_err; ?></span>
+                <span class="help-block><?php echo $name_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Birthdate</label>
                 <input type="date" name="birthdate" class="form-control <?php echo (!empty($birthdate_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $birthdate; ?>">
-                <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
+                <span class="help-block"><?php echo $birthdate_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Address</label>
                 <textarea name="address" class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?>"><?php echo $address; ?></textarea>
-                <span class="invalid-feedback"><?php echo $address_err; ?></span>
+                <span class="help-block"><?php echo $address_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Phone Number</label>
                 <input type="text" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
-                <span class="invalid-feedback"><?php echo $phone_err; ?></span>
+                <span class="help-block"><?php echo $phone_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Email</label>
                 <input type="text" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
-                <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                <span class="help-block"><?php echo $email_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <input type="reset" class="btn btn-secondary ml-2" value="Reset">
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <button type="reset" class="btn btn-secondary ml-2">Reset</button>
             </div>
             <p>Already have an account? <a href="MainLogin.php">Login here</a>.</p>
         </form>
