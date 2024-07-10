@@ -20,6 +20,12 @@ $current_page = isset($current_page) ? $current_page : '';
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+        body {
+            margin: 0; /* Remove default margin to span full width */
+            font-family: 'Inter', sans-serif; /* Use Google Font Inter */
+            background-color: whitesmoke;
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -30,7 +36,9 @@ $current_page = isset($current_page) ? $current_page : '';
             position: -webkit-sticky; /* Safari */
             position: sticky;
             top: 0;
-            z-index:2;
+            z-index: 2;
+            width: AUTO;
+            margin: 0 auto; /* Center the header */
         }
 
         .logo {
@@ -152,5 +160,4 @@ $current_page = isset($current_page) ? $current_page : '';
         </div>
     </div>
 </body>
-
 </html>

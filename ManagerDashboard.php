@@ -8,19 +8,13 @@
     <link rel="stylesheet" href="donor/style.css">
     <title>Manager Dashboard</title>
     <style>
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background-color: #f9fcff;
-            background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
-            font-family: "Inter", sans-serif;
-            
+        body { 
+            background-color: whitesmoke; /* Dark Cyan Theme Background */
+            color: #FFFFFF; /* White text for contrast */
         }
 
         .detailIndex {
             margin: 2% auto;
-            max-width: 100%;
             padding: 10px;
             position: relative;
             z-index: 1;
