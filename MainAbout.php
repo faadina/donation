@@ -1,6 +1,6 @@
 <?php
 $title = "About Us Page";
-include 'DonorHeader.php';
+include 'MainHeader.php';
 ?>
 
 <body>
