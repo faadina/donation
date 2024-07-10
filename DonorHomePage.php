@@ -10,7 +10,7 @@ include 'DonorHeader.php';
                 <span>Give a helping hand to children who NEED it!</span>
             </h2>
             <div class="btn">
-                <a href="donate.html">DONATE NOW</a>
+                <a href="DonorDonateAllocation.php">DONATE NOW</a>
             </div>
         </div>
     </div>
