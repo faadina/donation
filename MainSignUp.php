@@ -2,18 +2,11 @@
 require_once("dbConnect.php"); // Include your database connection file
 
 // Initialize variables
-$username = $password = $role = $name = $birthdate = $address = $phone = $email = "";
-$username_err = $password_err = $role_err = $name_err = $birthdate_err = $address_err = $phone_err = $email_err = "";
+$username = $password = $name = $birthdate = $address = $phone = $email = "";
+$username_err = $password_err = $name_err = $birthdate_err = $address_err = $phone_err = $email_err = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
-    // Validate role
-    if (isset($_POST["role"]) && !empty(trim($_POST["role"]))) {
-        $role = trim($_POST["role"]);
-    } else {
-        $role_err = "Please select a role.";
-    }
 
     // Validate name
     if (empty(trim($_POST["name"]))) {
@@ -62,62 +55,62 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } else {
         $username = trim($_POST["username"]);
     }
-        // Check if username already exists in donor table
-        $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
-        $stmt_donor = mysqli_prepare($conn, $sql_donor);
-        if ($stmt_donor) {
-            mysqli_stmt_bind_param($stmt_donor, "s", $username);
-            mysqli_stmt_execute($stmt_donor);
-            mysqli_stmt_store_result($stmt_donor);
-            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
-                $username_err = "This username is already taken.";
-            }
-            mysqli_stmt_close($stmt_donor);
-        } else {
-            echo "Something went wrong with the donor table query.";
+
+    // Check if username already exists in donor table
+    $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
+    $stmt_donor = mysqli_prepare($conn, $sql_donor);
+    if ($stmt_donor) {
+        mysqli_stmt_bind_param($stmt_donor, "s", $username);
+        mysqli_stmt_execute($stmt_donor);
+        mysqli_stmt_store_result($stmt_donor);
+        if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+            $username_err = "This username is already taken.";
         }
+        mysqli_stmt_close($stmt_donor);
+    } else {
+        echo "Something went wrong with the donor table query.";
+    }
 
     // Validate password
     if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter a password.";
     } elseif (strlen(trim($_POST["password"])) < 6) {
         $password_err = "Password must have at least 6 characters.";
-    } elseif (strlen(trim($_POST["password"])) > 50 || ($role == "Donor" && strlen(trim($_POST["password"])) > 10)) {
+    } elseif (strlen(trim($_POST["password"])) > 50) {
         $password_err = "Password exceeds the maximum allowed length.";
     } else {
         $password = trim($_POST["password"]);
     }
 
     // Check input errors before inserting in database
-    if (empty($username_err) && empty($password_err) && empty($role_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
-        // Prepare an insert statement based on role
-        if ($role == "Donor") {
-            $sql = "INSERT INTO Donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
-            if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "sssssssi", $username, $param_password, $param_name, $param_birthdate, $param_address, $param_phone, $param_email, $param_role);
+    if (empty($username_err) && empty($password_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
+        // Prepare an insert statement
+        $sql = "INSERT INTO donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $sql);
+        if ($stmt) {
+            // Set parameters
+            $param_password = md5($password); 
+            $param_name = $name;
+            $param_birthdate = $birthdate;
+            $param_address = $address;
+            $param_phone = $phone;
+            $param_email = $email;
+
+            // Bind parameters
+            mysqli_stmt_bind_param($stmt, "sssssss", $username, $param_password, $param_name, $param_birthdate, $param_address, $param_phone, $param_email);
+
+            // Attempt to execute the prepared statement
+            if (mysqli_stmt_execute($stmt)) {
+                // Registration successful, redirect to login page
+                echo "<script>alert('Registration successful. Please login.');</script>";
+                echo "<script>location.href='MainLogin.php';</script>";
+                exit;
+            } else {
+                echo "Something went wrong. Please try again later.";
             }
-        }
-        // Set common parameters
-        $param_password = md5($password); // For demonstration; use bcrypt or better for production
-        $param_name = $name;
-        $param_birthdate = $birthdate;
-        $param_address = $address;
-        $param_phone = $phone;
-        $param_email = $email;
-        $param_role = ($role == "Donor") ;
 
-        // Attempt to execute the prepared statement
-        if (mysqli_stmt_execute($stmt)) {
-            // Registration successful, redirect to login page
-            echo "<script>alert('Registration successful. Please login.');</script>";
-            echo "<script>location.href='MainLogin.php';</script>";
-            exit;
-        } else {
-            echo "Something went wrong. Please try again later.";
+            mysqli_stmt_close($stmt);
         }
-
-        mysqli_stmt_close($stmt);
     }
 
     // Close connection
