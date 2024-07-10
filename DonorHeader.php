@@ -16,7 +16,7 @@
     <nav class="nav nav_top">
         <div class="nav_side">
             <a href="DonorDonateAllocation.php">HOME</a>
-            <a href="#">HISTORY</a>
+            <a href="DonorDonateHistory.php">HISTORY</a>
             <a href="DonorProfile.php">PROFILE</a>
         </div>
     </nav>
