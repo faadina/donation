@@ -21,8 +21,9 @@
 
         .logo {
             height: auto;
-            width: 4.5rem;
+            width: 8rem;
             margin-right: 10px;
+            filter: drop-shadow(2px 2px 3px rgb(252, 252, 252));
         }
 
         nav {
@@ -62,7 +63,6 @@
             display: flex;
             align-items: center;
             margin-right: 20px;
-            /* Adjusted margin */
         }
 
         .manager-username {
@@ -116,7 +116,7 @@
 
 <body>
     <div class="header">
-        <img src="images/logoVacayVista.png" class="logo" alt="Logo">
+        <img src="images/madrasahLogo.png" class="logo" alt="Logo">
         <div class="nav__content">
             <nav>
                 <ul>
