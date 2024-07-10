@@ -42,8 +42,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Check if username exists and verify password
                     if (mysqli_stmt_fetch($stmt)) {
-                        // Hash the input password using md5 and compare it with the stored hash
-                        if (md5($password) === $stored_password) {
+                        // Compare plain text password
+                        if ($password === $stored_password) {
                             // Password is correct, so start a new session if not already started
                             if (!isset($_SESSION["loggedin"])) {
                                 session_start();
@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         if (empty($message)) {
             // If no match was found, set a default error message
-            $message = "Username not found.";
+            $message = "Username not found or password incorrect.";
         }
 
         // Close connection
@@ -149,6 +149,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 </head>
 <body>
+<?php
+    include('MainHeader.php');
+    ?>
 <div class="wrapper">
     <h2>Login Page</h2>
     <p>Please fill this form to access the system.</p>
