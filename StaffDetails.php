@@ -17,7 +17,11 @@ $result = mysqli_query($conn, $sql);
 
 // Check if query was successful
 if ($result) {
+    $count = mysqli_num_rows($result); // Count total number of staff
+    $i = 1; // Counter for enumeration
+
     while ($row = mysqli_fetch_assoc($result)) {
+        $row['No'] = $i++;
         $staffData[] = $row;
     }
 } else {
@@ -30,6 +34,7 @@ mysqli_close($conn);
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Staff Information</title>
@@ -40,17 +45,18 @@ mysqli_close($conn);
     <style type="text/css">
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        body { 
-            background-color: whitesmoke; 
-            color: #FFFFFF; 
+        body {
+            background-color: whitesmoke;
+            color: #FFFFFF;
         }
-        .wrapper { 
+
+        .wrapper {
             color: black;
-            width: 80%; 
-            padding: 20px; 
+            width: 80%;
+            padding: 20px;
             margin: 0 auto;
             margin-top: 50px;
-            background-color: whitesmoke; 
+            background-color: whitesmoke;
             border-radius: 10px;
             box-shadow: 0px 0px 10px 0px #000000;
         }
@@ -61,7 +67,9 @@ mysqli_close($conn);
             border-collapse: collapse;
         }
 
-        table, th, td {
+        table,
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
@@ -76,6 +84,7 @@ mysqli_close($conn);
             background-color: black;
             border: none;
         }
+
         .btn-primary:hover {
             background-color: #808080;
         }
@@ -83,53 +92,69 @@ mysqli_close($conn);
         .btn {
             margin: 0 auto;
         }
+
         .modal-content {
-            color: black; 
+            color: black;
         }
+
         .modal-body {
             color: black;
         }
+
         .modal-header {
             color: black;
         }
+
         .modal-title {
-            color: black; /* Font color for modal title */
+            color: black;
+            /* Font color for modal title */
         }
     </style>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
+
 <body>
     <?php include('ManagerHeader.php'); ?>
     <div class="wrapper">
         <h2>Staff Information</h2>
-        <a href="createStaff.php" class="btn btn-primary mb-3">Create Staff Account</a> 
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <p>Total Staff: <?php echo $count; ?></p>
+            </div>
+            <div class="col-md-6 text-right">
+                <a style="background:green;" href="createStaff.php" class="btn btn-primary" ><i class="bi bi-person-plus"></i>&nbsp;Staff</a>
+            </div>
+        </div>
 
         <table>
             <thead>
                 <tr>
+                    <th>No</th>
                     <th>Staff ID</th>
                     <th>Name</th>
                     <th>Phone Number</th>
                     <th>Email</th>
-                    <th>Password</th> 
-                    <th colspan='3' style="text-align:center;">Actions</th> 
+                    <th>Password</th>
+                    <th colspan='3' style="text-align:center;">Actions</th>
                 </tr>
             </thead>
             <tbody>
                 <?php foreach ($staffData as $staff) : ?>
-                <tr>
-                    <td><?php echo htmlspecialchars($staff['staffID']); ?></td>
-                    <td><?php echo htmlspecialchars($staff['staffName']); ?></td>
-                    <td><?php echo htmlspecialchars($staff['staffPhoneNo']); ?></td>
-                    <td><?php echo htmlspecialchars($staff['staffEmail']); ?></td>
-                    <td><?php echo htmlspecialchars($staff['staffPassword']); ?></td>
-                    <td style="text-align:center;"><button class="btn btn-info btn-sm" onclick="showReadModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>', '<?php echo htmlspecialchars($staff['staffPassword']); ?>')"><i class="bi bi-eye"></i></button></td>
-                    <td style="text-align:center;"><a href="updateStaff.php?id=<?php echo $staff['staffID']; ?>" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a></td>
-                    <td style="text-align:center;"><button class="btn btn-danger btn-sm" onclick="showDeleteModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>')"><i class="bi bi-trash"></i></button></td>
-                </tr>
+                    <tr>
+                        <td><?php echo htmlspecialchars($staff['No']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['staffID']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['staffName']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['staffPhoneNo']); ?></td>
+                        <td><?php echo htmlspecialchars($staff['staffEmail']); ?></td>
+                        <td><?php echo htmlspecialchars(substr($staff['staffPassword'], 0, 3)) . str_repeat('*', strlen($staff['staffPassword']) - 3); ?></td>
+                        <td style="text-align:center;"><button style="background:none; border:none; color:green;" class="btn btn-info btn-sm" onclick="showReadModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>', '<?php echo htmlspecialchars($staff['staffPassword']); ?>')"><i class="bi bi-eye"></i></button></td>
+                        <td style="text-align:center;"><a style="background:none; border:none; color:orange;"  href="updateStaff.php?id=<?php echo $staff['staffID']; ?>" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a></td>
+                        <td style="text-align:center;"><button  style="background:none; border:none; color:red;"  class="btn btn-danger btn-sm" onclick="showDeleteModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>')"><i class="bi bi-trash"></i></button></td>
+                    </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
+
     </div>
 
     <!-- Read Modal -->
@@ -206,11 +231,13 @@ mysqli_close($conn);
 
         $('#confirmDeleteButton').click(function() {
             var staffID = $(this).data('staffid');
-            
+
             $.ajax({
                 url: 'deleteStaff.php',
                 type: 'POST',
-                data: { id: staffID },
+                data: {
+                    id: staffID
+                },
                 success: function(response) {
                     if (response === 'success') {
                         $('#deleteModal').modal('hide');
@@ -226,4 +253,5 @@ mysqli_close($conn);
         });
     </script>
 </body>
+
 </html>
