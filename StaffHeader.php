@@ -121,8 +121,8 @@
             <nav>
                 <ul>
                     <li><a href="StaffDashboard.php" class="<?php echo ($current_page == 'StaffDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="Allocation.php" class="<?php echo ($current_page == 'Allocation.php') ? 'active' : ''; ?>">Allocation</a></li>
-                    <li><a href="Donor.php'" class="<?php echo ($current_page == 'Donor.php') ? 'active' : ''; ?>">Donor</a></li>
+                    <li><a href="AllocationView.php" class="<?php echo ($current_page == 'AllocationView.php') ? 'active' : ''; ?>">Allocation</a></li>
+                    <li><a href="DonorView.php'" class="<?php echo ($current_page == 'DonorView.php') ? 'active' : ''; ?>">Donor</a></li>
                     <li class="dropdown manager-info">
                         <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
                             <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: ?

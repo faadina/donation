@@ -22,6 +22,9 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
+    <?php
+        include('staffHeader.php');
+    ?>
     <div class="container">
         <h2 class="my-4">Allocation Records</h2>
         <table class="table table-striped">
