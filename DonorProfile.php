@@ -31,7 +31,7 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         // Check if the user exists, if yes then fetch the details
         if (mysqli_stmt_num_rows($stmt) == 1) {
             // Bind result variables
-            mysqli_stmt_bind_result($stmt, $id, $name, $birthdate,  $phone,$address, $email);
+            mysqli_stmt_bind_result($stmt, $id, $name,  $phone,$birthdate,$address, $email);
             mysqli_stmt_fetch($stmt);
 
             // Format the birthdate to dd/mm/yyyy

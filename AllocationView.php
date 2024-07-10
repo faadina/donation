@@ -26,6 +26,7 @@ $result = $conn->query($sql);
     <div class="container">
         <h2 class="my-4">Allocation Records</h2>
         <a href="AllocationCreate.php" class="btn btn-success">Create New Allocation</a>
+        <a href="DonationView.php" class="btn btn-success">Donation</a>
         <table class="table table-striped">
             <thead>
                 <tr>
