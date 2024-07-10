@@ -15,10 +15,9 @@
 <body>
     <nav class="nav nav_top">
         <div class="nav_side">
-            <a href="DonorHomePage.php">HOME</a>
-            <a href="DonorAbout.php">ABOUT US</a>
-            <a href="DonorDonateAllocation.php">DONATE</a>
-            <a href="Maincontact.php">CONTACT</a>
+            <a href="DonorDonateAllocation.php">HOME</a>
+            <a href="#">HISTORY</a>
+            <a href="DonorProfile.php">PROFILE</a>
         </div>
     </nav>
 </body>
