@@ -7,11 +7,13 @@
     <link rel="stylesheet" href="donor/style.css">
     <title>Manager</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: #104854;
+            background: black;
             color: #fff;
             font-weight: 600;
             padding: 10px 20px;
@@ -20,7 +22,7 @@
         .logo {
             height: auto;
             width: 4.5rem;
-            margin-right: 10px; /* Adjusted margin */
+            margin-right: 10px;
         }
 
         nav {
@@ -56,13 +58,14 @@
             border-bottom: 2px solid #e4b909;
         }
 
-        .guest-info {
+        .manager-info {
             display: flex;
             align-items: center;
-            margin-right: 20px; /* Adjusted margin */
+            margin-right: 20px;
+            /* Adjusted margin */
         }
 
-        .guest-username {
+        .manager-username {
             color: #e4b909;
             margin-left: 10px;
         }
@@ -91,18 +94,18 @@
             color: white;
         }
     </style>
-    
+
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        document.addEventListener('DOMContentLoaded', function() {
             const dropdownToggle = document.querySelector('.dropdown-toggle');
             const dropdownMenu = document.querySelector('.dropdown-menu');
 
-            dropdownToggle.addEventListener('click', function (e) {
+            dropdownToggle.addEventListener('click', function(e) {
                 e.preventDefault();
                 dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
             });
 
-            document.addEventListener('click', function (e) {
+            document.addEventListener('click', function(e) {
                 if (!dropdownToggle.contains(e.target) && !dropdownMenu.contains(e.target)) {
                     dropdownMenu.style.display = 'none';
                 }
@@ -113,15 +116,15 @@
 
 <body>
     <div class="header">
-        <img src="image/logoVacayVista.png" class="logo" alt="Logo">
+        <img src="images/logoVacayVista.png" class="logo" alt="Logo">
         <div class="nav__content">
             <nav>
                 <ul>
-                <li><a href="ManagerDashboard.php" class="<?php echo ($current_page == 'ManagerDashboard.php')? 'active' : ''; ?>">Dashboard</a></li>
-                    <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php')? 'active' : ''; ?>">Report</a></li>
-                    <li class="dropdown guest-info">
+                    <li><a href="ManagerDashboard.php" class="<?php echo ($current_page == 'ManagerDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
+                    <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
+                    <li class="dropdown manager-info">
                         <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="image/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: <?php echo htmlspecialchars($username); ?>
+                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: ?
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
                             <a class="dropdown-item" href="ManagerProfile.php">🗝 Profile</a>
