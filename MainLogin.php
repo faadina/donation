@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     // Check if username exists and verify password
                     if (mysqli_stmt_fetch($stmt)) {
                         // Hash the input password using md5 and compare it with the stored hash
-                        if (md5($password) === $stored_password) { 
+                        if (md5($password) === $stored_password) {
                             // Password is correct, so start a new session if not already started
                             if (!isset($_SESSION["loggedin"])) {
                                 session_start();
