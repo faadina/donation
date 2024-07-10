@@ -1,3 +1,10 @@
+<?php
+
+$staffID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
+
+$current_page = isset($current_page) ? $current_page : '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -13,16 +20,15 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(109.6deg, rgb(148, 233, 194) 11.2%, rgb(224, 235, 186) 91.1%);
+            background: black;
             font-weight: 600;
             padding: 10px 20px;
         }
 
         .logo {
             height: auto;
-            width: 8rem;
+            width: 5rem;
             margin-right: 10px;
-            filter: drop-shadow(2px 2px 3px rgb(252, 252, 252));
         }
 
         nav {
@@ -115,16 +121,16 @@
 
 <body>
     <div class="header">
-        <img src="images/madrasahLogo.png" class="logo" alt="Logo">
+        <img src="images/madrasahLogo1.png" class="logo" alt="Logo">
         <div class="nav__content">
             <nav>
                 <ul>
                     <li><a href="StaffDashboard.php" class="<?php echo ($current_page == 'StaffDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
                     <li><a href="AllocationView.php" class="<?php echo ($current_page == 'AllocationView.php') ? 'active' : ''; ?>">Allocation</a></li>
-                    <li><a href="DonorView.php'" class="<?php echo ($current_page == 'DonorView.php') ? 'active' : ''; ?>">Donor</a></li>
+                    <li><a href="DonorView.php" class="<?php echo ($current_page == 'DonorView.php') ? 'active' : ''; ?>">Donor</a></li>
                     <li class="dropdown manager-info">
                         <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: ?
+                        <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: <?php echo $staffID; ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
                             <a class="dropdown-item" href="StaffProfile.php">🗝 Profile</a>

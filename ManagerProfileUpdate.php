@@ -119,19 +119,9 @@ mysqli_close($conn);
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: #f8f9fa;
-            font-family: "Inter", sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
 
         .content_section {
-            margin-top: 100px;
+
             width: 60%;
             max-width: 500px;
             margin: 40px auto;
@@ -212,7 +202,8 @@ mysqli_close($conn);
 </head>
 
 <body>
-    <?php include('DonorHeader.php'); ?>
+    <?php include('ManagerHeader.php'); ?>
+
     <div class="content_section">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
         <br><br>
@@ -239,7 +230,7 @@ mysqli_close($conn);
                 <span class="error"><?php echo $email_err; ?></span>
             </div>
             <div class="button-container">
-                <a href="DonorProfile.php" class="edit-button">↤ Back</a>
+                <a href="ManagerProfile.php" class="edit-button">↤ Back</a>
                 <button type="submit" class="edit-button">Update ⟳</button>
             </div>
         </form>
