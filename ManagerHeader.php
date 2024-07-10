@@ -1,6 +1,4 @@
 <?php
-// Start or resume session
-session_start();
 
 // Check if managerID is set in session
 $managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; // Replace 'Unknown' with a default message or handle empty case accordingly
@@ -23,14 +21,15 @@ $current_page = isset($current_page) ? $current_page : '';
         body {
             margin: 0; /* Remove default margin to span full width */
             font-family: 'Inter', sans-serif; /* Use Google Font Inter */
-            background-color: whitesmoke;
+            background-color: #F2FCEB;
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(120deg, #d4fc79 0%, #96e6a1 100%);
+            background-color: #f9fcff;
+            background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
             font-weight: 600;
             padding: 10px 20px;
             position: -webkit-sticky; /* Safari */
@@ -66,19 +65,18 @@ $current_page = isset($current_page) ? $current_page : '';
             padding: 5px 10px;
             border: 1px solid transparent;
             text-decoration: none;
-            color: #fdfdfb;
+            color:#104854;
             font-weight: bold;
-            border-bottom: 2px solid transparent;
         }
 
         ul li a:hover,
         ul li a:focus {
-            color: #e4b909;
+            color: green;
         }
 
         ul li a.active {
             color: #e4b909;
-            border-bottom: 2px solid #e4b909;
+            
         }
 
         .manager-info {

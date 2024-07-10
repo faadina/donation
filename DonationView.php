@@ -63,7 +63,7 @@ $result = $conn->query($sql);
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
                         echo "<td>" . $row["donationMethod"] . "</td>";
                         echo "<td>" . $row["donationStatus"] . "</td>";
-                        echo "<td><a href='" . $row["donationReceipt"] . "' class='btn btn-primary btn-mini-column' target='_blank'>View</a></td>";
+                        echo "<td><a href='#' class='btn btn-primary btn-mini-column' onclick='viewReceipt(\"" . $row["donationReceipt"] . "\")'>View</a></td>";
                         echo "<td>" . $row["donorID"] . "</td>";
                         echo "<td>" . $row["staffID"] . "</td>";
                         echo "<td>" . $row["allocationID"] . "</td>";

@@ -135,60 +135,90 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Allocation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Include SweetAlert -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
-    <div class="container">
-        <h2 class="my-4">Update Allocation</h2>
-        <form action="AllocationUpdate.php" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="allocationID" class="form-label">Allocation ID</label>
-                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" readonly>
-            </div>
-            <div class="mb-3">
-                <label for="allocationName" class="form-label">Allocation Name</label>
-                <input type="text" class="form-control" id="allocationName" name="allocationName" value="<?php echo $allocationName; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="allocationStartDate" class="form-label">Allocation Start Date</label>
-                <input type="date" class="form-control" id="allocationStartDate" name="allocationStartDate" value="<?php echo $allocationStartDate; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="allocationEndDate" class="form-label">Allocation End Date</label>
-                <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" value="<?php echo $allocationEndDate; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Allocation Status</label><br>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="statusActive" name="allocationStatus" value="Active" <?php echo ($allocationStatus == "Active") ? "checked" : ""; ?> required>
-                    <label class="form-check-label" for="statusActive">Active</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" id="statusInactive" name="allocationStatus" value="Inactive" <?php echo ($allocationStatus == "Inactive") ? "checked" : ""; ?> required>
-                    <label class="form-check-label" for="statusInactive">Inactive</label>
-                </div>
-            </div>
+    <?php include('staffHeader.php'); ?>
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Update Allocation</h2>
+                    </div>
+                    <div class="card-body">
+                        <form id="updateForm" action="AllocationUpdate.php" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="allocationID" class="form-label">Allocation ID</label>
+                                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allocationName" class="form-label">Allocation Name</label>
+                                <input type="text" class="form-control" id="allocationName" name="allocationName" value="<?php echo $allocationName; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allocationStartDate" class="form-label">Allocation Start Date</label>
+                                <input type="date" class="form-control" id="allocationStartDate" name="allocationStartDate" value="<?php echo $allocationStartDate; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allocationEndDate" class="form-label">Allocation End Date</label>
+                                <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" value="<?php echo $allocationEndDate; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Allocation Status</label><br>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="statusActive" name="allocationStatus" value="Active" <?php echo ($allocationStatus == "Active") ? "checked" : ""; ?> required>
+                                    <label class="form-check-label" for="statusActive">Active</label>
+                                </div>
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input" type="radio" id="statusInactive" name="allocationStatus" value="Inactive" <?php echo ($allocationStatus == "Inactive") ? "checked" : ""; ?> required>
+                                    <label class="form-check-label" for="statusInactive">Inactive</label>
+                                </div>
+                            </div>
 
-            <div class="mb-3">
-                <label for="allocationDetails" class="form-label">Allocation Details</label>
-                <textarea class="form-control" id="allocationDetails" name="allocationDetails" required><?php echo $allocationDetails; ?></textarea>
+                            <div class="mb-3">
+                                <label for="allocationDetails" class="form-label">Allocation Details</label>
+                                <textarea class="form-control" id="allocationDetails" name="allocationDetails" required><?php echo $allocationDetails; ?></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="targetAmount" class="form-label">Target Amount</label>
+                                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" value="<?php echo $targetAmount; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allocationImage" class="form-label">Current Allocation Image</label><br>
+                                <?php if (!empty($allocationImage)) : ?>
+                                    <img src="<?php echo $allocationImage; ?>" class="img-fluid rounded" alt="Current Allocation Image">
+                                <?php else : ?>
+                                    No Image
+                                <?php endif; ?>
+                                <input type="file" class="form-control mt-3" id="allocationImage" name="allocationImage">
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="confirmUpdate()">Update</button>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="targetAmount" class="form-label">Target Amount</label>
-                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" value="<?php echo $targetAmount; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="allocationImage" class="form-label">Current Allocation Image</label><br>
-                <?php if (!empty($allocationImage)) : ?>
-                    <img src="<?php echo $allocationImage; ?>" class="image-preview" alt="Current Allocation Image"><br><br>
-                <?php else : ?>
-                    No Image
-                <?php endif; ?>
-                <input type="file" class="form-control" id="allocationImage" name="allocationImage">
-            </div>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
+        </div>
     </div>
+    <script>
+        function confirmUpdate() {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You are about to update this allocation's information.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, update it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('updateForm').submit(); // Submit the form if confirmed
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>
