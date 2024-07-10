@@ -149,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h2 class="card-title">Update Allocation</h2>
                     </div>
                     <div class="card-body">
-                        <form id="updateForm" action="AllocationUpdate.php" method="post" enctype="multipart/form-data">
+                        <form action="AllocationUpdate.php" method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label for="allocationID" class="form-label">Allocation ID</label>
                                 <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" readonly>
@@ -195,30 +195,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <?php endif; ?>
                                 <input type="file" class="form-control mt-3" id="allocationImage" name="allocationImage">
                             </div>
-                            <button type="button" class="btn btn-primary" onclick="confirmUpdate()">Update</button>
+                            <button type="submit" class="btn btn-primary">Update</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
+    </div
     <script>
-        function confirmUpdate() {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You are about to update this allocation's information.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'Yes, update it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    document.getElementById('updateForm').submit(); // Submit the form if confirmed
-                }
-            });
-        }
-    </script>
-</body>
-
-</html>
+    function confirmUpdate() {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You are about to update this allocation's information.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, update it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                document.getElementById('updateForm').submit(); // Submit the form if confirmed
+            }
+        });
+    }
+</script>

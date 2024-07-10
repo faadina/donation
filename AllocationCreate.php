@@ -46,37 +46,56 @@ function uploadImage($file) {
 
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Generate a unique allocationID
-    $allocationID = generateUniqueID($conn);
-
-    $allocationName = $_POST["allocationName"];
+    // Validate and sanitize input data
+    $allocationName = htmlspecialchars($_POST["allocationName"]);
     $allocationStartDate = $_POST["allocationStartDate"];
     $allocationEndDate = $_POST["allocationEndDate"];
-    $allocationStatus = "Active"; // Set allocation status to Active
-    $allocationDetails = $_POST["allocationDetails"];
-    $targetAmount = $_POST["targetAmount"];
-    $currentAmount = 0; // Set initial current amount to 0
-    
+    $allocationDetails = htmlspecialchars($_POST["allocationDetails"]);
+    $targetAmount = floatval($_POST["targetAmount"]);
+
+    // Validate dates (simple validation)
+    if (empty($allocationStartDate) || empty($allocationEndDate) || strtotime($allocationStartDate) >= strtotime($allocationEndDate)) {
+        echo "Invalid date range.";
+        exit();
+    }
+
     // Check if an image file was uploaded
     $allocationImage = "";
     if (!empty($_FILES["allocationImage"]["name"])) {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
     }
 
+    // Generate a unique allocationID
+    $allocationID = generateUniqueID($conn);
+
     // Prepare SQL statement for insertion
     $sql = "INSERT INTO Allocation (allocationID, allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
-            VALUES ('$allocationID', '$allocationName', '$allocationStartDate', '$allocationEndDate', '$allocationStatus', '$allocationDetails', '$targetAmount', '$currentAmount', '$allocationImage')";
-
-    // Execute SQL statement
-    if ($conn->query($sql) === TRUE) {
-        // Display the newly inserted allocationID
-        header("Location: AllocationView.php");
-        exit();
-    } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
-    }
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
-    $conn->close(); // Close database connection
+    // Create a prepared statement
+    $stmt = $conn->prepare($sql);
+    if ($stmt) {
+        $allocationStatus = "Active"; // Set allocation status to Active
+        $currentAmount = 0; // Set initial current amount to 0
+        
+        // Bind parameters to the statement
+        $stmt->bind_param("ssssssdds", $allocationID, $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $currentAmount, $allocationImage);
+
+        // Execute the statement
+        if ($stmt->execute()) {
+            // Redirect to view page upon successful insertion
+            header("Location: AllocationView.php");
+            exit();
+        } else {
+            echo "Error: " . $stmt->error;
+        }
+    } else {
+        echo "Error: " . $conn->error;
+    }
+
+    // Close statement and connection
+    $stmt->close();
+    $conn->close();
 }
 
 // Function to generate unique allocationID based on the highest existing ID in the database
@@ -104,7 +123,6 @@ function generateUniqueID($conn) {
     return $newID;
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -156,7 +174,7 @@ function generateUniqueID($conn) {
                             <div class="mb-3">
                                 <label for="allocationImage" class="form-label">Allocation Image</label>
                                 <input type="file" class="form-control" id="allocationImage" name="allocationImage" accept=".jpg, .jpeg, .png, .gif">
-                                <div class="invalid-feedback">Only JPG, JPEG, PNG & GIF files are allowed.</div>
+                                <div class="invalid-feedback">Only JPG, PNG, and GIF files are allowed.</div>
                             </div>
                             <button type="button" class="btn btn-primary" onclick="validateForm()">
                                 <i class="bi bi-check"></i> Create
@@ -207,7 +225,7 @@ function generateUniqueID($conn) {
             }
 
             // Validate file upload (optional)
-            if (allocationImage !== "" && !['image/jpeg', 'image/png', 'image/gif'].includes(getFileExtension(allocationImage))) {
+            if (allocationImage !== "" && !['jpeg', 'jpg', 'png', 'gif'].includes(getFileExtension(allocationImage))) {
                 handleValidationFailure('allocationImage', 'Only JPG, PNG, and GIF files are allowed.');
                 return;
             }
