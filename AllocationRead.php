@@ -36,14 +36,15 @@ if (isset($_GET['allocationID'])) {
         .image-preview {
             max-width: 300px;
             max-height: 300px;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <?php include('staffHeader.php'); ?>
-    <div class="container">
-        <h2 class="my-4">View Allocation Details</h2>
-        <a href="AllocationView.php" class="btn btn-secondary mb-3">Back to Allocation Records</a>
+    <div class="container my-4">
+        <h2 class="mb-4">View Allocation Details</h2>
+        <a href="AllocationView.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Allocation Records</a>
         <div class="card">
             <div class="card-header">
                 Allocation Details
@@ -51,12 +52,12 @@ if (isset($_GET['allocationID'])) {
             <div class="card-body">
                 <p><strong>Allocation ID:</strong> <?php echo $row['allocationID']; ?></p>
                 <p><strong>Name:</strong> <?php echo $row['allocationName']; ?></p>
-                <p><strong>Start Date:</strong> <?php echo date('d/m/y', strtotime($row['allocationStartDate'])); ?></p>
-                <p><strong>End Date:</strong> <?php echo date('d/m/y', strtotime($row['allocationEndDate'])); ?></p>
+                <p><strong>Start Date:</strong> <?php echo date('d/m/Y', strtotime($row['allocationStartDate'])); ?></p>
+                <p><strong>End Date:</strong> <?php echo date('d/m/Y', strtotime($row['allocationEndDate'])); ?></p>
                 <p><strong>Status:</strong> <?php echo $row['allocationStatus']; ?></p>
                 <p><strong>Details:</strong> <?php echo $row['allocationDetails']; ?></p>
-                <p><strong>Target Amount (RM):</strong> <?php echo $row['targetAmount']; ?></p>
-                <p><strong>Current Amount (RM):</strong> <?php echo $row['currentAmount']; ?></p>
+                <p><strong>Target Amount (RM):</strong> <?php echo number_format($row['targetAmount'], 2); ?></p>
+                <p><strong>Current Amount (RM):</strong> <?php echo number_format($row['currentAmount'], 2); ?></p>
                 <p><strong>Image:</strong><br>
                     <?php
                     if (!empty($row['allocationImage'])) {
