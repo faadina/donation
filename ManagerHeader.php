@@ -1,3 +1,14 @@
+<?php
+// Start or resume session
+session_start();
+
+// Check if managerID is set in session
+$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; // Replace 'Unknown' with a default message or handle empty case accordingly
+
+// Check if $current_page is set, assuming it's defined somewhere in your script
+$current_page = isset($current_page) ? $current_page : '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,7 +33,6 @@
             z-index:2;
         }
 
-    
         .logo {
             height: auto;
             width: 8rem;
@@ -129,8 +139,8 @@
                     <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
                     
                     <li class="dropdown manager-info">
-                        <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: ?
+                        <a style="background-color:white; border-radius:4px; color:#104854;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
+                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: <?php echo $managerID; ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
                             <a class="dropdown-item" href="ManagerProfile.php">🗝 Profile</a>

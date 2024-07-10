@@ -149,6 +149,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 </head>
 <body>
+<?php
+    include('MainHeader.php');
+    ?>
 <div class="wrapper">
     <h2>Login Page</h2>
     <p>Please fill this form to access the system.</p>
