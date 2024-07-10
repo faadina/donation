@@ -16,7 +16,7 @@
         <div class="nav_side">
             <a href="DonorHomePage.php">HOME</a>
             <a href="DonorAbout.php">ABOUT US</a>
-            <a href="DonorDonate.php">DONATE</a>
+            <a href="DonorDonateAllocation.php">DONATE</a>
             <a href="Maincontact.php">CONTACT</a>
         </div>
     </nav>
