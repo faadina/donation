@@ -19,11 +19,11 @@ body {
     top: 0;
     right: 0;
     left: 0;
-    height: 100px; 
+    height: 100px;
     padding: 25px; 
     font-size: 20px; 
     display: flex;
-    align-items: center;
+    align-items: center; 
 }
 
 .nav_side {
