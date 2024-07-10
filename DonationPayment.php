@@ -33,18 +33,31 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     $stmt->close();
 
+    // Debugging allocationID
+    echo "Allocation ID: " . htmlspecialchars($allocationID);
+
+    // Check if allocationID exists in Allocation table
+    $stmt = $conn->prepare("SELECT allocationID FROM Allocation WHERE allocationID = ?");
+    $stmt->bind_param('i', $allocationID);
+    $stmt->execute();
+    $stmt->store_result();
+    if ($stmt->num_rows == 0) {
+        die('Invalid allocationID.');
+    }
+    $stmt->close();
+
     // Insert donation record
     $stmt = $conn->prepare("INSERT INTO Donation (donationID, donationAmount, donationDate, donationStatus, donationReceipt, donorID, allocationID) VALUES (?, ?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
         error_log('mysqli statement prepare error: ' . $conn->error);
-        die('An error occurred while processing your donation.');
+        die('An error occurred while preparing your donation.');
     }
     $null = NULL;
     $stmt->bind_param('sdssbss', $donationID, $donationAmount, $payDate, $status, $null, $donorID, $allocationID);
     $stmt->send_long_data(4, $receipt);
     if ($stmt->execute() === false) {
         error_log('mysqli statement execute error: ' . $stmt->error);
-        die('An error occurred while processing your donation.');
+        die('An error occurred while executing your donation.');
     }
     $stmt->close();
 
@@ -84,6 +97,10 @@ if (isset($_GET['allocationID'])) {
 <head>
     <title>Donation Payment</title>
     <!-- Include necessary CSS or JS files here -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div class="main-content d-flex justify-content-center">
@@ -97,7 +114,7 @@ if (isset($_GET['allocationID'])) {
                 <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
                 <p><strong>Raised: RM </strong> <?php echo htmlspecialchars($allocation['currentAmount']); ?></p>
                 <p><strong>Goal: RM </strong> <?php echo htmlspecialchars($allocation['targetAmount']); ?></p>
-                <form action="thankyou.php" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
+                <form action="DonationPayment.php" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
                     <label for="donationAmount">Donation Amount:</label>
                     <input type="number" id="donationAmount" name="donationAmount" class="form-control" required min="1" step="0.01" value="0.00" oninput="updateTotalAmount()">
                     
@@ -113,6 +130,24 @@ if (isset($_GET['allocationID'])) {
         <?php else: ?>
         <p>No allocation found or selected.</p>
         <?php endif; ?>
+    </div>
+
+    <!-- Thank You Modal -->
+    <div class="modal fade" id="thankYouModal" tabindex="-1" role="dialog" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="thankYouModalLabel">Thank You for Your Donation!</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Your donation is currently pending approval. You will receive a confirmation email once it has been approved.</p>
+                    <a href="index.php" class="btn btn-primary">Return to Home</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
