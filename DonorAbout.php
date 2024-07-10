@@ -2,6 +2,7 @@
 $title = "About Us Page";
 include 'DonorHeader.php';
 ?>
+
 <body>
     <div class="main_about">
         <div class="main_content_about">
@@ -9,8 +10,6 @@ include 'DonorHeader.php';
         </h2>
         </div>
     </div>
-    <!-- -------------------------------------------ABOUT US--------------------------------------------------------->
-    <!-- --------------------------------------------HOW WE HELP--------------------------------------------------------->
     <div class="product product_about">
         <h2>HOW WE HELP</h2>
         <div class="product_container">
