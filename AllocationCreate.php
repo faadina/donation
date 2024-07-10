@@ -118,6 +118,9 @@ function generateUniqueID($conn) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <?php
+        include('staffHeader.php');
+    ?>
     <div class="container">
         <h2 class="my-4">Create Allocation</h2>
         <form action="AllocationCreate.php" method="post" enctype="multipart/form-data">

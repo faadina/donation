@@ -26,18 +26,20 @@
         }
 
         .detailIndex h1 {
-            font-size: 50px;
+            font-size: 40px;
             color: #1a1649;
-            margin-bottom: 3px;
             text-shadow: 2PX 3px 1px rgba(130, 9, 9, 0.1);
             text-align: center;
             font-weight: 700;
         }
 
+        .detailIndex h1, .detailIndex h2{
+            margin: 2px;
+        }
+
         .detailIndex h2 {
-            font-size: 35px;
+            font-size: 30px;
             color: #1a1649;
-            margin-bottom: 1%;
             text-shadow: 2PX 3px 1px rgba(130, 9, 9, 0.1);
             text-align: center;
             font-weight: 700;
@@ -125,22 +127,15 @@
         <div class="summary-box" style="background-color:#2a3f45">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>DONATION ALLOCATION REPORT</h3>
-                <a href="reportDonationAllocation.php" class="btn">View Report</a>
-            </div>
-        </div>
-        <div class="summary-box" style="background-color:#2a3f45">
-            <img src="images/reportIcon.png" alt="Report Icon">
-            <div>
-                <h3>MONTHLY DONATION REPORT</h3>
+                <h3>ALLOCATION</h3>
                 <a href="reportMonthlyDonation.php" class="btn">View Report</a>
             </div>
         </div>
         <div class="summary-box" style="background-color:#2a3f45">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>Report 3</h3>
-                <a href="report3.php" class="btn">View Report</a>
+                <h3>DONOR</h3>
+                <a href="reportDonationAllocation.php" class="btn">View</a>
             </div>
         </div>
     </div>
