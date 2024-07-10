@@ -1,18 +1,16 @@
 <?php
 session_start();
 
-/*// Check if the user is logged in, if not then redirect to login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: MainLogin.php");
     exit;
-}*/
+}
 
 // Include the database connection file
 require_once("dbConnect.php");
 
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
-
 
 // Fetch the user details from the database
 $sql = "SELECT managerID, managerName, managerPhoneNo,managerEmail FROM manager WHERE managerID = ?";

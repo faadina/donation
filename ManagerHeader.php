@@ -1,9 +1,7 @@
 <?php
 
-// Check if managerID is set in session
-$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; // Replace 'Unknown' with a default message or handle empty case accordingly
+$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
 
-// Check if $current_page is set, assuming it's defined somewhere in your script
 $current_page = isset($current_page) ? $current_page : '';
 
 ?>

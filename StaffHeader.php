@@ -1,3 +1,10 @@
+<?php
+
+$staffID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
+
+$current_page = isset($current_page) ? $current_page : '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -124,7 +131,7 @@
                     <li><a href="DonorView.php'" class="<?php echo ($current_page == 'DonorView.php') ? 'active' : ''; ?>">Donor</a></li>
                     <li class="dropdown manager-info">
                         <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: ?
+                        <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: <?php echo $staffID; ?>
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
                             <a class="dropdown-item" href="StaffProfile.php">🗝 Profile</a>

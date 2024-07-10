@@ -1,11 +1,6 @@
 <?php
 session_start();
 
-/*// Check if the user is logged in, if not then redirect to login page
-if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
-    header("location: MainLogin.php");
-    exit;
-}*/
 
 // Include the database connection file
 require_once("dbConnect.php");
@@ -62,14 +57,6 @@ mysqli_close($conn);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: white;
-            font-family: "Inter", sans-serif;
-        }
 
         .content_section {
             margin-top: 30px;
@@ -190,7 +177,7 @@ mysqli_close($conn);
         </table>
         </div>
         <div class="buttons-container">
-            <a href="staffProfile.php" class="update-button">
+            <a href="staffProfileUpdate.php" class="update-button">
                 <img src="images/editIcon.png" alt="Edit Icon">UPDATE PROFILE
             </a>
             <br>
