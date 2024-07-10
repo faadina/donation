@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include 'dbConnect.php';
 $title = "Donation Page";
 include 'DonorHeader.php';
 
