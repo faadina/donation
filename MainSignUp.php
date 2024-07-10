@@ -11,11 +11,11 @@ $username_err = $password_err = $confirm_password_err = $userlevel_err = "";
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate user level
-    if (empty(trim($_POST["userlevel"]))) {
+    if (empty(trim($_POST["role"]))) {
         $userlevel_err = "Please select a user level.";
     } else {
-        $userlevel = trim($_POST["userlevel"]);
-        if (!in_array($userlevel, ['1', '2'])) {
+        $userlevel = trim($_POST["role"]);
+        if (!in_array($userlevel, ['1', '2', '3'])) {
             $userlevel_err = "Invalid user level.";
         }
     }
@@ -94,7 +94,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if (mysqli_stmt_execute($stmt)) {
                 echo "<script>alert('Successfully created an account');</script>";
                 // Redirect to login page
-                echo "<script>location.href='login.php';</script>";
+                echo "<script>location.href='MainLogin.php';</script>";
             } else {
                 echo "Something went wrong. Please try again later.";
             }
@@ -131,23 +131,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         box-shadow: 0px 0px 10px 0px #000000;
     }
     .form-control {
-        background-color: grey; /* Dark input fields */
+        background-color: grey; 
         border: none;
         color: #FFFFFF;
     }
     .form-control:focus {
-        background-color: black;
+        background-color: grey;
         color: #FFFFFF;
     }
     .btn-primary {
-        background-color: #00CED1;
+        background-color: black;
         border: none;
     }
     .btn-primary:hover {
-        background-color: #20B2AA;
+        background-color: #808080;
     }
     .btn-secondary {
-        background-color: #696969;
+        background-color: black;
         border: none;
     }
     .btn-secondary:hover {

@@ -16,14 +16,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $user_type = trim($_POST["user_type"]);
     
     // Check the user type and validate the username accordingly
-    if ($user_type == "student" && !preg_match("/^\d{10}$/", $username)) {
-        $message = "Student username must be exactly 10 digits.";
-    } elseif ($user_type == "admin" && !preg_match("/^A\d{4}$/", $username)) {
-        $message = "Admin username must start with 'A' followed by 4 digits.";
+    if ($user_type == "donor" ) {
+        $message = "Please enter the username correctly";
+    } elseif ($user_type == "staff" ) {
+        $message = "Please enter the username correctly";
+    } elseif ($user_type == "manager" ) {
+        $message = "Please enter the username correctly";
     } else {
         // Prepare a select statement
-        $sql = "SELECT id, username, userpassword, userlevel FROM users WHERE username = ?";
-        
+        $sql = "";
+        switch ($user_type) {
+            case "staff":
+                $sql = "SELECT staffID, staffPassword, 'role' FROM Staff WHERE staffID = ?";
+                break;
+            case "donor":
+                $sql = "SELECT donorID, donorPassword, 'role' FROM Donor WHERE donorID = ?";
+                break;
+            case "manager":
+                $sql = "SELECT managerID, managerPassword, 'role' FROM Manager WHERE managerID = ?";
+                break;
+        }
         if ($stmt = mysqli_prepare($dbCon, $sql)) {
             // Bind variables to the prepared statement as parameters 
             mysqli_stmt_bind_param($stmt, "s", $param_username);
@@ -52,7 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["userlevel"] = $userlevel;
                             
                             // Redirect user to welcome page
-                            header("location: Home.php");
+                            header("location: DonorHomePage.php");
                         } else {
                             // Display an error message if password is not valid
                             $message = "Wrong Username & Password.";
@@ -97,24 +109,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         border-radius: 10px;
         box-shadow: 0px 0px 10px 0px #000000;
     }
-    .form-control {
-        background-color: grey; /* Dark input fields */
-        border: none;
-        color: #FFFFFF;
-    }
+
     .form-control:focus {
-        background-color: black;
+        background-color: grey;
         color: #FFFFFF;
     }
     .btn-primary {
-        background-color: #00CED1;
+        background-color: black;
         border: none;
     }
     .btn-primary:hover {
-        background-color: #20B2AA;
+        background-color: #808080;
     }
     .btn-secondary {
-        background-color: #696969;
+        background-color: black;
         border: none;
     }
     .btn-secondary:hover {
