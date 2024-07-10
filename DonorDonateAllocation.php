@@ -1,4 +1,6 @@
 <?php
+session_start();
+
 include 'dbConnect.php';
 $title = "Donation Page";
 include 'DonorHeader.php'; // Include your header here
