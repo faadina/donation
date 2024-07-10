@@ -28,7 +28,7 @@ $result = $conn->query($sql);
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
             echo '<div class="goal">Goal: MYR ' . ($row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite') . '</div>';
-            echo '<a href="MainLogin.php" class="donate-button">Donate Now</a>';
+            echo '<a href="DonorDetailPayment.php" class="donate-button">Donate Now</a>';
             echo '</div>';
             echo '</div>';
         }
