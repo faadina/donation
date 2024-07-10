@@ -90,6 +90,13 @@
             font-size: 15px;
         }
 
+        .summary-box:hover {
+            transform: translateY(-10px);
+            border-top-left-radius: 15px;
+            border-bottom-left-radius: 15px;
+            filter: drop-shadow(1px 1px 2px rgba(244, 242, 239, 0.8));
+        }
+
         .btn {
             text-decoration: none;
             color: #1f244a;
