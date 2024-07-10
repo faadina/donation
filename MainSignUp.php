@@ -1,8 +1,8 @@
 <?php
-require_once("dbConnect.php"); // Include your database connection file
+require_once("db.php"); // Include your database connection file
 
 // Initialize variables
-$username = $password = $role = $name = $birthdate = $address = $phone = $email = "";
+$username = $password = $role = $name = $birthdate  = $address = $phone = $email = "";
 $username_err = $password_err = $role_err = $name_err = $birthdate_err = $address_err = $phone_err = $email_err = "";
 
 // Processing form data when form is submitted
@@ -31,6 +31,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $birthdate = trim($_POST["birthdate"]);
     }
 
+
     // Validate address
     if (empty(trim($_POST["address"]))) {
         $address_err = "Please enter your address.";
@@ -54,6 +55,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email_err = "Invalid email format.";
     } else {
         $email = trim($_POST["email"]);
+
+        // Check if email already exists in guest table
+        $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
+        $stmt_donor = mysqli_prepare($conn, $sql_donor);
+        if ($stmt_donor) {
+            mysqli_stmt_bind_param($stmt_donor, "s", $email);
+            mysqli_stmt_execute($stmt_donor);
+            mysqli_stmt_store_result($stmt_donor);
+            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_donor);
+        } else {
+            echo "Something went wrong with the guest table query.";
+        }
+
     }
 
     // Validate username
@@ -61,8 +78,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username_err = "Please enter a username.";
     } else {
         $username = trim($_POST["username"]);
-    }
-        // Check if username already exists in donor table
+
+        // Check if username already exists in guest table
         $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
         $stmt_donor = mysqli_prepare($conn, $sql_donor);
         if ($stmt_donor) {
@@ -74,38 +91,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             }
             mysqli_stmt_close($stmt_donor);
         } else {
-            echo "Something went wrong with the donor table query.";
+            echo "Something went wrong with the guest table query.";
         }
+
+    }
 
     // Validate password
     if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter a password.";
     } elseif (strlen(trim($_POST["password"])) < 6) {
         $password_err = "Password must have at least 6 characters.";
-    } elseif (strlen(trim($_POST["password"])) > 50 || ($role == "Donor" && strlen(trim($_POST["password"])) > 10)) {
-        $password_err = "Password exceeds the maximum allowed length.";
     } else {
         $password = trim($_POST["password"]);
     }
 
     // Check input errors before inserting in database
-    if (empty($username_err) && empty($password_err) && empty($role_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
+    if (empty($username_err) && empty($password_err) && empty($role_err) && empty($name_err) && empty($birthdate_err) && empty($gender_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
         // Prepare an insert statement based on role
-        if ($role == "Donor") {
-            $sql = "INSERT INTO Donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-            $stmt = mysqli_prepare($conn, $sql);
+        if ($role == "donor") {
+            $sql = "INSERT INTO donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";            $stmt = mysqli_prepare($dbCon, $sql);
             if ($stmt) {
-                mysqli_stmt_bind_param($stmt, "sssssssi", $username, $param_password, $param_name, $param_birthdate, $param_address, $param_phone, $param_email, $param_role);
+                mysqli_stmt_bind_param($stmt, "sssssssss", $username, $param_password, $param_name, $param_gender, $param_birthdate, $param_address, $param_phone, $param_email, $param_role);
             }
         }
+
         // Set common parameters
         $param_password = md5($password); // For demonstration; use bcrypt or better for production
         $param_name = $name;
+        $param_gender = $gender;
         $param_birthdate = $birthdate;
         $param_address = $address;
         $param_phone = $phone;
         $param_email = $email;
-        $param_role = ($role == "Donor") ;
+        $param_role = ($role == "donor") ; // Assuming 0 for guest role, 1 for agent role
 
         // Attempt to execute the prepared statement
         if (mysqli_stmt_execute($stmt)) {
@@ -146,7 +164,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         border-radius: 10px;
         box-shadow: 0px 0px 10px 0px #000000;
     }
-
     .form-control:focus {
         background-color: grey;
         color: #FFFFFF;
@@ -180,41 +197,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="form-group">
                 <label>Username</label>
                 <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                <span class="help-block"><?php echo $username_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
-                <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                <span class="help-block"><?php echo $password_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Name</label>
                 <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>">
-                <span class="invalid-feedback"><?php echo $name_err; ?></span>
+                <span class="help-block><?php echo $name_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Birthdate</label>
                 <input type="date" name="birthdate" class="form-control <?php echo (!empty($birthdate_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $birthdate; ?>">
-                <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
+                <span class="help-block"><?php echo $birthdate_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Address</label>
                 <textarea name="address" class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?>"><?php echo $address; ?></textarea>
-                <span class="invalid-feedback"><?php echo $address_err; ?></span>
+                <span class="help-block"><?php echo $address_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Phone Number</label>
                 <input type="text" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
-                <span class="invalid-feedback"><?php echo $phone_err; ?></span>
+                <span class="help-block"><?php echo $phone_err; ?></span>
             </div>
             <div class="form-group">
                 <label>Email</label>
                 <input type="text" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
-                <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                <span class="help-block"><?php echo $email_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <input type="reset" class="btn btn-secondary ml-2" value="Reset">
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <button type="reset" class="btn btn-secondary ml-2">Reset</button>
             </div>
             <p>Already have an account? <a href="MainLogin.php">Login here</a>.</p>
         </form>

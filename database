@@ -3,7 +3,7 @@ CREATE TABLE Staff (
     staffName VARCHAR(100) NOT NULL,
     staffPhoneNo VARCHAR(15),
     staffEmail VARCHAR(100) UNIQUE NOT NULL,
-    staffPassword VARCHAR(50) NOT NULL,
+    staffPassword VARCHAR(250) NOT NULL,
     role INT
 
 );
@@ -14,7 +14,7 @@ CREATE TABLE Donor (
     donorDOB DATE,
     donorAddress VARCHAR(255),
     donorEmail VARCHAR(100) UNIQUE NOT NULL,
-    donorPassword VARCHAR(10) NOT NULL,
+    donorPassword VARCHAR(250) NOT NULL,
     role INT
 );
 CREATE TABLE Manager (
@@ -22,7 +22,7 @@ CREATE TABLE Manager (
     managerName VARCHAR(100) NOT NULL,
     managerPhoneNo VARCHAR(15),
     managerEmail VARCHAR(100) UNIQUE NOT NULL,
-    managerPassword VARCHAR(50) NOT NULL,
+    managerPassword VARCHAR(250) NOT NULL,
     role INT
 );
 CREATE TABLE Allocation (
