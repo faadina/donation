@@ -13,8 +13,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: black;
-            background-color: black;
+            background: linear-gradient(109.6deg, rgb(148, 233, 194) 11.2%, rgb(224, 235, 186) 91.1%);
             font-weight: 600;
             padding: 10px 20px;
         }
