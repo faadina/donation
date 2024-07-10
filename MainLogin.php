@@ -3,7 +3,7 @@
 require_once "dbConnect.php";
 
 // Initialize variables
-$username = $password = $user_type = "";
+$username = $password = "";
 $message = "";
 
 // Processing form data when form is submitted
@@ -14,30 +14,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate inputs
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);
-    $user_type = isset($_POST["user_type"]) ? trim($_POST["user_type"]) : "";
 
-    if (empty($username) || empty($password) ) {
-        $message = "Please enter username, password, and select user type.";
+    if (empty($username) || empty($password)) {
+        $message = "Please enter both username and password.";
     } else {
-        // Prepare a select statement based on user type
-        switch ($user_type) {
-            case "staff":
-                $sql = "SELECT staffID, staffPassword, '2' AS role FROM Staff WHERE staffID = ?";
-                break;
-            case "donor":
-                $sql = "SELECT donorID, donorPassword, '1' AS role FROM Donor WHERE donorID = ?";
-                break;
-            case "manager":
-                $sql = "SELECT managerID, managerPassword, '3' AS role FROM Manager WHERE managerID = ?";
-                break;
+        // Define an array to hold the SQL statements for each user type
+        $sqlStatements = [
+            "donor" => "SELECT donorID, donorPassword FROM Donor WHERE donorID = ?",
+            "manager" => "SELECT managerID, managerPassword FROM Manager WHERE managerID = ?",
+            "staff" => "SELECT staffID, staffPassword FROM Staff WHERE staffID = ?"
+        ];
 
-                break;
-        }
-
-        if (!empty($sql)) {
+        // Loop through each SQL statement and check for a match
+        foreach ($sqlStatements as $userType => $sql) {
             // Attempt to prepare the SQL statement
-            $stmt = mysqli_prepare($conn, $sql);
-            if ($stmt) {
+            if ($stmt = mysqli_prepare($conn, $sql)) {
                 // Bind parameters
                 mysqli_stmt_bind_param($stmt, "s", $param_username);
 
@@ -47,11 +38,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Attempt to execute the prepared statement
                 if (mysqli_stmt_execute($stmt)) {
                     // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $hashed_password, $userlevel);
+                    mysqli_stmt_bind_result($stmt, $id, $stored_password);
 
                     // Check if username exists and verify password
                     if (mysqli_stmt_fetch($stmt)) {
-                        if (password_verify($password, $hashed_password)) {
+                        // Hash the input password using md5 and compare it with the stored hash
+                        if (md5($password) === $stored_password) { 
                             // Password is correct, so start a new session if not already started
                             if (!isset($_SESSION["loggedin"])) {
                                 session_start();
@@ -61,30 +53,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["username"] = $username;
-                            $_SESSION["userlevel"] = $userlevel;
 
-                            // Redirect user to appropriate page based on user type
-                            switch ($userlevel) {
-                                case "2":
-                                    header("Location: StaffDashboard.php");
-                                    exit;
-                                case "1":
+                            // Redirect user to the appropriate page based on user type
+                            switch ($userType) {
+                                case "donor":
                                     header("Location: DonorDonateAllocation.php");
                                     exit;
-                                case "3":
+                                case "manager":
                                     header("Location: ManagerDashboard.php");
                                     exit;
-                                default:
-                                    header("Location: DonorHeader.php"); // Default redirect if userlevel is not recognized
+                                case "staff":
+                                    header("Location: StaffDashboard.php");
                                     exit;
                             }
                         } else {
                             // Display an error message if password is not valid
                             $message = "Wrong password.";
                         }
-                    } else {
-                        // Display an error message if username doesn't exist
-                        $message = "Username not found.";
+                        break; // Exit the loop once a match is found
                     }
                 } else {
                     echo "Oops! Something went wrong. Please try again later.";
@@ -95,6 +81,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 echo "Oops! Something went wrong. Please try again later.";
             }
+        }
+
+        if (empty($message)) {
+            // If no match was found, set a default error message
+            $message = "Username not found.";
         }
 
         // Close connection
