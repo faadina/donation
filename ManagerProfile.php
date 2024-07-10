@@ -1,11 +1,10 @@
 <?php
 session_start();
 
-/*// Check if the user is logged in, if not then redirect to login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: MainLogin.php");
     exit;
-}*/
+}
 
 // Include the database connection file
 require_once("dbConnect.php");
@@ -167,7 +166,7 @@ mysqli_close($conn);
     </style>
 </head>
 <body>
-    <?php include('donorHeader.php'); ?>
+    <?php include('ManagerHeader.php'); ?>
     <div class="content_section">
         <h1></h1>
         <h1>MANAGER PROFILE INFORMATION</h1>

@@ -1,3 +1,57 @@
+<?php
+session_start();
+
+/*// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}*/
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
+
+
+// Fetch the user details from the database
+$sql = "SELECT managerID, managerName, managerPhoneNo,managerEmail FROM manager WHERE managerID = ?";
+if ($stmt = mysqli_prepare($conn, $sql)) {
+    // Bind variables to the prepared statement as parameters
+    mysqli_stmt_bind_param($stmt, "s", $param_username);
+
+    // Set parameters
+    $param_username = $username;
+
+    // Attempt to execute the prepared statement
+    if (mysqli_stmt_execute($stmt)) {
+        // Store result
+        mysqli_stmt_store_result($stmt);
+
+        // Check if the user exists, if yes then fetch the details
+        if (mysqli_stmt_num_rows($stmt) == 1) {
+            // Bind result variables
+            mysqli_stmt_bind_result($stmt, $id, $name, $phone, $email);
+            mysqli_stmt_fetch($stmt);
+
+        } else {
+            // User doesn't exist
+            echo "User doesn't exist.";
+            exit;
+        }
+    } else {
+        echo "Oops! Something went wrong. Please try again later.";
+        exit;
+    }
+
+    // Close statement
+    mysqli_stmt_close($stmt);
+}
+
+// Close connection
+mysqli_close($conn);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -6,6 +60,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="initial-scale=1.0">
     <link rel="stylesheet" href="donor/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <title>Manager Dashboard</title>
     <style>
         body { 
