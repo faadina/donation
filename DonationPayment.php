@@ -3,12 +3,12 @@ session_start();
 
 include 'dbConnect.php';
 
-// Debugging session
-if (!isset($_SESSION['userid'])) {
+// Check if user ID is set in session
+if (!isset($_SESSION['username'])) {
     die('User ID not found in session.');
 }
 
-$donorID = $_SESSION['userid'];
+$donorID = $_SESSION['username']; // Use username as the donor ID
 
 // Debugging donorID
 echo "Donor ID: " . htmlspecialchars($donorID);
@@ -36,12 +36,14 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Insert donation record
     $stmt = $conn->prepare("INSERT INTO Donation (donationID, donationAmount, donationDate, donationStatus, donationReceipt, donorID, allocationID) VALUES (?, ?, ?, ?, ?, ?, ?)");
     if ($stmt === false) {
-        error_log('mysqli statement prepare error:' . $conn->error);
+        error_log('mysqli statement prepare error: ' . $conn->error);
         die('An error occurred while processing your donation.');
     }
-    $stmt->bind_param('sdssbss', $donationID, $donationAmount, $payDate, $status, $receipt, $donorID, $allocationID);
+    $null = NULL;
+    $stmt->bind_param('sdssbss', $donationID, $donationAmount, $payDate, $status, $null, $donorID, $allocationID);
+    $stmt->send_long_data(4, $receipt);
     if ($stmt->execute() === false) {
-        error_log('mysqli statement execute error:' . $stmt->error);
+        error_log('mysqli statement execute error: ' . $stmt->error);
         die('An error occurred while processing your donation.');
     }
     $stmt->close();
@@ -61,8 +63,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 // Fetch allocation details for display
+$allocation = null;
 if (isset($_GET['allocationID'])) {
-    $allocationID = $_GET['allocationID'];
+    $allocationID = intval($_GET['allocationID']);
 
     $stmt = $conn->prepare("SELECT * FROM Allocation WHERE allocationID = ?");
     $stmt->bind_param('i', $allocationID);
@@ -84,6 +87,7 @@ if (isset($_GET['allocationID'])) {
 </head>
 <body>
     <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
         <div class="allocation-details d-flex justify-content-center">
             <div class="allocation-image">
                 <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
@@ -93,7 +97,7 @@ if (isset($_GET['allocationID'])) {
                 <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
                 <p><strong>Raised: RM </strong> <?php echo htmlspecialchars($allocation['currentAmount']); ?></p>
                 <p><strong>Goal: RM </strong> <?php echo htmlspecialchars($allocation['targetAmount']); ?></p>
-                <form action="DonationPayment.php" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
+                <form action="thankyou.php" method="POST" enctype="multipart/form-data" onsubmit="return validateForm();">
                     <label for="donationAmount">Donation Amount:</label>
                     <input type="number" id="donationAmount" name="donationAmount" class="form-control" required min="1" step="0.01" value="0.00" oninput="updateTotalAmount()">
                     
@@ -106,11 +110,14 @@ if (isset($_GET['allocationID'])) {
                 </form>
             </div>
         </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
     </div>
 
     <script>
         function updateTotalAmount() {
-            var currentAmount = <?php echo $allocation['currentAmount']; ?>;
+            var currentAmount = <?php echo $allocation['currentAmount'] ?? 0; ?>;
             var donationAmount = parseFloat(document.getElementById('donationAmount').value) || 0;
             var totalDonation = currentAmount + donationAmount;
             document.getElementById('totalDonation').innerText = totalDonation.toFixed(2);
