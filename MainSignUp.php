@@ -1,5 +1,5 @@
 <?php
-require_once("dbConnect.php"); // Include your database connection file
+require_once("dbConnect.php"); 
 
 // Initialize variables
 $username = $password = $name = $birthdate = $address = $phone = $email = "";
@@ -166,6 +166,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </style>
 </head>
 <body>
+    <?php
+    include('MainHeader.php');
+    ?>
     <div class="wrapper">
         <h2>Sign Up</h2>
         <p>Please fill this form to create an account.</p>
