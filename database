@@ -34,7 +34,7 @@ CREATE TABLE Allocation (
     allocationDetails VARCHAR(250) NOT NULL,
     targetAmount Double NOT NULL,
     currentAmount Double NOT NULL,
-    allocationImage VARCHAR(255)
+    allocationImage LONGLOB
 );
 CREATE TABLE Donation (
     donationID VARCHAR(10) PRIMARY KEY NOT NULL,

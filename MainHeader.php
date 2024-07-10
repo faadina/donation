@@ -18,7 +18,7 @@
             <a href="MainHome.php">HOME</a>
             <a href="MainAbout.php">ABOUT US</a>
             <a href="Maincontact.php">CONTACT</a>
-            <a href="MainLogin.php">Login</a>
+            <a href="MainLogin.php">LOGIN</a>
         </div>
     </nav>
 </body>
