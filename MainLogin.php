@@ -91,13 +91,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Sign In</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"> 
+<title>Login Page</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <style type="text/css">
     body { 
         font: 14px sans-serif; 
-        background-color: whitesmoke; /* Dark Cyan Theme Background */
-        color: #FFFFFF; /* White text for contrast */
+        background-color: whitesmoke;
+        color: #FFFFFF;
     }
     .wrapper { 
         color:black;
@@ -105,11 +108,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         padding: 20px; 
         margin: auto;
         margin-top: 100px;
-        background-color: whitesmoke; /* Dark Cyan Box Background */
+        background-color: whitesmoke;
         border-radius: 10px;
         box-shadow: 0px 0px 10px 0px #000000;
     }
-
     .form-control:focus {
         background-color: grey;
         color: #FFFFFF;
@@ -129,7 +131,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         background-color: #808080;
     }
     .message {
-        color: #FF4500; /* OrangeRed message color for errors */
+        color: #FF4500;
     }
     a {
         color: #00CED1;
@@ -144,8 +146,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <h2>Login Page</h2>
     <p>Please fill this form to access the system.</p>
     <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-        <div class="message"><?php if ($message != "") { echo $message; } ?></div>
-
         <div class="form-group">
             <label>Username</label>
             <input type="text" name="username" class="form-control" required>
@@ -160,8 +160,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </form>
     <br>
-    <p>Don't have an account? <a href="MainSignUp.php">Register Here</a>.</p>
+    <p>Don't have an account? <button type="button" class="btn btn-link" data-toggle="modal" data-target="#joinUsModal">Register Here</button>.</p>
     <a style="text-align: center;" href="DonorHomePage.php" class="btn btn-secondary">Cancel</a>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="joinUsModal" tabindex="-1" role="dialog" aria-labelledby="joinUsModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="joinUsModalLabel">Join Us</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Click the button below to sign up.</p>
+        <a href="MainSignUp.php" class="btn btn-primary">Sign Up Now</a>
+      </div>
+    </div>
+  </div>
 </div>
 </body>
 </html>
