@@ -137,12 +137,6 @@
             </div>
         </div>
         <div class="summary-box" style="background-color:#2a3f45">
-            <img src="images/reportIcon.png" alt="Report Icon">
-            <div>
-                <h3>Report 3</h3>
-                <a href="report3.php" class="btn">View Report</a>
-            </div>
-        </div>
     </div>
 </body>
 
