@@ -65,12 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
     }
 
-    // Generate a unique allocationID
-    $allocationID = generateUniqueID($conn);
-
     // Prepare SQL statement for insertion
-    $sql = "INSERT INTO Allocation (allocationID, allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO Allocation (allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
     // Create a prepared statement
     $stmt = $conn->prepare($sql);
@@ -79,7 +76,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $currentAmount = 0; // Set initial current amount to 0
         
         // Bind parameters to the statement
-        $stmt->bind_param("ssssssdds", $allocationID, $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $currentAmount, $allocationImage);
+        $stmt->bind_param("ssssssds", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $currentAmount, $allocationImage);
 
         // Execute the statement
         if ($stmt->execute()) {
@@ -96,31 +93,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Close statement and connection
     $stmt->close();
     $conn->close();
-}
-
-// Function to generate unique allocationID based on the highest existing ID in the database
-function generateUniqueID($conn) {
-    $prefix = "A"; // Prefix for allocation IDs
-    $sql = "SELECT MAX(allocationID) AS maxID FROM Allocation WHERE allocationID LIKE 'A%'";
-    $result = $conn->query($sql);
-    
-    if ($result && $result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-        $maxID = $row["maxID"];
-        if ($maxID) {
-            $lastNumber = intval(substr($maxID, 1)); // Extract numeric part after prefix
-            $newNumber = $lastNumber + 1; // Increment number
-            $newID = $prefix . str_pad($newNumber, 3, "0", STR_PAD_LEFT); // Generate new ID
-        } else {
-            // If no existing records, start with the first allocation ID
-            $newID = $prefix . "001";
-        }
-    } else {
-        // Query error handling
-        $newID = $prefix . "001";
-    }
-
-    return $newID;
 }
 ?>
 <!DOCTYPE html>

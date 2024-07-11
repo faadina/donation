@@ -5,8 +5,8 @@ CREATE TABLE Staff (
     staffEmail VARCHAR(100) UNIQUE NOT NULL,
     staffPassword VARCHAR(250) NOT NULL,
     role INT
-
 );
+
 CREATE TABLE Donor (
     donorID VARCHAR(10) PRIMARY KEY NOT NULL,
     donorName VARCHAR(100) NOT NULL,
@@ -16,6 +16,7 @@ CREATE TABLE Donor (
     donorEmail VARCHAR(100) UNIQUE NOT NULL,
     donorPassword VARCHAR(250) NOT NULL
 );
+
 CREATE TABLE Manager (
     managerID VARCHAR(10) PRIMARY KEY NOT NULL,
     managerName VARCHAR(100) NOT NULL,
@@ -24,19 +25,21 @@ CREATE TABLE Manager (
     managerPassword VARCHAR(250) NOT NULL,
     role INT
 );
+
 CREATE TABLE Allocation (
-    allocationID VARCHAR(10) PRIMARY KEY NOT NULL,
+    allocationID INT AUTO_INCREMENT PRIMARY KEY,
     allocationName VARCHAR(50) NOT NULL,
     allocationStartDate DATE NOT NULL,
     allocationEndDate DATE NOT NULL,
     allocationStatus VARCHAR(50) NOT NULL,
-    allocationDetails VARCHAR(250) NOT NULL,
-    targetAmount Double NOT NULL,
-    currentAmount Double NOT NULL,
+    allocationDetails TEXT,
+    targetAmount DOUBLE NOT NULL,
+    currentAmount DOUBLE NOT NULL,
     allocationImage VARCHAR(255)
 );
+
 CREATE TABLE Donation (
-    donationID VARCHAR(10) PRIMARY KEY NOT NULL,
+    donationID INT AUTO_INCREMENT PRIMARY KEY,
     donationAmount DECIMAL(10, 2) NOT NULL,
     donationDate DATE NOT NULL,
     donationMethod VARCHAR(50),
@@ -44,18 +47,18 @@ CREATE TABLE Donation (
     donationReceipt VARCHAR(255),
     donorID VARCHAR(50),
     staffID VARCHAR(50),
-    allocationID VARCHAR(50),
+    allocationID INT,
     FOREIGN KEY (donorID) REFERENCES Donor(donorID),
     FOREIGN KEY (staffID) REFERENCES Staff(staffID),
     FOREIGN KEY (allocationID) REFERENCES Allocation(allocationID)
 );
+
 CREATE TABLE Report (
     reportID VARCHAR(10) PRIMARY KEY NOT NULL,
     reportType VARCHAR(100) NOT NULL,
     reportDate DATE NOT NULL,
     managerID VARCHAR(50),
-    donationID VARCHAR(50),
+    donationID INT,
     FOREIGN KEY (managerID) REFERENCES Manager(managerID),
     FOREIGN KEY (donationID) REFERENCES Donation(donationID)
 );
-
