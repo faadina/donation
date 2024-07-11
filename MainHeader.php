@@ -3,15 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="donor/styles.css">
+    <link rel="stylesheet" href="donor/contact.css">
     <link rel="stylesheet" href="donor/bootstrap.min.css">
-    <link rel="stylesheet" href="donor/allocation.css">
     <title><?php echo $title; ?></title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+    
 </head>
 
 <body>
@@ -19,7 +16,7 @@
         <div class="nav_side">
             <a href="MainHome.php">HOME</a>
             <a href="MainAbout.php">ABOUT US</a>
-            <a href="Maincontact.php">CONTACT</a>
+            <a href="MainContact.php">CONTACT</a>
             <a href="MainLogin.php">LOGIN</a>
         </div>
     </nav>

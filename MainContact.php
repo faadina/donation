@@ -1,13 +1,11 @@
 <?php
-$title = "Contact Page";
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+$title = "Contact";
 include 'MainHeader.php';
 ?>
-<style>
-    .main-content {
-        margin-top: 10%;
 
-    }
-</style>
 <body>
     <div class="main-content d-flex justify-content-center align-items-center">
         <div class="contact-container">
