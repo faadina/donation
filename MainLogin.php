@@ -8,9 +8,6 @@ $message = "";
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Start or resume a session
-    session_start();
-
     // Validate inputs
     $username = trim($_POST["username"]);
     $password = trim($_POST["password"]);
@@ -28,7 +25,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // Loop through each SQL statement and check for a match
         foreach ($sqlStatements as $userType => $sql) {
             // Attempt to prepare the SQL statement
-            if ($stmt = mysqli_prepare($conn, $sql)) {
+            if ($stmt = mysqli_prepare($con, $sql)) {
                 // Bind parameters
                 mysqli_stmt_bind_param($stmt, "s", $param_username);
 
@@ -42,10 +39,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
                     // Check if username exists and verify password
                     if (mysqli_stmt_fetch($stmt)) {
-                        // Compare plain text password
-                        if ($password === $stored_password) {
+                        // Compare plain text password with hashed password
+                        if (password_verify($password, $stored_password)) {
                             // Password is correct, so start a new session if not already started
-                            if (!isset($_SESSION["loggedin"])) {
+                            if (session_status() == PHP_SESSION_NONE) {
                                 session_start();
                             }
 
@@ -53,6 +50,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
                             $_SESSION["username"] = $username;
+                            $_SESSION["userType"] = $userType;
 
                             // Redirect user to the appropriate page based on user type
                             switch ($userType) {
@@ -89,7 +87,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // Close connection
-        mysqli_close($conn);
+        mysqli_close($con);
     }
 }
 ?>

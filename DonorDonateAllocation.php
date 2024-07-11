@@ -1,9 +1,8 @@
 <?php
 session_start();
-
 include 'dbConnect.php';
 $title = "Donation Page";
-include 'DonorHeader.php'; // Include your header here
+include 'DonorHeader.php'; 
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -11,7 +10,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch allocations
 $sql = "SELECT * FROM Allocation";
 $result = $conn->query($sql);
 ?>
@@ -24,12 +22,12 @@ $result = $conn->query($sql);
             echo '<img src="' . htmlspecialchars($row["allocationImage"]) . '" alt="' . htmlspecialchars($row["allocationName"]) . '">';
             echo '<div class="card-content">';
             echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
-            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '... <a href="DonorDetailAllocation.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read more...</a></p>';
+            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '... <a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read more...</a></p>';
             echo '</div>';
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
             echo '<div class="goal">Goal: MYR ' . ($row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite') . '</div>';
-            echo '<a href="DonationPayment.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
+            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
             echo '</div>';
             echo '</div>';
         }

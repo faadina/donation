@@ -58,7 +58,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Check if username already exists in donor table
     $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
-    $stmt_donor = mysqli_prepare($conn, $sql_donor);
+    $stmt_donor = mysqli_prepare($con, $sql_donor);
     if ($stmt_donor) {
         mysqli_stmt_bind_param($stmt_donor, "s", $username);
         mysqli_stmt_execute($stmt_donor);
@@ -86,10 +86,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($username_err) && empty($password_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
         // Prepare an insert statement
         $sql = "INSERT INTO donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $sql);
+        $stmt = mysqli_prepare($con, $sql);
         if ($stmt) {
-            // Set parameters
-            $param_password = $password; // Store password as plain text
+            // Hash the password before storing
+            $param_password = password_hash($password, PASSWORD_DEFAULT);
             $param_name = $name;
             $param_birthdate = $birthdate;
             $param_address = $address;
@@ -114,7 +114,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Close connection
-    mysqli_close($conn);
+    mysqli_close($con);
 }
 ?>
 <!DOCTYPE html>
