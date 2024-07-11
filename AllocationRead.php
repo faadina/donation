@@ -92,7 +92,7 @@ if (isset($_GET['allocationID'])) {
                 if ($result_donations->num_rows > 0) {
                     while ($donation = $result_donations->fetch_assoc()) {
                         echo "<p><strong>Donation ID:</strong> " . $donation['donationID'] . "</p>";
-                        echo "<p><strong>Amount (RM):</strong> " . number_format($donation['amount'], 2) . "</p>";
+                        echo "<p><strong>Amount (RM):</strong> " . number_format($donation['donationAmount'], 2) . "</p>";
                         // Add more fields as needed
                         echo "<hr>";
                     }
