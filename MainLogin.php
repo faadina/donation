@@ -263,7 +263,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <img src="images/mtidhlogo.jpg" alt="Madarasah Logo">
             </div>
             <div class="form-container">
-                <h2 style="text-align:center;">Welcome Back!</h2>
+                <h2 style="text-align:center; color:#444C38; font-weight:700;">Welcome Back!</h2>
                 <p style="text-align:center;">Please fill this form to login.</p>
 
                 <?php if (!empty($message)) : ?>

@@ -1,5 +1,5 @@
 <?php
-require_once("dbConnect.php"); 
+require_once("dbConnect.php");
 
 // Initialize variables
 $username = $password = $name = $birthdate = $address = $phone = $email = "";
@@ -119,102 +119,188 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<title>Sign Up</title>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-<style type="text/css">
-    
-    body { 
-        font: 14px sans-serif; 
-        background-color: whitesmoke; /* Dark Cyan Theme Background */
-        color: #FFFFFF; /* White text for contrast */
-    }
-    .wrapper { 
-        color: black;
-        width: 360px; 
-        padding: 20px; 
-        margin: auto;
-        margin-top: 100px;
-        background-color: whitesmoke; /* Dark Cyan Box Background */
-        border-radius: 10px;
-        box-shadow: 0px 0px 10px 0px #000000;
-    }
 
-    .form-control:focus {
-        background-color: grey;
-        color: #FFFFFF;
-    }
-    .btn-primary {
-        background-color: black;
-        border: none;
-    }
-    .btn-primary:hover {
-        background-color: #808080;
-    }
-    .btn-secondary {
-        background-color: black;
-        border: none;
-    }
-    .btn-secondary:hover {
-        background-color: #808080;
-    }
-    .message {
-        color: #808080;
-        font-size: 12px;
-        margin-top: 10px;
-    }
-</style>
+<head>
+    <meta charset="UTF-8">
+    <title>Sign Up</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style type="text/css">
+        body {
+            font: 14px sans-serif;
+            background-color: whitesmoke;
+            color: #FFFFFF;
+        }
+
+        .wrapper {
+            width: 50%;
+            background-color: whitesmoke;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px 0px #000000;
+            overflow: hidden;
+            display: flex;
+            margin: auto;
+            padding: 20px;
+            margin-top: 10%;
+        }
+
+        .form-container {
+            flex: 1;
+            padding: 20px;
+        }
+
+        .form-control:focus {
+            background-color: whitesmoke;
+            color: #FFFFFF;
+        }
+
+        .btn-primary {
+            background-color: black;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #808080;
+        }
+
+        .btn-secondary {
+            background-color: black;
+            border: none;
+        }
+
+        .btn-secondary:hover {
+            background-color: #808080;
+        }
+
+        .message {
+            color: #808080;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .input-group {
+            position: relative;
+            margin: 10px 0;
+        }
+
+        .input-group input,
+        .input-group textarea {
+            width: 100%;
+            height: 50px;
+            border-radius: 8px;
+            font-size: 18px;
+            padding: 0 10px;
+            border: 1px solid #1047548e;
+            background: transparent;
+            color: #104854;
+            outline: none;
+            margin-bottom: 10px;
+        }
+
+        .input-group label {
+            position: absolute;
+            top: 40%;
+            left: 20px;
+            transform: translateY(-50%);
+            color: #104854;
+            font-size: 15px;
+            pointer-events: none;
+            transition: 0.3s;
+        }
+
+        input:focus,
+        textarea:focus {
+            border: 2px solid #4D5D53;
+        }
+
+        input:focus~label,
+        textarea:focus~label,
+        input:valid~label,
+        textarea:valid~label {
+            top: 0;
+            left: 20px;
+            font-size: 16px;
+            padding: 0 2px;
+            background: whitesmoke;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        
+        .btn-register {
+            background-color: #444C38;
+            border: none;
+            border-radius: 8px;
+            padding: 5px 100px;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 40px;
+            text-align: center;
+            margin: 0 auto;
+        }
+
+        .btn-register:hover {
+            background-color: #B2BEB5;
+            color: #444C38;
+
+        }
+    </style>
 </head>
+
 <body>
     <?php
     include('MainHeader.php');
     ?>
     <div class="wrapper">
-        <h2>Sign Up</h2>
-        <p>Please fill this form to create an account.</p>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                <span class="invalid-feedback"><?php echo $username_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
-                <span class="invalid-feedback"><?php echo $password_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Name</label>
-                <input type="text" name="name" class="form-control <?php echo (!empty($name_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $name; ?>">
-                <span class="invalid-feedback"><?php echo $name_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Birthdate</label>
-                <input type="date" name="birthdate" class="form-control <?php echo (!empty($birthdate_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $birthdate; ?>">
-                <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Address</label>
-                <textarea name="address" class="form-control <?php echo (!empty($address_err)) ? 'is-invalid' : ''; ?>"><?php echo $address; ?></textarea>
-                <span class="invalid-feedback"><?php echo $address_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Phone Number</label>
-                <input type="text" name="phone" class="form-control <?php echo (!empty($phone_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $phone; ?>">
-                <span class="invalid-feedback"><?php echo $phone_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Email</label>
-                <input type="text" name="email" class="form-control <?php echo (!empty($email_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $email; ?>">
-                <span class="invalid-feedback"><?php echo $email_err; ?></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <input type="reset" class="btn btn-secondary ml-2" value="Reset">
-            </div>
-            <p>Already have an account? <a href="MainLogin.php">Login here</a>.</p>
-        </form>
+        <div class="form-container">
+            <h2 style="text-align:center; color:#444C38; font-weight:700;">Sign Up</h2>
+            <p style="text-align:center;">Please fill this form to create an account.</p>
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <div class="input-group">
+                    <input type="text" name="username" required value="<?php echo $username; ?>">
+                    <label>Username</label>
+                    <span class="invalid-feedback"><?php echo $username_err; ?></span>
+                </div>
+                <div class="input-group">
+                    <input type="password" name="password" required value="<?php echo $password; ?>">
+                    <label>Password</label>
+                    <span class="invalid-feedback"><?php echo $password_err; ?></span>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="name" required value="<?php echo $name; ?>">
+                    <label>Name</label>
+                    <span class="invalid-feedback"><?php echo $name_err; ?></span>
+                </div>
+                <div class="input-group">
+                    <input type="date" name="birthdate" required value="<?php echo $birthdate; ?>">
+                    <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
+                    <label style="font-size:10px;">Date of Birth</label>
+                </div>
+                <div class="input-group">
+                    <textarea name="address" required><?php echo $address; ?></textarea>
+                    <label>Address</label>
+                    <span class="invalid-feedback"><?php echo $address_err; ?></span>
+                </div>
+                <div class="input-group">
+                    <input type="text" name="phone" required value="<?php echo $phone; ?>">
+                    <label>Phone</label>
+                    <span class="invalid-feedback"><?php echo $phone_err; ?></span>
+                </div>
+                <div class="input-group">
+                    <input type="email" name="email" required value="<?php echo $email; ?>">
+                    <label>Email</label>
+                    <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                </div>
+                <div class="form-group">
+                    <input type="submit" class="btn-register" value="Register">
+                </div>
+                <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
+            </form>
+        </div>
     </div>
 </body>
+
 </html>
