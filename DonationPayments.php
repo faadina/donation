@@ -116,8 +116,8 @@ $conn->close();
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="donationReceipt">Donation Receipt:</label>
-                        <input type="file" id="donationReceipt" name="donationReceipt" required>
+                        <label for="donationReceipt">Donation Receipt (PDF only):</label>
+                        <input type="file" id="donationReceipt" name="donationReceipt" accept="application/pdf" required>
                     </div>
                     <button type="submit" class="btn btn-success">DONATE NOW</button>
                 </form>
@@ -132,6 +132,19 @@ $conn->close();
         $(document).ready(function() {
             $('#donationForm').on('submit', function(e) {
                 e.preventDefault();
+
+                var fileInput = $('#donationReceipt')[0];
+                var file = fileInput.files[0];
+
+                if (file.type !== 'application/pdf') {
+                    swal({
+                        title: "Invalid File Type",
+                        text: "Please upload a PDF file.",
+                        icon: "error",
+                        button: "OK",
+                    });
+                    return;
+                }
 
                 var formData = new FormData(this);
 
