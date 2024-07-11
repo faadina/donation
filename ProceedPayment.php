@@ -1,11 +1,13 @@
 <?php
 session_start();
 include 'dbConnect.php';
-$title = "Proceed Payment";
-include 'DonorHeader.php';
+
+$response = array('status' => 'error', 'message' => 'Unknown error');
 
 if (!isset($_SESSION['username'])) {
-    die('User ID not found in session.');
+    $response['message'] = 'User ID not found in session.';
+    echo json_encode($response);
+    exit;
 }
 
 $donorID = $_SESSION['username'];
@@ -15,14 +17,18 @@ $donationMethod = $_POST['donationMethod'] ?? '';
 $donationReceipt = $_FILES['donationReceipt'] ?? null;
 
 if (empty($allocationID) || empty($donationAmount) || empty($donationMethod) || empty($donationReceipt)) {
-    die('Please fill in all required fields.');
+    $response['message'] = 'Please fill in all required fields.';
+    echo json_encode($response);
+    exit;
 }
 
 $target_dir = "uploads/";
 $target_file = $target_dir . basename($donationReceipt["name"]);
 
 if (!move_uploaded_file($donationReceipt["tmp_name"], $target_file)) {
-    die('Error uploading file.');
+    $response['message'] = 'Error uploading file.';
+    echo json_encode($response);
+    exit;
 }
 
 // Check if donorID exists in Donor table
@@ -32,7 +38,9 @@ $stmt->execute();
 $stmt->store_result();
 
 if ($stmt->num_rows == 0) {
-    die('Invalid donor ID.');
+    $response['message'] = 'Invalid donor ID.';
+    echo json_encode($response);
+    exit;
 }
 
 $stmt->close();
@@ -57,23 +65,16 @@ try {
     // Commit transaction
     $conn->commit();
 
-    echo '<h1>Thank You for Your Donation!</h1>';
-    echo '<p>Your donation is currently pending approval. You will receive a confirmation email once it has been approved.</p>';
-    echo '<a href="DonorDonateHistory.php" class="btn btn-primary">Return to Home</a>';
+    $response['status'] = 'success';
+    $response['message'] = 'Thank you for your donation! Your donation is currently pending approval.';
 
 } catch (mysqli_sql_exception $exception) {
     // Rollback transaction if an error occurs
     $conn->rollback();
+    $response['message'] = 'Error processing your donation. Please try again later.';
     throw $exception;
 }
 
 $conn->close();
+echo json_encode($response);
 ?>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Thank You for Your Donation!</title>
-</head>
-<body>
-</body>
-</html>
