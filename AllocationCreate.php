@@ -71,25 +71,41 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
     }
 
-   // Prepare SQL statement for insertion
-$sql = "INSERT INTO Allocation (allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-$stmt = $conn->prepare($sql);
-if ($stmt) {
-// Set default value for currentAmount to 0
-$currentAmount = 0;
-$stmt->bind_param("ssssssds", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $currentAmount, $allocationImage);
-if ($stmt->execute()) {
-// Redirect to AllocationView.php after successful creation
-header("Location: AllocationView.php");
-exit();
-} else {
-echo "Error creating record: " . $stmt->error;
-}
-} else {
-echo "Error preparing statement: " . $conn->error;
-}
+    // Calculate total donated amount (replace with your actual calculation/query)
+    $allocationID = 1; // Replace with the actual allocation ID from your form or logic
+    $sql_total_donation = "SELECT SUM(donationAmount) AS totalDonorAmount FROM Donations WHERE allocationID = ?";
+    $stmt_total_donation = $conn->prepare($sql_total_donation);
+    if ($stmt_total_donation) {
+        $stmt_total_donation->bind_param("i", $allocationID);
+        $stmt_total_donation->execute();
+        $result_total_donation = $stmt_total_donation->get_result();
+        if ($result_total_donation->num_rows > 0) {
+            $row_total_donation = $result_total_donation->fetch_assoc();
+            $totalDonorAmount = $row_total_donation['totalDonorAmount'];
+        } else {
+            $totalDonorAmount = 0; // If no donations found, default to 0
+        }
+        $stmt_total_donation->close();
+    } else {
+        echo "Error preparing total donation statement: " . $conn->error;
+    }
 
+    // Prepare SQL statement for insertion
+    $sql = "INSERT INTO Allocation (allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    if ($stmt) {
+        $stmt->bind_param("ssssssds", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $totalDonorAmount, $allocationImage);
+        if ($stmt->execute()) {
+            // Redirect to AllocationView.php after successful creation
+            header("Location: AllocationView.php");
+            exit();
+        } else {
+            echo "Error creating record: " . $stmt->error;
+        }
+    } else {
+        echo "Error preparing statement: " . $conn->error;
+    }
 
     $stmt->close(); // Close statement
     $conn->close(); // Close database connection
