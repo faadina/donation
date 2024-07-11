@@ -81,6 +81,12 @@ $conn->close();
             background-color: #218838;
         }
     </style>
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
     <div class="main-content d-flex justify-content-center">
@@ -94,7 +100,7 @@ $conn->close();
                 <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
                 <p><strong>Raised: RM </strong> <?php echo htmlspecialchars($allocation['currentAmount']); ?></p>
                 <p><strong>Goal: RM </strong> <?php echo htmlspecialchars($allocation['targetAmount']); ?></p>
-                <form action="ProceedPayment.php" method="post" enctype="multipart/form-data">
+                <form id="donationForm" enctype="multipart/form-data">
                     <input type="hidden" name="donorID" value="<?php echo htmlspecialchars($donorID); ?>">
                     <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
                     <div class="form-group">
@@ -121,5 +127,47 @@ $conn->close();
         <p>No allocation found or selected.</p>
         <?php endif; ?>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $('#donationForm').on('submit', function(e) {
+                e.preventDefault();
+
+                var formData = new FormData(this);
+
+                $.ajax({
+                    type: 'POST',
+                    url: 'ProceedPayment.php',
+                    data: formData,
+                    contentType: false,
+                    processData: false,
+                    success: function(response) {
+                        var jsonResponse = JSON.parse(response);
+                        var status = jsonResponse.status;
+                        var message = jsonResponse.message;
+
+                        swal({
+                            title: status === 'success' ? "Thank You for Your Donation!" : "Error",
+                            text: message,
+                            icon: status,
+                            buttons: {
+                                confirm: {
+                                    text: "Return to History",
+                                    value: true,
+                                    visible: true,
+                                    className: "btn btn-primary",
+                                    closeModal: true
+                                }
+                            }
+                        }).then((willGoToHistory) => {
+                            if (willGoToHistory) {
+                                window.location.href = "DonorDonateHistory.php";
+                            }
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
