@@ -18,11 +18,21 @@ if (empty($allocationID)) {
 
 // Fetch allocation details for display
 $stmt = $conn->prepare("SELECT * FROM Allocation WHERE allocationID = ?");
-$stmt->bind_param('s', $allocationID);
+$stmt->bind_param('i', $allocationID);
 $stmt->execute();
 $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
+
+// Fetch allocation status from Allocation table
+$allocationStatus = $allocation['allocationStatus'] ?? '';
+
+// Check if donation status is 'Inactive'
+$isInactive = false;
+if ($allocationStatus === 'Inactive') {
+    $isInactive = true;
+}
+
 $conn->close();
 ?>
 
@@ -70,15 +80,21 @@ $conn->close();
             margin: 5px 0;
         }
         .btn {
-            background-color: #28a745;
-            color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .btn:hover {
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
             background-color: #218838;
+        }
+        .btn-closed {
+            background-color: #dc3545;
+            color: white;
         }
     </style>
     <!-- Include SweetAlert CSS -->
@@ -119,7 +135,11 @@ $conn->close();
                         <label for="donationReceipt">Donation Receipt (PDF only):</label>
                         <input type="file" id="donationReceipt" name="donationReceipt" accept="application/pdf" required>
                     </div>
-                    <button type="submit" class="btn btn-success">DONATE NOW</button>
+                    <?php if ($isInactive): ?>
+                        <button type="button" class="btn btn-closed" disabled>CLOSED</button>
+                    <?php else: ?>
+                        <button type="submit" class="btn btn-success">DONATE NOW</button>
+                    <?php endif; ?>
                 </form>
             </div>
         </div>
