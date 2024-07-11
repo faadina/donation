@@ -1,225 +1,125 @@
 <?php
+session_start();
 include 'dbConnect.php';
 $title = "Donation Page";
-include 'DonorHeader.php'; // Include your header here
+include 'DonorHeader.php';
 
-$conn = new mysqli($servername, $username, $password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+// Check if user ID is set in session
+if (!isset($_SESSION['username'])) {
+    die('User ID not found in session.');
 }
 
-// Fetch donations
-$sql = "SELECT * FROM donation";
-$result = $conn->query($sql);
+$donorID = $_SESSION['username'];
+$allocationID = $_GET['allocationID'] ?? '';
+
+if (empty($allocationID)) {
+    die('No allocation selected.');
+}
+
+// Fetch allocation details for display
+$stmt = $conn->prepare("SELECT * FROM Allocation WHERE allocationID = ?");
+$stmt->bind_param('s', $allocationID);
+$stmt->execute();
+$result = $stmt->get_result();
+$allocation = $result->fetch_assoc();
+$stmt->close();
+$conn->close();
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donation History</title>
-
-    <!-- Include SweetAlert CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
-
-    <!-- Include SweetAlert JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-
+    <title>Donation Page</title>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: Arial, sans-serif;
             background-color: #f4f4f4;
-            color: #333;
-            margin: 0;
+            margin: 10%;
             padding: 0;
-            min-height: 100vh;
         }
-
-        .wrapper {
-            width: 80%;
-            margin: 20px auto;
+        .main-content {
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
         }
-
-        .donation-container {
-            background-color: black;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        .allocation-details {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
             padding: 20px;
             margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: row;
         }
-
-        .donation-table {
+        .allocation-image {
+            max-width: 40%;
+            margin-right: 20px;
+        }
+        .allocation-image img {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .donation-table th, .donation-table td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-
-        .donation-table th {
-            background-color: #f0f0f0;
-            font-weight: bold;
-        }
-
-        .btn-feedback {
-            background-color: darkcyan;
-            color: #fff;
-            padding: 8px 16px;
             border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
         }
-
-        .btn-feedback:hover {
-            background-color: #0d7a8a;
+        .allocation-info {
+            flex-grow: 1;
         }
-
-        .view-receipt-btn {
-            background-color: #333;
-            color: #fff;
-            padding: 6px 12px;
+        .allocation-info h2 {
+            margin-top: 0;
+        }
+        .allocation-info p {
+            margin: 5px 0;
+        }
+        .btn {
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-
-        .view-receipt-btn:hover {
-            background-color: #555;
-        }
-
-        @keyframes moveDots {
-            0% { content: '.'; }
-            25% { content: '..'; }
-            50% { content: '...'; }
-            75% { content: '..'; }
-            100% { content: '.'; }
-        }
-
-        .loading-dots:after {
-            content: '.';
-            animation: moveDots 1s infinite;
-            display: inline-block;
+        .btn:hover {
+            background-color: #218838;
         }
     </style>
 </head>
 <body>
-
-    <div class="wrapper">
-        <br><br><br><br>
-        <h2>Donation History</h2>
-        <div class="donation-container">
-            <table class="donation-table">
-                <thead>
-                    <tr>
-                        <th>Donation ID</th>
-                        <th>Donation Amount</th>
-                        <th>Donation Date</th>
-                        <th>Donation Method</th>
-                        <th>Donation Status</th>
-                        <th>Donation Receipt</th>
-                        <th>Allocation ID</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationAmount']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationMethod']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
-                            <td>
-                                <?php if (!empty($row['donationReceipt'])): ?>
-                                    <?php $receiptPath = 'uploads/' . urlencode($row['donationReceipt']); ?>
-                                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($receiptPath); ?>">View Receipt</button>
-                                    <!-- Debug information -->
-                                    <div style="display:none;"><?php echo htmlspecialchars($receiptPath); ?></div>
-                                <?php else: ?>
-                                    No Receipt
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($row['allocationID']); ?></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
-            </table>
+    <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
+        <div class="allocation-details d-flex justify-content-center">
+            <div class="allocation-image">
+                <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
+            </div>
+            <div class="allocation-info">
+                <h2><b><?php echo htmlspecialchars($allocation['allocationName']); ?></b></h2>
+                <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
+                <p><strong>Raised: RM </strong> <?php echo htmlspecialchars($allocation['currentAmount']); ?></p>
+                <p><strong>Goal: RM </strong> <?php echo htmlspecialchars($allocation['targetAmount']); ?></p>
+                <form action="ProceedPayment.php" method="post" enctype="multipart/form-data">
+                    <input type="hidden" name="donorID" value="<?php echo htmlspecialchars($donorID); ?>">
+                    <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
+                    <div class="form-group">
+                        <label for="donationAmount">Donation Amount (RM):</label>
+                        <input type="number" id="donationAmount" name="donationAmount" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationMethod">Donation Method:</label>
+                        <select id="donationMethod" name="donationMethod" required>
+                            <option value="Credit Card">Credit Card</option>
+                            <option value="Bank Transfer">Bank Transfer</option>
+                            <option value="PayPal">PayPal</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="donationReceipt">Donation Receipt:</label>
+                        <input type="file" id="donationReceipt" name="donationReceipt" required>
+                    </div>
+                    <button type="submit" class="btn btn-success">DONATE NOW</button>
+                </form>
+            </div>
         </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
     </div>
-    <?php
-    $files = scandir('uploads/');
-    echo '<pre>';
-    print_r($files);
-    echo '</pre>';
-    ?>
-    <script>
-        // JavaScript for handling receipt viewing with SweetAlert
-        const receiptButtons = document.querySelectorAll('.view-receipt-btn');
-        receiptButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const receiptUrl = this.getAttribute('data-receipt-url');
-                const fileExtension = receiptUrl.split('.').pop().toLowerCase();
-
-                let receiptHtml = '';
-
-                if (fileExtension === 'pdf') {
-                    receiptHtml = `
-                        <div style="text-align: center;">
-                            <embed src="${receiptUrl}" width="100%" height="600px" type="application/pdf">
-                        </div>
-                    `;
-                } else {
-                    receiptHtml = `
-                        <div style="text-align: center;">
-                            <img src="${receiptUrl}" class="receipt-image" alt="Receipt" onerror="this.onerror=null;this.src='error.png';">
-                        </div>
-                    `;
-                }
-
-                // Show SweetAlert with embedded receipt image or PDF
-                swal({
-                    title: "View Receipt",
-                    content: {
-                        element: "div",
-                        attributes: {
-                            innerHTML: receiptHtml
-                        },
-                    },
-                    buttons: {
-                        cancel: "Close",
-                        confirm: {
-                            text: "Download",
-                            value: "download", // Custom value to distinguish download action
-                        },
-                    },
-                }).then((value) => {
-                    if (value === "download") {
-                        // Show loading state with three dots
-                        swal({
-                            title: "Downloading...",
-                            text: "Please wait",
-                            buttons: false, // Disable any buttons during loading state
-                            closeOnClickOutside: false, // Prevent closing by clicking outside
-                            closeOnEsc: false, // Prevent closing by pressing ESC key
-                            timer: 3000, // Adjust timeout as needed (in milliseconds)
-                        }).then(() => {
-                            // After loading state, open the receipt URL in a new tab
-                            window.open(receiptUrl, '_blank');
-                        });
-                    }
-                });
-            });
-        });
-    </script>
 </body>
 </html>
