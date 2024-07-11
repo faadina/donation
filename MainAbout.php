@@ -1,5 +1,8 @@
 <?php
-$title = "About Us Page";
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+$title = "About Us";
 include 'MainHeader.php';
 ?>
 

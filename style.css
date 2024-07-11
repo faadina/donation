@@ -5,6 +5,7 @@ body {
 /*------------------------------------------------NAVBAR----------------------------------------*/
 .nav {
     background-color: rgba(0, 0, 0, 0.856);
+    width: 100%;
     align-items: center;
     font-weight: 600;
     z-index: 9;
@@ -13,7 +14,13 @@ body {
     display: flex;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
-
+.nav a {
+    color: white;
+    text-decoration: none;
+    font-size: 16px;
+    padding: 14px 20px;
+    text-align: center;
+}
 .nav_top {
     position: fixed;
     top: 0;
@@ -27,12 +34,15 @@ body {
 }
 
 .nav_side {
-    margin-left: auto;
-    margin-top: 0; 
-    display: flex; 
-    align-items: center; 
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px 0;
 }
-
+.nav a:hover {
+    background-color: #575757;
+    color: white;
+}
 .nav_side a {
     text-decoration: none;
     margin-right: 10px;

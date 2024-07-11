@@ -1,5 +1,8 @@
 <?php
-$title = "Contact Page";
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+$title = "Contact";
 include 'MainHeader.php';
 ?>
 
@@ -7,27 +10,26 @@ include 'MainHeader.php';
     <div class="main-content d-flex justify-content-center align-items-center">
         <div class="contact-container">
             <h1 class="title text-center">Contact Us</h1>
-            <div class="contact-section d-flex justify-content-between align-items-center">
+            <div class="contact-section">
                 <div class="contact-info">
-                    <div class="contact-item d-flex align-items-center">
-                        <img src="image/whatsapp.png" alt="WhatsApp" class="contact-icon">
-                        <p>017 - 9547236</p>
+                    <div class="contact-item">
+                        <img src="images/phone.png" alt="WhatsApp" class="contact-icon">
+                        <p><a href="09-617 6525" target="_blank">09-617 6525</a></p>
                     </div>
-                    <div class="contact-item d-flex align-items-center">
-                        <img src="image/facebook.png" alt="Facebook" class="contact-icon">
-                        <p>BOOKWORMRENTAL</p>
+                    <div class="contact-item">
+                        <img src="images/facebook.png" alt="Facebook" class="contact-icon">
+                        <p><a href="https://www.facebook.com/MTIDH" target="_blank">Madrasah Tarbiyyah Islamiyyah Darul Hijrah</a></p>
                     </div>
-                    <div class="contact-item d-flex align-items-center">
-                        <img src="image/instagram.png" alt="Instagram" class="contact-icon">
-                        <p>BOOKWORMRENTAL</p>
+                    <div class="contact-item">
+                        <img src="images/email.png" alt="Email" class="contact-icon">
+                        <p><a href="kompleksdarulhijrah@gmail.com" target="_blank">kompleksdarulhijrah@gmail.com</a></p>
                     </div>
                 </div>
                 <div class="contact-image">
-                    <img src="Items/customer_service.png" alt="Customer Service" class="img-fluid">
+                    <img src="images/student.jpg" alt="Customer Service" class="img-fluid">
                 </div>
             </div>
         </div>
     </div>
 </body>
-
 </html>
