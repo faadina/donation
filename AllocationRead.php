@@ -8,7 +8,7 @@ if (isset($_GET['allocationID'])) {
     // Fetch allocation record from the database based on allocationID
     $sql = "SELECT * FROM Allocation WHERE allocationID = ?";
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $allocationID);
+    $stmt->bind_param("s", $allocationID); // Assuming allocationID is a string, adjust if it's an integer
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -25,7 +25,7 @@ if (isset($_GET['allocationID'])) {
     if (isset($_GET['viewDonations']) && $_GET['viewDonations'] == 'true') {
         $sql_donations = "SELECT * FROM Donation WHERE allocationID = ?";
         $stmt_donations = $conn->prepare($sql_donations);
-        $stmt_donations->bind_param("i", $allocationID);
+        $stmt_donations->bind_param("s", $allocationID); // Assuming allocationID is a string, adjust if it's an integer
         $stmt_donations->execute();
         $result_donations = $stmt_donations->get_result();
     }
