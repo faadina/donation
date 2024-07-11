@@ -11,13 +11,15 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 }
 
 // Ensure the connection is properly established using $con from dbConnect.php
-if ($con->connect_error) {
-    die("Connection failed: " . $con->connect_error);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
 // Retrieve all allocations from the database
 $sql = "SELECT * FROM Allocation";
-$result = $con->query($sql);
+$result = $conn->query($sql);
+
+
 ?>
 
 <!DOCTYPE html>
@@ -103,7 +105,7 @@ $result = $con->query($sql);
     } else {
         echo "<p>No allocations found</p>";
     }
-    $con->close();
+    $conn->close();
     ?>
 </div>
 
