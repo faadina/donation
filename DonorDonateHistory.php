@@ -22,11 +22,11 @@ $result = $conn->query($sql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donation History</title>
 
-        <!-- Include SweetAlert CSS -->
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
 
-<!-- Include SweetAlert JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
 
     <style>
         body {
@@ -50,10 +50,12 @@ $result = $conn->query($sql);
             padding: 20px;
             margin-bottom: 20px;
         }
+
         .receipt-image {
             max-width: 100%;
             height: auto;
         }
+
         .donation-table {
             width: 100%;
             border-collapse: collapse;
@@ -100,6 +102,7 @@ $result = $conn->query($sql);
         .view-receipt-btn:hover {
             background-color: #555;
         }
+
         @keyframes moveDots {
             0% { content: '.'; }
             25% { content: '..'; }
@@ -112,6 +115,12 @@ $result = $conn->query($sql);
             content: '.';
             animation: moveDots 1s infinite;
             display: inline-block;
+        }
+
+        .receipt-iframe {
+            width: 100%;
+            height: 800px; /* Increased height for better visibility */
+            border: none;
         }
     </style>
 </head>
@@ -142,11 +151,13 @@ $result = $conn->query($sql);
                             <td><?php echo htmlspecialchars($row['donationMethod']); ?></td>
                             <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
                             <td>
-                                <button class="view-receipt-btn" data-receipt-url="<?php echo $row['donationReceipt']; ?>">View Receipt</button>
-                            </td>                            
-
+                                <?php if (!empty($row['donationReceipt'])): ?>
+                                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">View Receipt</button>
+                                <?php else: ?>
+                                    No Receipt
+                                <?php endif; ?>
+                            </td>
                             <td><?php echo htmlspecialchars($row['allocationID']); ?></td>
-
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -160,46 +171,63 @@ $result = $conn->query($sql);
         receiptButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const receiptUrl = this.getAttribute('data-receipt-url');
+                const fileExtension = receiptUrl.split('.').pop().toLowerCase();
 
-                // Construct HTML content to embed receipt image in SweetAlert message
-                const receiptHtml = `
-                    <div style="text-align: center;">
-                        <img src="${receiptUrl}" class="receipt-image" alt="Receipt">
-                    </div>
-                `;
-
-                // Show SweetAlert with embedded receipt image and loading state
-                swal({
-                    title: "View Receipt",
-                    content: {
-                        element: "div",
-                        attributes: {
-                            innerHTML: receiptHtml
+                if (fileExtension === 'pdf') {
+                    // Show SweetAlert with embedded PDF viewer and print option
+                    swal({
+                        title: "View Receipt",
+                        content: {
+                            element: "iframe",
+                            attributes: {
+                                src: receiptUrl,
+                                class: "receipt-iframe"
+                            },
                         },
-                    },
-                    buttons: {
-                        cancel: "Close",
-                        confirm: {
-                            text: "Download",
-                            value: "download", // Custom value to distinguish download action
+                        buttons: {
+                            cancel: "Close",
+                            confirm: {
+                                text: "Print",
+                                value: "print", // Custom value to distinguish print action
+                            },
                         },
-                    },
-                }).then((value) => {
-                    if (value === "download") {
-                        // Show loading state with three dots
-                        swal({
-                            title: "Downloading...",
-                            text: "Please wait",
-                            buttons: false, // Disable any buttons during loading state
-                            closeOnClickOutside: false, // Prevent closing by clicking outside
-                            closeOnEsc: false, // Prevent closing by pressing ESC key
-                            timer: 3000, // Adjust timeout as needed (in milliseconds)
-                        }).then(() => {
-                            // After loading state, open the receipt URL in a new tab
+                    }).then((value) => {
+                        if (value === "print") {
+                            // Open the receipt URL in a new tab for printing
                             window.open(receiptUrl, '_blank');
-                        });
-                    }
-                });
+                        }
+                    });
+                } else {
+                    // Construct HTML content to embed receipt image in SweetAlert message
+                    const receiptHtml = `
+                        <div style="text-align: center;">
+                            <img src="${receiptUrl}" class="receipt-image" alt="Receipt">
+                        </div>
+                    `;
+
+                    // Show SweetAlert with embedded receipt image and print option
+                    swal({
+                        title: "View Receipt",
+                        content: {
+                            element: "div",
+                            attributes: {
+                                innerHTML: receiptHtml
+                            },
+                        },
+                        buttons: {
+                            cancel: "Close",
+                            confirm: {
+                                text: "Print",
+                                value: "print", // Custom value to distinguish print action
+                            },
+                        },
+                    }).then((value) => {
+                        if (value === "print") {
+                            // Open the receipt URL in a new tab for printing
+                            window.open(receiptUrl, '_blank');
+                        }
+                    });
+                }
             });
         });
     </script>
