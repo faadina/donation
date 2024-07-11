@@ -40,14 +40,12 @@ $result = $conn->query($sql);
         <table id="donationTable" class="table table-striped">
             <thead>
                 <tr>
-                    <th>ID</th>
+                    <th>Donation ID</th>
                     <th>Amount (RM)</th>
                     <th>Date</th>
                     <th>Method</th>
                     <th>Status</th>
                     <th>Receipt</th>
-                    <th>Donor ID</th>
-                    <th>Staff ID</th>
                     <th>Allocation ID</th>
                     <th colspan='2' style="text-align:center;">Action</th>
                     <th>Edit</th>
@@ -63,13 +61,14 @@ $result = $conn->query($sql);
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
                         echo "<td>" . $row["donationMethod"] . "</td>";
                         echo "<td>" . $row["donationStatus"] . "</td>";
-                        echo "<td><a href='#' class='btn btn-primary btn-mini-column' onclick='viewReceipt(\"" . $row["donationReceipt"] . "\")'>View</a></td>";
-                        echo "<td>" . $row["donorID"] . "</td>";
-                        echo "<td>" . $row["staffID"] . "</td>";
+                        
+                        // Displaying receipt with a link to view PDF
+                        echo "<td><a href='ReceiptView.php?donationID=" . $row["donationID"] . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+                        
                         echo "<td>" . $row["allocationID"] . "</td>";
 
                         // Check the donation status and display corresponding actions
-                        if ($row["donationStatus"] == "Pending") {
+                        if ($row["donationStatus"] == "pending") {
                             echo "<td><a href='DonationAccept.php?donationID=" . $row["donationID"] . "' class='btn btn-success btn-mini-column'>Accept</a></td>";
                             echo "<td><a href='DonationReject.php?donationID=" . $row["donationID"] . "' class='btn btn-danger btn-mini-column'>Reject</a></td>";
                         } elseif ($row["donationStatus"] == "Accepted") {
@@ -77,8 +76,6 @@ $result = $conn->query($sql);
                         } elseif ($row["donationStatus"] == "Rejected") {
                             echo "<td colspan='2' style='text-align:center;'><button class='btn btn-secondary btn-mini-column' disabled>Rejected</button></td>";
                         }
-                        
-                        
 
                         // Icon-based edit button
                         echo "<td><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' class='btn btn-info btn-mini-column'><i class='bi bi-pencil-square'></i></a></td>";
@@ -86,7 +83,7 @@ $result = $conn->query($sql);
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='12'>No donation records found</td></tr>";
+                    echo "<tr><td colspan='10'>No donation records found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -128,7 +125,7 @@ $result = $conn->query($sql);
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
                 var statusCell = rows[i].getElementsByTagName("td")[4];
-                if (statusCell && statusCell.innerText.trim() !== "Pending") {
+                if (statusCell && statusCell.innerText.trim() !== "pending") {
                     rows[i].style.display = "none";
                 } else {
                     rows[i].style.display = "";

@@ -41,43 +41,39 @@ $donationDate = "";
 $donationMethod = "";
 $donationStatus = "";
 $donationReceipt = "";
-$donorID = "";
-$staffID = "";
 $allocationID = "";
 
 // Check if donationID is provided via GET parameter
 if (isset($_GET['donationID'])) {
     $donationID = $_GET['donationID'];
 
-    // Fetch existing donation details from the database
-    $sql = "SELECT * FROM Donation WHERE donationID = '$donationID'";
-    $result = $conn->query($sql);
+   // Fetch existing donation details from the database
+$sql = "SELECT * FROM Donation WHERE donationID = '$donationID'";
+$result = $conn->query($sql);
 
-    if ($result->num_rows > 0) {
-        // Populate variables with current values
-        $row = $result->fetch_assoc();
-        $donationAmount = $row["donationAmount"];
-        $donationDate = $row["donationDate"];
-        $donationMethod = $row["donationMethod"];
-        $donationStatus = $row["donationStatus"];
-        $donationReceipt = $row["donationReceipt"];
-        $donorID = $row["donorID"];
-        $staffID = $row["staffID"];
-        $allocationID = $row["allocationID"];
-    } else {
-        echo "Donation not found.";
-    }
+if ($result->num_rows > 0) {
+    // Populate variables with current values
+    $row = $result->fetch_assoc();
+    $donationAmount = $row["donationAmount"];
+    $donationDate = $row["donationDate"]; // Ensure this is correctly fetched
+    $donationMethod = $row["donationMethod"];
+    $donationStatus = $row["donationStatus"];
+    $donationReceipt = $row["donationReceipt"];
+    $allocationID = $row["allocationID"];
+} else {
+    echo "Donation not found.";
+}
+
 }
 
 // Process form submission for update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data
     $donationID = $_POST["donationID"];
     $donationAmount = $_POST["donationAmount"];
-    $donationDate = $_POST["donationDate"];
+    $donationDate = $_POST["donationDate"]; // Ensure this is correctly fetched
     $donationMethod = $_POST["donationMethod"];
     $donationStatus = $_POST["donationStatus"];
-    $donorID = $_POST["donorID"];
-    $staffID = $_POST["staffID"];
     $allocationID = $_POST["allocationID"];
 
     // Check if a receipt file was uploaded
@@ -92,8 +88,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             donationDate = '$donationDate',
             donationMethod = '$donationMethod',
             donationStatus = '$donationStatus',
-            donorID = '$donorID',
-            staffID = '$staffID',
             allocationID = '$allocationID'";
 
     // Append donationReceipt update if a receipt was uploaded
@@ -115,7 +109,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $conn->close(); // Close database connection
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -125,52 +118,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h2 class="my-4">Update Donation</h2>
-        <form action="DonationUpdate.php" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="donationID" class="form-label">Donation ID</label>
-                <input type="text" class="form-control" id="donationID" name="donationID" value="<?php echo $donationID; ?>" readonly>
+    <?php include('staffHeader.php'); ?>
+    <div class="container my-4">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="card-title">Update Donation</h2>
+                    </div>
+                    <div class="card-body">
+                        <form action="DonationUpdate.php" method="post" enctype="multipart/form-data">
+                            <div class="mb-3">
+                                <label for="donationID" class="form-label">Donation ID</label>
+                                <input type="text" class="form-control" id="donationID" name="donationID" value="<?php echo $donationID; ?>" readonly>
+                            </div>
+                            <div class="mb-3">
+                                <label for="donationAmount" class="form-label">Donation Amount</label>
+                                <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="donationDate" class="form-label">Donation Date</label>
+                                <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="donationMethod" class="form-label">Donation Method</label>
+                                <input type="text" class="form-control" id="donationMethod" name="donationMethod" value="<?php echo $donationMethod; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="donationStatus" class="form-label">Donation Status</label>
+                                <input type="text" class="form-control" id="donationStatus" name="donationStatus" value="<?php echo $donationStatus; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="allocationID" class="form-label">Allocation ID</label>
+                                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="donationReceipt" class="form-label">Current Donation Receipt</label><br>
+                                <?php if (!empty($donationReceipt)) : ?>
+                                    <a href="<?php echo $donationReceipt; ?>" target="_blank">View Receipt</a><br><br>
+                                <?php else : ?>
+                                    No Receipt
+                                <?php endif; ?>
+                                <input type="file" class="form-control" id="donationReceipt" name="donationReceipt">
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check"></i> Update
+                            </button>
+                            <a href="DonationView.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Donation Records</a>
+                        </form>
+                    </div>
+                </div>
             </div>
-            <div class="mb-3">
-                <label for="donationAmount" class="form-label">Donation Amount</label>
-                <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="donationDate" class="form-label">Donation Date</label>
-                <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="donationMethod" class="form-label">Donation Method</label>
-                <input type="text" class="form-control" id="donationMethod" name="donationMethod" value="<?php echo $donationMethod; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="donationStatus" class="form-label">Donation Status</label>
-                <input type="text" class="form-control" id="donationStatus" name="donationStatus" value="<?php echo $donationStatus; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="donorID" class="form-label">Donor ID</label>
-                <input type="text" class="form-control" id="donorID" name="donorID" value="<?php echo $donorID; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="staffID" class="form-label">Staff ID</label>
-                <input type="text" class="form-control" id="staffID" name="staffID" value="<?php echo $staffID; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="allocationID" class="form-label">Allocation ID</label>
-                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" required>
-            </div>
-            <div class="mb-3">
-                <label for="donationReceipt" class="form-label">Current Donation Receipt</label><br>
-                <?php if (!empty($donationReceipt)) : ?>
-                    <a href="<?php echo $donationReceipt; ?>" target="_blank">View Receipt</a><br><br>
-                <?php else : ?>
-                    No Receipt
-                <?php endif; ?>
-                <input type="file" class="form-control" id="donationReceipt" name="donationReceipt">
-            </div>
-            <button type="submit" class="btn btn-primary">Update</button>
-        </form>
+        </div>
     </div>
 </body>
 </html>
