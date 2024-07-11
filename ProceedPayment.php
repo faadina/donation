@@ -1,145 +1,217 @@
 <?php
-session_start();
-
 include 'dbConnect.php';
+$title = "Donation Page";
+include 'DonorHeader.php'; // Include your header here
 
-// Check if donor ID is set in session
-if (!isset($_SESSION['username'])) {
-    die('User ID not found in session.');
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
 
-$donorID = $_SESSION['username']; // Use username as the donor ID
-
-// Initialize variables
-$allocationID = $donationAmount = $donationMethod = '';
-
-// Debugging variables
-echo "GET data: ";
-print_r($_GET);
-echo "<br>POST data: ";
-print_r($_POST);
-
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // Check if form data is set
-    if (isset($_POST['allocationID'], $_POST['donationAmount'], $_POST['donationMethod'])) {
-        $allocationID = $_POST['allocationID'];
-        $donationAmount = $_POST['donationAmount'];
-        $donationMethod = $_POST['donationMethod'];
-        $donationDate = date('Y-m-d'); // Current date
-        $donationStatus = 'Pending'; // Default status
-
-        // Handle file upload
-        if (isset($_FILES['donationReceipt']) && $_FILES['donationReceipt']['error'] == UPLOAD_ERR_OK) {
-            $fileTmpPath = $_FILES['donationReceipt']['tmp_name'];
-            $fileName = $_FILES['donationReceipt']['name'];
-            $uploadDir = 'uploads/';
-            $dest_path = $uploadDir . $fileName;
-
-            if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                // File is successfully uploaded
-                $donationReceipt = $dest_path;
-            } else {
-                die('Error moving the uploaded file.');
-            }
-        } else {
-            die('Error uploading file.');
-        }
-
-        // Generate a unique donationID
-        $donationID = substr(uniqid('D'), 0, 10); // Adjust length to fit the column
-
-        // Insert donation record into the database
-        $stmt = $conn->prepare("INSERT INTO Donation (donationID, donationAmount, donationDate, donationMethod, donationStatus, donorID, allocationID, donationReceipt) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $stmt->bind_param('sdssssss', $donationID, $donationAmount, $donationDate, $donationMethod, $donationStatus, $donorID, $allocationID, $donationReceipt);
-
-        if ($stmt->execute()) {
-            echo "Donation successful. Thank you for your generosity!";
-            // Optionally, redirect to a success page or display a success message
-        } else {
-            echo "Error: " . $stmt->error;
-        }
-
-        $stmt->close();
-    } else {
-        echo "Form data missing.";
-    }
-
-    $conn->close();
-} else {
-    echo "No allocation selected.";
-}
+// Fetch donations
+$sql = "SELECT * FROM donation";
+$result = $conn->query($sql);
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Proceed Payment</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donation History</title>
+
+    <!-- Include SweetAlert CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #f4f4f4;
-            margin: 10%;
+            color: #333;
+            margin: 0;
             padding: 0;
+            min-height: 100vh;
         }
-        .main-content {
+
+        .wrapper {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+        .donation-container {
+            background-color: black;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
-            max-width: 800px;
-            margin: 0 auto;
+            margin-bottom: 20px;
         }
-        .form-group {
-            margin-bottom: 15px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .form-group input, .form-group select {
+
+        .donation-table {
             width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
-        .btn {
-            background-color: #28a745;
-            color: white;
-            padding: 10px 20px;
+
+        .donation-table th, .donation-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .donation-table th {
+            background-color: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .btn-feedback {
+            background-color: darkcyan;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-feedback:hover {
+            background-color: #0d7a8a;
+        }
+
+        .view-receipt-btn {
+            background-color: #333;
+            color: #fff;
+            padding: 6px 12px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
         }
-        .btn:hover {
-            background-color: #218838;
+
+        .view-receipt-btn:hover {
+            background-color: #555;
+        }
+
+        @keyframes moveDots {
+            0% { content: '.'; }
+            25% { content: '..'; }
+            50% { content: '...'; }
+            75% { content: '..'; }
+            100% { content: '.'; }
+        }
+
+        .loading-dots:after {
+            content: '.';
+            animation: moveDots 1s infinite;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <div class="main-content">
-        <?php if ($allocationID): ?>
-        <h2>Proceed Payment</h2>
-        <form action="ProceedPayment.php" method="post" enctype="multipart/form-data">
-            <div class="form-group">
-                <label for="allocationID">Allocation ID:</label>
-                <input type="text" id="allocationID" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>" readonly>
-            </div>
-            <div class="form-group">
-                <label for="donationAmount">Donation Amount (RM):</label>
-                <input type="number" id="donationAmount" name="donationAmount" value="<?php echo htmlspecialchars($donationAmount); ?>" required>
-            </div>
-            <div class="form-group">
-                <label for="donationMethod">Donation Method:</label>
-                <select id="donationMethod" name="donationMethod" required>
-                    <option value="Credit Card" <?php if ($donationMethod == 'Credit Card') echo 'selected'; ?>>Credit Card</option>
-                    <option value="Bank Transfer" <?php if ($donationMethod == 'Bank Transfer') echo 'selected'; ?>>Bank Transfer</option>
-                    <option value="PayPal" <?php if ($donationMethod == 'PayPal') echo 'selected'; ?>>PayPal</option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label for="donationReceipt">Donation Receipt:</label>
-                <input type="file" id="donationReceipt" name="donationReceipt" required>
-            </div>
-            <button type="submit" class="btn">Donate Now</button>
-        </form>
-        <?php else: ?>
-        <p>No allocation selected. Please select an allocation first.</p>
-        <?php endif; ?>
+
+    <div class="wrapper">
+        <br><br><br><br>
+        <h2>Donation History</h2>
+        <div class="donation-container">
+            <table class="donation-table">
+                <thead>
+                    <tr>
+                        <th>Donation ID</th>
+                        <th>Donation Amount</th>
+                        <th>Donation Date</th>
+                        <th>Donation Method</th>
+                        <th>Donation Status</th>
+                        <th>Donation Receipt</th>
+                        <th>Allocation ID</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <?php while ($row = $result->fetch_assoc()): ?>
+                    <tr>
+                        <td><?php echo htmlspecialchars($row['donationID']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donationAmount']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donationMethod']); ?></td>
+                        <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
+                        <td>
+                            <?php if (!empty($row['donationReceipt'])): ?>
+                                <?php $receiptPath = 'uploads/' . urlencode($row['donationReceipt']); ?>
+                                <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($receiptPath); ?>">View Receipt</button>
+                                <!-- Debug information -->
+                                <div style="display:none;"><?php echo htmlspecialchars($receiptPath); ?></div>
+                            <?php else: ?>
+                                No Receipt
+                            <?php endif; ?>
+                        </td>
+                        <td><?php echo htmlspecialchars($row['allocationID']); ?></td>
+                    </tr>
+                <?php endwhile; ?>
+
+                </tbody>
+            </table>
+        </div>
     </div>
+<?php
+$files = scandir('uploads/');
+echo '<pre>';
+print_r($files);
+echo '</pre>';
+?>
+    <script>
+    // JavaScript for handling receipt viewing with SweetAlert
+    const receiptButtons = document.querySelectorAll('.view-receipt-btn');
+    receiptButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const receiptUrl = this.getAttribute('data-receipt-url');
+
+            // Construct HTML content to embed receipt image in SweetAlert message
+            const receiptHtml = `
+                <div style="text-align: center;">
+                    <img src="${receiptUrl}" class="receipt-image" alt="Receipt" onerror="this.onerror=null;this.src='error.png';">
+                </div>
+            `;
+
+            // Show SweetAlert with embedded receipt image and loading state
+            swal({
+                title: "View Receipt",
+                content: {
+                    element: "div",
+                    attributes: {
+                        innerHTML: receiptHtml
+                    },
+                },
+                buttons: {
+                    cancel: "Close",
+                    confirm: {
+                        text: "Download",
+                        value: "download", // Custom value to distinguish download action
+                    },
+                },
+            }).then((value) => {
+                if (value === "download") {
+                    // Show loading state with three dots
+                    swal({
+                        title: "Downloading...",
+                        text: "Please wait",
+                        buttons: false, // Disable any buttons during loading state
+                        closeOnClickOutside: false, // Prevent closing by clicking outside
+                        closeOnEsc: false, // Prevent closing by pressing ESC key
+                        timer: 3000, // Adjust timeout as needed (in milliseconds)
+                    }).then(() => {
+                        // After loading state, open the receipt URL in a new tab
+                        window.open(receiptUrl, '_blank');
+                    });
+                }
+            });
+        });
+    });
+</script>
+
 </body>
 </html>
