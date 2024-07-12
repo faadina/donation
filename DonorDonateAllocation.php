@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'dbConnect.php'; // Use the existing $con variable for the connection
+include 'dbConnect.php'; // Use the existing $conn variable for the connection
 $title = "Donation Page";
 include 'DonorHeader.php';
 
@@ -10,7 +10,7 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     exit;
 }
 
-// Ensure the connection is properly established using $con from dbConnect.php
+// Ensure the connection is properly established using $conn from dbConnect.php
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }

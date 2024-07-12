@@ -18,7 +18,7 @@ if (isset($_GET['donationID'])) {
     
     // Prepare and bind parameter
     $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $donationID);
+    $stmt->bind_param("s", $donationID);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -27,7 +27,12 @@ if (isset($_GET['donationID'])) {
         // Fetch the row (there should be only one since donationID is unique)
         $row = $result->fetch_assoc();
 
-        echo "<!DOCTYPE html>
+        // Close statement
+        $stmt->close();
+
+        // HTML content for the receipt
+        $htmlContent = "
+        <!DOCTYPE html>
         <html lang='en'>
         <head>
             <meta charset='UTF-8'>
@@ -160,17 +165,17 @@ if (isset($_GET['donationID'])) {
             </div>
         </body>
         </html>";
+
+        // Output the HTML content
+        echo $htmlContent;
   
     } else {
         echo "Error: Donation ID not found or unable to fetch data.";
     }
 
-    // Close statement and database connection
-    $stmt->close();
+    // Close database connection
     $conn->close();
 } else {
     echo "Error: Donation ID parameter is missing.";
 }
 ?>
-
-

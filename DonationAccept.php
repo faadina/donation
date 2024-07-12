@@ -29,7 +29,7 @@ if (isset($_GET['donationID']) && !empty($_GET['donationID'])) {
 
         // Update current amount in Allocation table
         $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
-        $stmt->bind_param("di", $donationAmount, $allocationID);
+        $stmt->bind_param("is", $donationAmount, $allocationID);
         $stmt->execute();
         $stmt->close();
 

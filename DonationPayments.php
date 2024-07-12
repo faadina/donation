@@ -24,6 +24,8 @@ $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
 
+
+
 // Fetch allocation status from Allocation table
 $allocationStatus = $allocation['allocationStatus'] ?? '';
 
@@ -174,7 +176,7 @@ $conn->close();
                         <button type="button" class="btn btn-closed" disabled>CLOSED</button>
                         <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php else: ?>
-                        <button type="submit" class="btn btn-success">DONATE NOW</button>
+                        <button type="submit" class="btn btn-success">DONATE NOW</button> 
                         <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php endif; ?>
                 </form>
