@@ -2,7 +2,7 @@
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Fetch donation records from the database
-$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationMethod, d.donationStatus, d.allocationID, a.allocationName
+$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
 $result = $conn->query($sql);
@@ -34,11 +34,12 @@ $result = $conn->query($sql);
         }
     </style>
 </head>
-<body>
     <?php include('staffHeader.php'); ?>
+    
     <div class="container">
+    
         <h2 class="my-4">Donation Records</h2>
-
+        
         <!-- Buttons for filtering -->
         <div class="mb-3">
             <button class="btn btn-success mr-2" onclick="showAccepted()">List Accepted</button>
@@ -46,7 +47,6 @@ $result = $conn->query($sql);
             <button class="btn btn-warning mr-2" onclick="showPending()">List Pending</button>
             <button class="btn btn-primary" onclick="showAll()">View All</button>
         </div>
-
         <div class="mb-3" style="text-align: right;">
             <form id="searchForm" onsubmit="return searchDonation()">
                 <div class="input-group">
@@ -60,6 +60,8 @@ $result = $conn->query($sql);
                 </div>
             </form>
         </div>
+<body>
+        
 
         <table id="donationTable" class="table table-striped">
             <thead>
@@ -67,7 +69,6 @@ $result = $conn->query($sql);
                     <th>Donation ID</th>
                     <th>Amount (RM)</th>
                     <th>Date</th>
-                    <th>Method</th>
                     <th>Status</th>
                     <th>Receipt</th>
                     <th>Allocation Type</th>
@@ -79,11 +80,12 @@ $result = $conn->query($sql);
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
+                        
+
                         echo "<tr>";
                         echo "<td>" . $row["donationID"] . "</td>";
                         echo "<td>" . $row["donationAmount"] . "</td>";
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
-                        echo "<td>" . $row["donationMethod"] . "</td>";
                         echo "<td>" . $row["donationStatus"] . "</td>";
                         
                         // Displaying receipt with a link to view PDF
@@ -120,7 +122,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[3];
                 if (statusCell && statusCell.innerText.trim() !== "Accepted") {
                     rows[i].style.display = "none";
                 } else {
@@ -134,7 +136,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[3];
                 if (statusCell && statusCell.innerText.trim() !== "Rejected") {
                     rows[i].style.display = "none";
                 } else {
@@ -148,7 +150,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[3];
                 if (statusCell && statusCell.innerText.trim() !== "pending") {
                     rows[i].style.display = "none";
                 } else {
