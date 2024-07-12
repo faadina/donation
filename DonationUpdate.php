@@ -42,13 +42,15 @@ $donationMethod = "";
 $donationStatus = "";
 $donationReceipt = "";
 $allocationName = "";
+$allocationID = "";
 
 // Check if donationID is provided via GET parameter
 if (isset($_GET['donationID'])) {
     $donationID = $_GET['donationID'];
 }
+
 // Fetch existing donation details from the database including allocationName
-$sql = "SELECT d.*, a.allocationName
+$sql = "SELECT d.*, a.allocationName, a.allocationID
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID
         WHERE d.donationID = '$donationID'";
@@ -66,10 +68,10 @@ if ($result->num_rows > 0) {
     $donationStatus = $row["donationStatus"];
     $donationReceipt = $row["donationReceipt"];
     $allocationName = $row["allocationName"];
+    $allocationID = $row["allocationID"];
 } else {
     echo "Donation not found.";
 }
-
 
 // Process form submission for update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -87,32 +89,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $donationReceipt = uploadReceipt($_FILES["donationReceipt"]);
     }
 
-    // Prepare SQL statement for update
-    $sql = "UPDATE Donation SET
-            donationAmount = '$donationAmount',
-            donationDate = '$donationDate',
-            donationMethod = '$donationMethod',
-            donationStatus = '$donationStatus'";
+    // Begin transaction
+    $conn->begin_transaction();
 
-    // Append allocationID update if necessary
-    if (!empty($allocationID)) {
-        $sql .= ", allocationID = '$allocationID'";
-    }
+    try {
+        // Prepare SQL statement for update
+        $sql = "UPDATE Donation SET
+                donationAmount = '$donationAmount',
+                donationDate = '$donationDate',
+                donationMethod = '$donationMethod',
+                donationStatus = '$donationStatus'";
 
-    // Append donationReceipt update if a receipt was uploaded
-    if (!empty($donationReceipt)) {
-        $sql .= ", donationReceipt = '$donationReceipt'";
-    }
+        // Append allocationID update if necessary
+        if (!empty($allocationID)) {
+            $sql .= ", allocationID = '$allocationID'";
+        }
 
-    $sql .= " WHERE donationID = '$donationID'";
+        // Append donationReceipt update if a receipt was uploaded
+        if (!empty($donationReceipt)) {
+            $sql .= ", donationReceipt = '$donationReceipt'";
+        }
 
-    // Execute SQL statement
-    if ($conn->query($sql) === TRUE) {
-        // Redirect to DonationView.php after successful update
-        header("Location: DonationView.php");
-        exit();
-    } else {
-        echo "Error updating record: " . $conn->error;
+        $sql .= " WHERE donationID = '$donationID'";
+
+        // Execute SQL statement
+        if ($conn->query($sql) === TRUE) {
+            // Check if the status has changed to "Accepted"
+            if ($donationStatus == 'Accepted') {
+                // Update current amount in Allocation table
+                $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
+                $stmt->bind_param('di', $donationAmount, $allocationID);
+                $stmt->execute();
+                $stmt->close();
+            }
+
+            // Commit transaction
+            $conn->commit();
+
+            // Redirect to DonationView.php after successful update
+            header("Location: DonationView.php");
+            exit();
+        } else {
+            throw new Exception("Error updating record: " . $conn->error);
+        }
+    } catch (Exception $e) {
+        // Rollback transaction if an error occurs
+        $conn->rollback();
+        echo $e->getMessage();
     }
 
     $conn->close(); // Close database connection
@@ -146,10 +169,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
                             </div>
                             <div class="mb-3">
-    <label for="donationDate" class="form-label">Donation Date</label>
-    <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
-</div>
-
+                                <label for="donationDate" class="form-label">Donation Date</label>
+                                <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
+                            </div>
                             <div class="mb-3">
                                 <label for="donationMethod" class="form-label">Donation Method</label>
                                 <input type="text" class="form-control" id="donationMethod" name="donationMethod" value="<?php echo $donationMethod; ?>" required>
