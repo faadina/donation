@@ -1,10 +1,8 @@
 <?php
-
-$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
-
-$current_page = isset($current_page) ? $current_page : '';
-
+$current_page = basename($_SERVER['PHP_SELF']);
+$managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,25 +15,23 @@ $current_page = isset($current_page) ? $current_page : '';
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
         body {
-            margin: 0; /* Remove default margin to span full width */
-            font-family: 'Inter', sans-serif; /* Use Google Font Inter */
-            background-color: #F2FCEB;
+            margin: 0; 
+            font-family: 'Inter', sans-serif;      
         }
 
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background-color: #f9fcff;
-            background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
             font-weight: 600;
             padding: 10px 20px;
-            position: -webkit-sticky; /* Safari */
+            position: -webkit-sticky; 
             position: sticky;
             top: 0;
             z-index: 2;
             width: AUTO;
-            margin: 0 auto; /* Center the header */
+            margin: 0 auto; 
         }
 
         .logo {
@@ -62,24 +58,26 @@ $current_page = isset($current_page) ? $current_page : '';
             padding: 5px 10px;
             border: 1px solid transparent;
             text-decoration: none;
-            color:#104854;
+            color:lightgrey;
             font-weight: bold;
         }
 
         ul li a:hover,
         ul li a:focus {
-            color: green;
+            color: #b9e3c7;
+            text-decoration: none;
         }
 
         ul li a.active {
-            color: #e4b909;
-            
+            font-weight: 980;
+            color:white;
         }
 
         .manager-info {
             display: flex;
             align-items: center;
             margin-right: 20px;
+            position: relative; /* Add this line */
         }
 
         .manager-username {
@@ -90,24 +88,24 @@ $current_page = isset($current_page) ? $current_page : '';
         .dropdown-menu {
             display: none;
             position: absolute;
-            background-color: #fff;
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
             z-index: 99;
             padding: 0;
-            margin-top: 10%;
-            margin-left: 2%;
-            width: 13%;
+            top: 100%; /* Position it right under the manager-info element */
+            left: 0; /* Align it to the left of the manager-info element */
+            width: 150px;
         }
 
         .dropdown-menu a {
-            color: #000;
-            padding: 5px 10px;
+            color: white;
+            padding: 8px 10px;
             text-decoration: none;
             display: block;
             white-space: nowrap;
         }
 
         .dropdown-menu a:hover {
-            background: #104854;
+            background: #37383a;
             color: white;
         }
     </style>
@@ -142,12 +140,12 @@ $current_page = isset($current_page) ? $current_page : '';
                     <li><a href="ManagerReport.php" class="<?php echo ($current_page == 'ManagerReport.php') ? 'active' : ''; ?>">Report</a></li>
                     
                     <li class="dropdown manager-info">
-                        <a style="background-color:white; border-radius:4px; color:#104854; box-shadow: inset 0px 0px 3px rgba(0, 0, 0, 0.5); border:none;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                            <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Manager: <?php echo $managerID; ?>
+                        <a style="background-color:#1e1d1d; border:#fff; border-radius:8px; box-shadow: inset 0px 0px 3px rgba(0, 0, 0,5); border:none;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
+                            <img src="images/userIcon1.png" alt="User Icon" height="18" width="18"> Manager
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
-                            <a class="dropdown-item" href="ManagerProfile.php">🗝 Profile</a>
-                            <a class="dropdown-item" href="Logout.php">🗝 Log Out</a>
+                            <a class="dropdown-item" href="ManagerProfile.php">• User: <?php echo $managerID; ?></a>
+                            <a class="dropdown-item" href="Logout.php">• Log Out</a>
                         </div>
                     </li>
                 </ul>
