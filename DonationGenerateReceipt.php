@@ -6,15 +6,15 @@ include 'dbConnect.php';
 if (isset($_GET['donationID'])) {
     // Sanitize input to prevent SQL injection
     $donationID = $_GET['donationID'];
-
-    // Query to fetch data for the specified donationID from Donation, Allocation, and Donor tables
+    
     $query = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, 
-                     a.allocationID, a.allocationName, 
-                     o.donorID, o.donorName
-              FROM Donation d
-              INNER JOIN Allocation a ON d.AllocationID = a.allocationID
-              INNER JOIN Donor o ON d.donorID = o.donorID
-              WHERE d.donationID = ?";
+    a.allocationID, a.allocationName, 
+    o.donorID, o.donorName, o.donorPhoneNo
+FROM Donation d
+INNER JOIN Allocation a ON d.AllocationID = a.allocationID
+INNER JOIN Donor o ON d.donorID = o.donorID
+WHERE d.donationID = ?";
+
     
     // Prepare and bind parameter
     $stmt = $conn->prepare($query);
@@ -82,18 +82,22 @@ if (isset($_GET['donationID'])) {
                             <hr class='row brc-default-l1 mx-n1 mb-4' />
   
                             <div class='row'>
-                                <div class='col-sm-6'>
-                                    <div>
-                                        <span class='text-sm text-grey-m2 align-middle'>To:</span>
-                                        <span class='text-600 text-110 text-blue align-middle'>{$row['donorName']}</span>
-                                    </div>
-                                    <div class='text-grey-m2'>
-                                        <div class='my-1'>
-                                            <!-- Address details if available -->
-                                        </div>
-                                        <div class='my-1'><i class='fa fa-phone fa-flip-horizontal text-secondary'></i> <b class='text-600'>111-111-111</b></div>
-                                    </div>
-                                </div>
+                                  <div class='col-sm-6'>
+    <div>
+        <span class='text-sm text-grey-m2 align-middle'>To:</span>
+        <span class='text-600 text-110 text-blue align-middle'>{$row['donorName']}</span>
+    </div>
+    <div class='text-grey-m2'>
+        <div class='my-1'>
+            <!-- Address details if available -->
+        </div>
+        <div class='my-1'>
+            <i class='fa fa-phone fa-flip-horizontal text-secondary'></i>
+            <b class='text-600'>{$row['donorPhoneNo']}</b>
+        </div>
+    </div>
+</div>
+
                                 <!-- /.col -->
   
                                 <div class='text-95 col-sm-6 align-self-start d-sm-flex justify-content-end'>
@@ -152,7 +156,7 @@ if (isset($_GET['donationID'])) {
                                         </div>
                                     </div>
                                 </div>
-  
+
                                 <hr />
   
                                 <div>
