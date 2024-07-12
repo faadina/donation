@@ -34,10 +34,10 @@ $result = $conn->query($sql);
         }
     </style>
 </head>
+<body>
     <?php include('staffHeader.php'); ?>
-    
+
     <div class="container">
-    
         <h2 class="my-4">Donation Records</h2>
         
         <!-- Buttons for filtering -->
@@ -60,8 +60,6 @@ $result = $conn->query($sql);
                 </div>
             </form>
         </div>
-<body>
-        
 
         <table id="donationTable" class="table table-striped">
             <thead>
@@ -80,8 +78,6 @@ $result = $conn->query($sql);
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        
-
                         echo "<tr>";
                         echo "<td>" . $row["donationID"] . "</td>";
                         echo "<td>" . $row["donationAmount"] . "</td>";
