@@ -125,13 +125,19 @@ $result = $conn->query($sql);
             echo '<div class="progress-bar-container">';
             echo '<div class="progress-bar" style="width:' . $progress . '%;"></div>';
             echo '</div>';
-            if ($row["currentAmount"] >= $row["targetAmount"]) {
+
+            // Check if allocation is closed or inactive
+            if ($row["allocationStatus"] == 'Inactive' || $row["currentAmount"] >= $row["targetAmount"]) {
                 echo '<button class="closed-button" disabled>CLOSED</button>';
+                $sql_update = "UPDATE Allocation SET allocationStatus = 'Inactive' WHERE allocationID = '" . $row["allocationID"] . "'";
+
             } else {
                 echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
+                $sql_update = "UPDATE Allocation SET allocationStatus = 'Active' WHERE allocationID = '" . $row["allocationID"] . "'";
             }
-            echo '</div>';
-            echo '</div>';
+
+            echo '</div>'; // card-footer
+            echo '</div>'; // card
         }
     } else {
         echo "<p>No allocations found</p>";
@@ -139,6 +145,8 @@ $result = $conn->query($sql);
     $conn->close();
     ?>
 </div>
+
+
 
 </body>
 </html>
