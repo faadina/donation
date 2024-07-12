@@ -39,6 +39,7 @@ $result = $conn->query($sql);
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
+            padding: 20px;
         }
         .card {
             background-color: #fff;
@@ -47,6 +48,9 @@ $result = $conn->query($sql);
             box-shadow: 0 0 10px rgba(0,0,0,0.1);
             overflow: hidden;
             width: 300px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
         }
         .card img {
             width: 100%;
@@ -55,9 +59,11 @@ $result = $conn->query($sql);
         }
         .card-content {
             padding: 20px;
+            flex: 1;
         }
         .card-content h2 {
             margin-top: 0;
+            margin-bottom: 10px;
         }
         .card-footer {
             padding: 20px;
@@ -93,7 +99,7 @@ $result = $conn->query($sql);
             echo '<img src="' . htmlspecialchars($row["allocationImage"]) . '" alt="' . htmlspecialchars($row["allocationName"]) . '">';
             echo '<div class="card-content">';
             echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
-            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '... <a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read more...</a></p>';
+            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '</p>';
             echo '</div>';
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';

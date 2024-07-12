@@ -84,6 +84,7 @@ $conn->close();
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-right: 10px;
         }
         .btn-success {
             background-color: #28a745;
@@ -92,9 +93,19 @@ $conn->close();
         .btn-success:hover {
             background-color: #218838;
         }
+        .btn-back {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
         .btn-closed {
             background-color: #dc3545;
             color: white;
+        }
+        .btn-closed:hover {
+            background-color: #c82333;
         }
     </style>
     <!-- Include SweetAlert CSS -->
@@ -124,21 +135,15 @@ $conn->close();
                         <input type="number" id="donationAmount" name="donationAmount" required>
                     </div>
                     <div class="form-group">
-                        <label for="donationMethod">Donation Method:</label>
-                        <select id="donationMethod" name="donationMethod" required>
-                            <option value="Credit Card">Credit Card</option>
-                            <option value="Bank Transfer">Bank Transfer</option>
-                            <option value="PayPal">PayPal</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
                         <label for="donationReceipt">Donation Receipt (PDF only):</label>
                         <input type="file" id="donationReceipt" name="donationReceipt" accept="application/pdf" required>
                     </div>
                     <?php if ($isInactive): ?>
                         <button type="button" class="btn btn-closed" disabled>CLOSED</button>
+                        <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php else: ?>
                         <button type="submit" class="btn btn-success">DONATE NOW</button>
+                        <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php endif; ?>
                 </form>
             </div>
