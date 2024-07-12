@@ -1,7 +1,15 @@
 <?php
+session_start();
 include 'dbConnect.php';
-$title = "Donation Page";
+$title = "Donation History";
 include 'DonorHeader.php'; // Include your header here
+
+// Check if user ID is set in session
+if (!isset($_SESSION['username'])) {
+    die('User ID not found in session.');
+}
+
+$donorID = $_SESSION['username'];
 
 $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -9,9 +17,16 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch donations
-$sql = "SELECT * FROM donation";
-$result = $conn->query($sql);
+// Fetch donations for the logged-in donor
+$stmt = $conn->prepare("
+    SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
+    FROM Donation d 
+    JOIN Allocation a ON d.allocationID = a.allocationID 
+    WHERE d.donorID = ?
+");
+$stmt->bind_param('s', $donorID);
+$stmt->execute();
+$result = $stmt->get_result();
 ?>
 
 <!DOCTYPE html>
@@ -44,7 +59,7 @@ $result = $conn->query($sql);
         }
 
         .donation-container {
-            background-color: black;
+            background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
             padding: 20px;
@@ -136,10 +151,9 @@ $result = $conn->query($sql);
                         <th>Donation ID</th>
                         <th>Donation Amount</th>
                         <th>Donation Date</th>
-                        <th>Donation Method</th>
                         <th>Donation Status</th>
                         <th>Donation Receipt</th>
-                        <th>Allocation ID</th>
+                        <th>Allocation Name</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -148,7 +162,6 @@ $result = $conn->query($sql);
                             <td><?php echo htmlspecialchars($row['donationID']); ?></td>
                             <td><?php echo htmlspecialchars($row['donationAmount']); ?></td>
                             <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationMethod']); ?></td>
                             <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
                             <td>
                                 <?php if (!empty($row['donationReceipt'])): ?>
@@ -157,7 +170,7 @@ $result = $conn->query($sql);
                                     No Receipt
                                 <?php endif; ?>
                             </td>
-                            <td><?php echo htmlspecialchars($row['allocationID']); ?></td>
+                            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
                         </tr>
                     <?php endwhile; ?>
                 </tbody>
@@ -233,3 +246,8 @@ $result = $conn->query($sql);
     </script>
 </body>
 </html>
+
+<?php
+$stmt->close();
+$conn->close();
+?>

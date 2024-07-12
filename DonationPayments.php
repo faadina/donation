@@ -132,7 +132,7 @@ $conn->close();
                     <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
                     <div class="form-group">
                         <label for="donationAmount">Donation Amount (RM):</label>
-                        <input type="number" id="donationAmount" name="donationAmount" required>
+                        <input type="number" id="donationAmount" name="donationAmount" min="1" required>
                     </div>
                     <div class="form-group">
                         <label for="donationReceipt">Donation Receipt (PDF only):</label>
@@ -154,58 +154,60 @@ $conn->close();
     </div>
 
     <script>
-        $(document).ready(function() {
-            $('#donationForm').on('submit', function(e) {
-                e.preventDefault();
+$(document).ready(function() {
+    $('#donationForm').on('submit', function(e) {
+        e.preventDefault();
 
-                var fileInput = $('#donationReceipt')[0];
-                var file = fileInput.files[0];
+        var fileInput = $('#donationReceipt')[0];
+        var file = fileInput.files[0];
 
-                if (file.type !== 'application/pdf') {
-                    swal({
-                        title: "Invalid File Type",
-                        text: "Please upload a PDF file.",
-                        icon: "error",
-                        button: "OK",
-                    });
-                    return;
-                }
+        if (file.type !== 'application/pdf') {
+            swal({
+                title: "Invalid File Type",
+                text: "Please upload a PDF file.",
+                icon: "error",
+                button: "OK",
+            });
+            return;
+        }
 
-                var formData = new FormData(this);
+        var formData = new FormData(this);
 
-                $.ajax({
-                    type: 'POST',
-                    url: 'ProceedPayment.php',
-                    data: formData,
-                    contentType: false,
-                    processData: false,
-                    success: function(response) {
-                        var jsonResponse = JSON.parse(response);
-                        var status = jsonResponse.status;
-                        var message = jsonResponse.message;
+        $.ajax({
+            type: 'POST',
+            url: 'ProceedPayment.php',
+            data: formData,
+            contentType: false,
+            processData: false,
+            success: function(response) {
+                var jsonResponse = JSON.parse(response);
+                var status = jsonResponse.status;
+                var message = jsonResponse.message;
+                var donationID = jsonResponse.donationID;
 
-                        swal({
-                            title: status === 'success' ? "Thank You for Your Donation!" : "Error",
-                            text: message,
-                            icon: status,
-                            buttons: {
-                                confirm: {
-                                    text: "Return to History",
-                                    value: true,
-                                    visible: true,
-                                    className: "btn btn-primary",
-                                    closeModal: true
-                                }
-                            }
-                        }).then((willGoToHistory) => {
-                            if (willGoToHistory) {
-                                window.location.href = "DonorDonateHistory.php";
-                            }
-                        });
+                swal({
+                    title: status === 'success' ? "Thank You for Your Donation!" : "Error",
+                    text: message + (donationID ? "\nYour Donation ID is: " + donationID : ""),
+                    icon: status,
+                    buttons: {
+                        confirm: {
+                            text: "Return to History",
+                            value: true,
+                            visible: true,
+                            className: "btn btn-primary",
+                            closeModal: true
+                        }
+                    }
+                }).then((willGoToHistory) => {
+                    if (willGoToHistory) {
+                        window.location.href = "DonorDonateHistory.php";
                     }
                 });
-            });
+            }
         });
+    });
+});
+
     </script>
 </body>
 </html>
