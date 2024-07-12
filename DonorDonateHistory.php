@@ -1,31 +1,33 @@
 <?php
 session_start();
-include 'dbConnect.php';
-$title = "Donation History";
-include 'DonorHeader.php'; // Include your header here
+include 'dbConnect.php'; // Include your database connection file
 
-// Check if user ID is set in session
+// Check if user is logged in and retrieve donorID from session
 if (!isset($_SESSION['username'])) {
     die('User ID not found in session.');
 }
 
 $donorID = $_SESSION['username'];
 
+// Establish database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
 
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Fetch donations for the logged-in donor
+// Prepare SQL statement to fetch donation history for the logged-in donor including donor ID
 $stmt = $conn->prepare("
-    SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
+    SELECT d.donationID, d.donorID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
     FROM Donation d 
     JOIN Allocation a ON d.allocationID = a.allocationID 
     WHERE d.donorID = ?
 ");
 $stmt->bind_param('s', $donorID);
 $stmt->execute();
+
+// Get result set from the executed SQL query
 $result = $stmt->get_result();
 ?>
 
@@ -118,20 +120,6 @@ $result = $stmt->get_result();
             background-color: #555;
         }
 
-        @keyframes moveDots {
-            0% { content: '.'; }
-            25% { content: '..'; }
-            50% { content: '...'; }
-            75% { content: '..'; }
-            100% { content: '.'; }
-        }
-
-        .loading-dots:after {
-            content: '.';
-            animation: moveDots 1s infinite;
-            display: inline-block;
-        }
-
         .receipt-iframe {
             width: 100%;
             height: 800px; /* Increased height for better visibility */
@@ -140,11 +128,12 @@ $result = $stmt->get_result();
     </style>
 </head>
 <body>
-
     <div class="wrapper">
-        <br><br><br><br>
         <h2>Donation History</h2>
+        <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3> <!-- Display donor's ID -->
         <div class="donation-container">
+            
+
             <table class="donation-table">
                 <thead>
                     <tr>
@@ -160,7 +149,7 @@ $result = $stmt->get_result();
                     <?php while ($row = $result->fetch_assoc()): ?>
                         <tr>
                             <td><?php echo htmlspecialchars($row['donationID']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationAmount']); ?></td>
+                            <td>MYR <?php echo number_format($row['donationAmount'], 2); ?></td>
                             <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
                             <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
                             <td>
@@ -248,6 +237,7 @@ $result = $stmt->get_result();
 </html>
 
 <?php
+// Close prepared statement and database connection
 $stmt->close();
 $conn->close();
 ?>

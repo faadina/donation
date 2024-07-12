@@ -1,5 +1,17 @@
 <?php
-include 'dbConnect.php'; // Ensure this file includes your database connection details
+session_start();
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
 
 // Function to handle file upload (if needed)
 function uploadFile($file, $targetDir) {
@@ -74,6 +86,105 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $donorAddress = $_POST["donorAddress"];
     $donorEmail = $_POST["donorEmail"];
     $donorPassword = $_POST["donorPassword"];
+
+    // Validate name
+    if (empty(trim($_POST["name"]))) {
+        $name_err = "Please enter your name.";
+    } elseif (!preg_match("/^[a-zA-Z@. ]*$/", $_POST["name"])) {
+        $name_err = "Name can only contain letters, spaces, '.', and '@'.";
+    } elseif (preg_match("/\d/", $_POST["name"])) {
+        $name_err = "Name cannot contain numbers.";
+    } else {
+        $name = trim($_POST["name"]);
+    }
+
+    // Validate birthdate
+    if (empty(trim($_POST["birthdate"]))) {
+        $birthdate_err = "Please enter your birthdate.";
+    } else {
+        $birthdate = trim($_POST["birthdate"]);
+    }
+
+    // Validate address
+    if (empty(trim($_POST["address"]))) {
+        $address_err = "Please enter your address.";
+    } else {
+        $address = trim($_POST["address"]);
+    }
+
+    // Validate phone number
+    if (empty(trim($_POST["phone"]))) {
+        $phone_err = "Please enter your phone number.";
+    } elseif (!preg_match("/^[0-9-]*$/", $_POST["phone"])) {
+        $phone_err = "Phone number can only contain digits and hyphens (-).";
+    } else {
+        $phone = trim($_POST["phone"]);
+    }
+
+    // Validate email
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
+    } else {
+        $email = trim($_POST["email"]);
+    }
+    // Validate email
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
+    } else {
+        $email = trim($_POST["email"]);
+
+        // Check if email already exists in staff table
+        $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
+        $stmt_donor = mysqli_prepare($conn, $sql_donor);
+        if ($stmt_donor) {
+            mysqli_stmt_bind_param($stmt_donor, "s", $email);
+            mysqli_stmt_execute($stmt_donor);
+            mysqli_stmt_store_result($stmt_donor);
+            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_donor);
+        } else {
+            echo "Something went wrong with the donor table query.";
+        }
+
+        // Check if email already exists in donor table
+        $sql_staff = "SELECT staffID FROM staff WHERE staffEmail = ?";
+        $stmt_staff = mysqli_prepare($conn, $sql_staff);
+        if ($stmt_staff) {
+            mysqli_stmt_bind_param($stmt_staff, "s", $email);
+            mysqli_stmt_execute($stmt_staff);
+            mysqli_stmt_store_result($stmt_staff);
+            if (mysqli_stmt_num_rows($stmt_staff) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_staff);
+        } else {
+            echo "Something went wrong with the staff table query.";
+        }
+
+   
+
+        // Check if email already exists in manager table
+        $sql_manager = "SELECT managerID FROM manager WHERE managerEmail = ?";
+        $stmt_manager = mysqli_prepare($conn, $sql_manager);
+        if ($stmt_manager) {
+            mysqli_stmt_bind_param($stmt_manager, "s", $email);
+            mysqli_stmt_execute($stmt_manager);
+            mysqli_stmt_store_result($stmt_manager);
+            if (mysqli_stmt_num_rows($stmt_manager) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_manager);
+        } else {
+            echo "Something went wrong with the manager table query.";
+        }
+    }
+
 
     // Prepare SQL statement for update
     $sql = "UPDATE Donor SET

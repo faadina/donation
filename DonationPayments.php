@@ -1,8 +1,25 @@
 <?php
 session_start();
-include 'dbConnect.php';
+
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
+
+//include 'dbConnect.php';
+
 $title = "Donation Page";
-include 'DonorHeader.php';
+include 'DonorHeader.php'; // Assuming this includes your header
 
 // Check if user ID is set in session
 if (!isset($_SESSION['username'])) {
@@ -24,24 +41,20 @@ $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
 
-
-
 // Fetch allocation status from Allocation table
 $allocationStatus = $allocation['allocationStatus'] ?? '';
 
 // Check if donation status is 'Inactive'
-$isInactive = false;
-if ($allocationStatus === 'Inactive') {
-    $isInactive = true;
-}
+$isInactive = ($allocationStatus === 'Inactive');
 
 $conn->close();
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Donation Page</title>
+    <meta charset="UTF-8">
+    <title><?php echo htmlspecialchars($title); ?></title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -64,6 +77,21 @@ $conn->close();
             display: flex;
             flex-direction: row;
         }
+        .allocation-qr {
+            max-width: 40%;
+            margin-right: 20px;
+        }    
+        .qr-info h2 {
+            margin-top: 0;
+            font-size: 70px;
+            font-family: 'Times New Roman', Times, serif;
+            text-align: right;
+            margin-right: 20px;
+        } 
+        .allocation-qr img {
+            width: 100%;
+            border-radius: 5px;
+        }
         .allocation-image {
             max-width: 40%;
             margin-right: 20px;
@@ -77,6 +105,8 @@ $conn->close();
         }
         .allocation-info h2 {
             margin-top: 0;
+            font-size: 24px;
+            color: #333;
         }
         .allocation-info p {
             margin: 5px 0;
@@ -139,21 +169,16 @@ $conn->close();
     </style>
     <!-- Include SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
-    <!-- Include SweetAlert JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
-    <!-- Include jQuery -->
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-    <div class="main-content d-flex justify-content-center">
+    <div class="main-content">
         <?php if ($allocation): ?>
-        <div class="allocation-details d-flex justify-content-center">
+        <div class="allocation-details">
             <div class="allocation-image">
                 <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
             </div>
             <div class="allocation-info">
                 <h2><b><?php echo htmlspecialchars($allocation['allocationName']); ?></b></h2>
-                <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
                 <div class="raised-goal">
                     <div class="raised">Raised: RM <?php echo htmlspecialchars($allocation['currentAmount']); ?></div>
                     <div class="goal">Goal: RM <?php echo htmlspecialchars($allocation['targetAmount']); ?></div>
@@ -187,60 +212,95 @@ $conn->close();
         <?php endif; ?>
     </div>
 
+    <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
+        <div class="allocation-details d-flex justify-content-center">
+
+
+            <div class="allocation-info">
+                <h2><strong>Details:</strong></h2>
+                <p><?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
+            </div>
+        </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
+    </div>
+
+    <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
+        <div class="allocation-details d-flex justify-content-center">
+            <div class="allocation-qr">
+            <img src="images/qrbank.jpg" >
+            </div>
+            <div class="qr-info">
+                <h2>Donate <br>Here</h2>
+            </div>
+        </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
+    </div>
+
+    <!-- Include SweetAlert JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
-$(document).ready(function() {
-    $('#donationForm').on('submit', function(e) {
-        e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function() {
+            var donationForm = document.getElementById('donationForm');
 
-        var fileInput = $('#donationReceipt')[0];
-        var file = fileInput.files[0];
+            donationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-        if (file.type !== 'application/pdf') {
-            swal({
-                title: "Invalid File Type",
-                text: "Please upload a PDF file.",
-                icon: "error",
-                button: "OK",
-            });
-            return;
-        }
+                var fileInput = document.getElementById('donationReceipt');
+                var file = fileInput.files[0];
 
-        var formData = new FormData(this);
+                if (!file || file.type !== 'application/pdf') {
+                    swal({
+                        title: "Invalid File Type",
+                        text: "Please upload a PDF file.",
+                        icon: "error",
+                        button: "OK",
+                    });
+                    return;
+                }
 
-        $.ajax({
-            type: 'POST',
-            url: 'ProceedPayment.php',
-            data: formData,
-            contentType: false,
-            processData: false,
-            success: function(response) {
-                var jsonResponse = JSON.parse(response);
-                var status = jsonResponse.status;
-                var message = jsonResponse.message;
-                var donationID = jsonResponse.donationID;
+                var formData = new FormData(donationForm);
 
-                swal({
-                    title: status === 'success' ? "Thank You for Your Donation!" : "Error",
-                    text: message + (donationID ? "\nYour Donation ID is: " + donationID : ""),
-                    icon: status,
-                    buttons: {
-                        confirm: {
-                            text: "Return to History",
-                            value: true,
-                            visible: true,
-                            className: "btn btn-primary",
-                            closeModal: true
+                fetch('ProceedPayment.php', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => response.json())
+                .then(data => {
+                    var status = data.status;
+                    var message = data.message;
+                    var donationID = data.donationID;
+
+                    swal({
+                        title: status === 'success' ? "Thank You for Your Donation!" : "Error",
+                        text: message + (donationID ? "\nYour Donation ID is: " + donationID : ""),
+                        icon: status,
+                        buttons: {
+                            confirm: {
+                                text: "Return to History",
+                                value: true,
+                                visible: true,
+                                className: "btn btn-primary",
+                                closeModal: true
+                            }
                         }
-                    }
-                }).then((willGoToHistory) => {
-                    if (willGoToHistory) {
-                        window.location.href = "DonorDonateHistory.php";
-                    }
+                    }).then((willGoToHistory) => {
+                        if (willGoToHistory) {
+                            window.location.href = "DonorDonateHistory.php";
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    swal("Error", "An error occurred while processing your donation.", "error");
                 });
-            }
+            });
         });
-    });
-});
     </script>
 </body>
 </html>

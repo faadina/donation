@@ -118,6 +118,8 @@ $result = $conn->query($sql);
             echo '<div class="card-content">';
             echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
             echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '</p>';
+            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read More</a>';
+            echo '<p id="' . $row["allocationID"] . '-details" style="display: none;">' . htmlspecialchars($row["allocationDetails"]) . '</p>';
             echo '</div>';
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
@@ -125,13 +127,19 @@ $result = $conn->query($sql);
             echo '<div class="progress-bar-container">';
             echo '<div class="progress-bar" style="width:' . $progress . '%;"></div>';
             echo '</div>';
-            if ($row["currentAmount"] >= $row["targetAmount"]) {
+
+            // Check if allocation is closed or inactive
+            if ($row["allocationStatus"] == 'Inactive' || $row["currentAmount"] >= $row["targetAmount"]) {
                 echo '<button class="closed-button" disabled>CLOSED</button>';
+                $sql_update = "UPDATE Allocation SET allocationStatus = 'Inactive' WHERE allocationID = '" . $row["allocationID"] . "'";
+
             } else {
                 echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
+                $sql_update = "UPDATE Allocation SET allocationStatus = 'Active' WHERE allocationID = '" . $row["allocationID"] . "'";
             }
-            echo '</div>';
-            echo '</div>';
+
+            echo '</div>'; // card-footer
+            echo '</div>'; // card
         }
     } else {
         echo "<p>No allocations found</p>";
@@ -139,6 +147,23 @@ $result = $conn->query($sql);
     $conn->close();
     ?>
 </div>
+
+<script>
+function toggleDetails(cardId) {
+    var details = document.getElementById(cardId + '-details');
+    var readMoreBtn = document.getElementById(cardId + '-readmore');
+
+
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        readMoreBtn.innerText = 'Read Less';
+    } else {
+        details.style.display = 'none';
+        readMoreBtn.innerText = 'Read More';
+    }
+}
+</script>
+
 
 </body>
 </html>

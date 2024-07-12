@@ -1,5 +1,17 @@
 <?php
-include 'db.php'; // Include your database connection details
+session_start();
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
 
 // SQL query to select all staff records
 $sql = "SELECT * FROM Staff";

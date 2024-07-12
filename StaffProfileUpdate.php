@@ -13,6 +13,7 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
+
 // Initialize variables
 $name = $birthdate  = $address = $phone = $email = "";
 $name_err = $birthdate_err  = $address_err = $phone_err = $email_err = "";
@@ -56,10 +57,14 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate name
-    if (empty(trim($_POST['name']))) {
+    if (empty(trim($_POST["name"]))) {
         $name_err = "Please enter your name.";
+    } elseif (!preg_match("/^[a-zA-Z@. ]*$/", $_POST["name"])) {
+        $name_err = "Name can only contain letters, spaces, '.', and '@'.";
+    } elseif (preg_match("/\d/", $_POST["name"])) {
+        $name_err = "Name cannot contain numbers.";
     } else {
-        $name = trim($_POST['name']);
+        $name = trim($_POST["name"]);
     }
 
 
@@ -74,12 +79,45 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Validate email
-    if (empty(trim($_POST['email']))) {
+    if (empty(trim($_POST["email"]))) {
         $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
     } else {
-        $email = trim($_POST['email']);
+        $email = trim($_POST["email"]);
+
+
+    // Check if email already exists in donor table
+    $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
+    $stmt_donor = mysqli_prepare($conn, $sql_donor);
+    if ($stmt_donor) {
+        mysqli_stmt_bind_param($stmt_donor, "s", $email);
+        mysqli_stmt_execute($stmt_donor);
+        mysqli_stmt_store_result($stmt_donor);
+        if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+            $email_err = "This email is already registered.";
+        }
+        mysqli_stmt_close($stmt_donor);
+    } else {
+        echo "Something went wrong with the donor table query.";
     }
 
+
+    // Check if email already exists in manager table
+    $sql_manager = "SELECT managerID FROM manager WHERE managerEmail = ?";
+    $stmt_manager = mysqli_prepare($conn, $sql_manager);
+    if ($stmt_manager) {
+        mysqli_stmt_bind_param($stmt_manager, "s", $email);
+        mysqli_stmt_execute($stmt_manager);
+        mysqli_stmt_store_result($stmt_manager);
+        if (mysqli_stmt_num_rows($stmt_manager) > 0) {
+            $email_err = "This email is already registered.";
+        }
+        mysqli_stmt_close($stmt_manager);
+    } else {
+        echo "Something went wrong with the manager table query.";
+    }
+}
     // Check input errors before updating the database
     if (empty($name_err) && empty($birthdate_err)  && empty($address_err) && empty($phone_err) && empty($email_err)) {
         // Update the user details in the database
@@ -111,31 +149,20 @@ mysqli_close($conn);
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <title>Donor | Update Profile</title>
-    <link rel="stylesheet" href="css/gProfileUpdateStyletest.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Staff Profile Information</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: #f8f9fa;
-            font-family: "Inter", sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
 
         .content_section {
             margin-top: 100px;
             width: 60%;
             max-width: 500px;
             margin: 40px auto;
-            padding: 20px;
+            padding: 10px;
             background: #ffffff;
             border-radius: 15px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -212,7 +239,7 @@ mysqli_close($conn);
 </head>
 
 <body>
-    <?php include('StaffHeader.php'); ?>
+    <?php include('StaffHeader.php'); ?> 
     <div class="content_section">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
         <br><br>
@@ -239,7 +266,7 @@ mysqli_close($conn);
                 <span class="error"><?php echo $email_err; ?></span>
             </div>
             <div class="button-container">
-                <a href="DonorProfile.php" class="edit-button">↤ Back</a>
+                <a href="StaffProfile.php" class="edit-button">↤ Back</a>
                 <button type="submit" class="edit-button">Update ⟳</button>
             </div>
         </form>

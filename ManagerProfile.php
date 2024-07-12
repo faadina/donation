@@ -85,7 +85,7 @@ mysqli_close($conn);
         }
 
         .content_box {
-            width: 50%;
+            width: 60%;
             height: auto;
             border-radius: 26px;
             background: linear-gradient(0deg, white 0%, #EFE8E8 100%);
@@ -120,7 +120,7 @@ mysqli_close($conn);
 
         .shadow-img {
             filter: drop-shadow(2px 2px 4px rgba(0, 0, 0, 0.5));
-            width: 150px; /* Increased size of the user icon */
+            width: 100px; /* Increased size of the user icon */
             height: auto;
             margin-bottom: 20px; /* Add margin below the user icon */
         }
@@ -167,6 +167,9 @@ mysqli_close($conn);
             <img src="images/userIcon.png" class="shadow-img">
             <table>
             <tr>
+                <th>USERNAME</th>
+                <td>: <?php echo htmlspecialchars($id); ?></td>
+            </tr>            <tr>
                 <th>NAME</th>
                 <td>: <?php echo htmlspecialchars($name); ?></td>
             </tr>
