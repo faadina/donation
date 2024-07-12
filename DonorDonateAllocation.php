@@ -118,6 +118,8 @@ $result = $conn->query($sql);
             echo '<div class="card-content">';
             echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
             echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '</p>';
+            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read More</a>';
+            echo '<p id="' . $row["allocationID"] . '-details" style="display: none;">' . htmlspecialchars($row["allocationDetails"]) . '</p>';
             echo '</div>';
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
@@ -146,6 +148,21 @@ $result = $conn->query($sql);
     ?>
 </div>
 
+<script>
+function toggleDetails(cardId) {
+    var details = document.getElementById(cardId + '-details');
+    var readMoreBtn = document.getElementById(cardId + '-readmore');
+
+
+    if (details.style.display === 'none' || details.style.display === '') {
+        details.style.display = 'block';
+        readMoreBtn.innerText = 'Read Less';
+    } else {
+        details.style.display = 'none';
+        readMoreBtn.innerText = 'Read More';
+    }
+}
+</script>
 
 
 </body>

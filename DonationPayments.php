@@ -1,6 +1,22 @@
 <?php
 session_start();
-include 'dbConnect.php';
+
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
+
+//include 'dbConnect.php';
 
 $title = "Donation Page";
 include 'DonorHeader.php'; // Assuming this includes your header
@@ -61,6 +77,21 @@ $conn->close();
             display: flex;
             flex-direction: row;
         }
+        .allocation-qr {
+            max-width: 40%;
+            margin-right: 20px;
+        }    
+        .qr-info h2 {
+            margin-top: 0;
+            font-size: 70px;
+            font-family: 'Times New Roman', Times, serif;
+            text-align: right;
+            margin-right: 20px;
+        } 
+        .allocation-qr img {
+            width: 100%;
+            border-radius: 5px;
+        }
         .allocation-image {
             max-width: 40%;
             margin-right: 20px;
@@ -74,6 +105,8 @@ $conn->close();
         }
         .allocation-info h2 {
             margin-top: 0;
+            font-size: 24px;
+            color: #333;
         }
         .allocation-info p {
             margin: 5px 0;
@@ -146,7 +179,6 @@ $conn->close();
             </div>
             <div class="allocation-info">
                 <h2><b><?php echo htmlspecialchars($allocation['allocationName']); ?></b></h2>
-                <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
                 <div class="raised-goal">
                     <div class="raised">Raised: RM <?php echo htmlspecialchars($allocation['currentAmount']); ?></div>
                     <div class="goal">Goal: RM <?php echo htmlspecialchars($allocation['targetAmount']); ?></div>
@@ -173,6 +205,36 @@ $conn->close();
                         <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php endif; ?>
                 </form>
+            </div>
+        </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
+    </div>
+
+    <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
+        <div class="allocation-details d-flex justify-content-center">
+
+
+            <div class="allocation-info">
+                <h2><strong>Details:</strong></h2>
+                <p><?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
+            </div>
+        </div>
+        <?php else: ?>
+        <p>No allocation found or selected.</p>
+        <?php endif; ?>
+    </div>
+
+    <div class="main-content d-flex justify-content-center">
+        <?php if ($allocation): ?>
+        <div class="allocation-details d-flex justify-content-center">
+            <div class="allocation-qr">
+            <img src="images/qrbank.jpg" >
+            </div>
+            <div class="qr-info">
+                <h2>Donate <br>Here</h2>
             </div>
         </div>
         <?php else: ?>
