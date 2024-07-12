@@ -74,10 +74,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Validate email
-    if (empty(trim($_POST['email']))) {
+    if (empty(trim($_POST["email"]))) {
         $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
     } else {
-        $email = trim($_POST['email']);
+        $email = trim($_POST["email"]);
+
+        // Check if email already exists in donor table
+        $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
+        $stmt_donor = mysqli_prepare($conn, $sql_donor);
+        if ($stmt_donor) {
+            mysqli_stmt_bind_param($stmt_donor, "s", $email);
+            mysqli_stmt_execute($stmt_donor);
+            mysqli_stmt_store_result($stmt_donor);
+            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_donor);
+        } else {
+            echo "Something went wrong with the donor table query.";
+        }
+
+        // Check if email already exists in staff table
+        $sql_staff = "SELECT staffID FROM staff WHERE staffEmail = ?";
+        $stmt_staff = mysqli_prepare($conn, $sql_staff);
+        if ($stmt_staff) {
+            mysqli_stmt_bind_param($stmt_staff, "s", $email);
+            mysqli_stmt_execute($stmt_staff);
+            mysqli_stmt_store_result($stmt_staff);
+            if (mysqli_stmt_num_rows($stmt_staff) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_staff);
+        } else {
+            echo "Something went wrong with the staff table query.";
+        }
     }
 
     // Check input errors before updating the database
