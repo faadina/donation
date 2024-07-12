@@ -1,9 +1,13 @@
 <?php
+session_start();
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Check if donationID is set and not empty
 if (isset($_GET['donationID']) && !empty($_GET['donationID'])) {
     $donationID = $_GET['donationID'];
+
+    // Get the current staff username from the session
+    $staffID = $_SESSION['username'];
 
     // Begin transaction
     $conn->begin_transaction();
@@ -21,9 +25,9 @@ if (isset($_GET['donationID']) && !empty($_GET['donationID'])) {
             throw new Exception("Invalid donation ID or allocation ID.");
         }
 
-        // Update donation status to Accepted
-        $stmt = $conn->prepare("UPDATE Donation SET donationStatus = 'Accepted' WHERE donationID = ?");
-        $stmt->bind_param("s", $donationID);
+        // Update donation status to Accepted and log staff username
+        $stmt = $conn->prepare("UPDATE Donation SET donationStatus = 'Accepted', staffID = ? WHERE donationID = ?");
+        $stmt->bind_param("ss", $staffID, $donationID);
         $stmt->execute();
         $stmt->close();
 
