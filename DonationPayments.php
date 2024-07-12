@@ -18,7 +18,7 @@ if (empty($allocationID)) {
 
 // Fetch allocation details for display
 $stmt = $conn->prepare("SELECT * FROM Allocation WHERE allocationID = ?");
-$stmt->bind_param('i', $allocationID);
+$stmt->bind_param('s', $allocationID);
 $stmt->execute();
 $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
