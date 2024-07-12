@@ -64,7 +64,7 @@ mysqli_close($conn);
             margin-top: 50px;
             background-color: whitesmoke;
             border-radius: 10px;
-            box-shadow: 0px 0px 10px 0px #000000;
+            box-shadow: 0px 0px 5px 0px #000000 inset;
         }
 
         table {
@@ -113,8 +113,19 @@ mysqli_close($conn);
 
         .modal-title {
             color: black;
-            /* Font color for modal title */
         }
+
+        h2 {
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
+            color: #afe0a3;
+            font-weight: 700;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.2)inset;
+        }
+
     </style>
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 </head>
@@ -122,13 +133,13 @@ mysqli_close($conn);
 <body>
     <?php include('ManagerHeader.php'); ?>
     <div class="wrapper">
-        <h2>Staff Information</h2>
+        <h2>STAFF RECORDS</h2>
         <div class="row mb-3">
             <div class="col-md-6">
-                <p>Total Staff: <?php echo $count; ?></p>
+                <p style="font-weight:500;">Total Number of Staff:<b> <?php echo $count; ?></b></p>
             </div>
             <div class="col-md-6 text-right">
-                <a style="background:green;" href="createStaff.php" class="btn btn-primary" ><i class="bi bi-person-plus"></i>&nbsp;Staff</a>
+                <a style="background:green;" href="createStaff.php" class="btn btn-primary"><i class="bi bi-person-plus"></i>&nbsp;Add Staff</a>
             </div>
         </div>
 
@@ -154,8 +165,8 @@ mysqli_close($conn);
                         <td><?php echo htmlspecialchars($staff['staffEmail']); ?></td>
                         <td><?php echo htmlspecialchars(substr($staff['staffPassword'], 0, 3)) . str_repeat('*', strlen($staff['staffPassword']) - 3); ?></td>
                         <td style="text-align:center;"><button style="background:none; border:none; color:green;" class="btn btn-info btn-sm" onclick="showReadModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>', '<?php echo htmlspecialchars($staff['staffPassword']); ?>')"><i class="bi bi-eye"></i></button></td>
-                        <td style="text-align:center;"><a style="background:none; border:none; color:orange;"  href="updateStaff.php?id=<?php echo $staff['staffID']; ?>" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a></td>
-                        <td style="text-align:center;"><button  style="background:none; border:none; color:red;"  class="btn btn-danger btn-sm" onclick="showDeleteModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>')"><i class="bi bi-trash"></i></button></td>
+                        <td style="text-align:center;"><a style="background:none; border:none; color:orange;" href="updateStaff.php?id=<?php echo $staff['staffID']; ?>" class="btn btn-warning btn-sm"><i class="bi bi-pencil-square"></i></a></td>
+                        <td style="text-align:center;"><button style="background:none; border:none; color:red;" class="btn btn-danger btn-sm" onclick="showDeleteModal('<?php echo htmlspecialchars($staff['staffID']); ?>', '<?php echo htmlspecialchars($staff['staffName']); ?>', '<?php echo htmlspecialchars($staff['staffPhoneNo']); ?>', '<?php echo htmlspecialchars($staff['staffEmail']); ?>')"><i class="bi bi-trash"></i></button></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

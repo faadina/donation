@@ -23,7 +23,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty(trim($_POST["staffID"]))) {
         $staffID_err = "Please enter a staff ID.";
     } else {
-        $staffID = trim($_POST["staffID"]);
+        // Prepare a select statement to check if staffID already exists
+        $sql = "SELECT staffID FROM staff WHERE staffID = ?";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "s", $param_staffID);
+            $param_staffID = trim($_POST["staffID"]);
+            if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_store_result($stmt);
+                if (mysqli_stmt_num_rows($stmt) > 0) {
+                    $staffID_err = "This staff ID is already taken.";
+                } else {
+                    $staffID = trim($_POST["staffID"]);
+                }
+            } else {
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
 
     // Validate staff name
@@ -50,7 +66,23 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     } elseif (!filter_var(trim($_POST["staffEmail"]), FILTER_VALIDATE_EMAIL)) {
         $staffEmail_err = "Invalid email format.";
     } else {
-        $staffEmail = trim($_POST["staffEmail"]);
+        // Prepare a select statement to check if staffEmail already exists
+        $sql = "SELECT staffID FROM staff WHERE staffEmail = ?";
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            mysqli_stmt_bind_param($stmt, "s", $param_staffEmail);
+            $param_staffEmail = trim($_POST["staffEmail"]);
+            if (mysqli_stmt_execute($stmt)) {
+                mysqli_stmt_store_result($stmt);
+                if (mysqli_stmt_num_rows($stmt) > 0) {
+                    $staffEmail_err = "This email is already registered.";
+                } else {
+                    $staffEmail = trim($_POST["staffEmail"]);
+                }
+            } else {
+                echo "Oops! Something went wrong. Please try again later.";
+            }
+            mysqli_stmt_close($stmt);
+        }
     }
 
     // Validate staff password
@@ -68,10 +100,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($staffID_err) && empty($staffName_err) && empty($staffPhone_err) && empty($staffEmail_err) && empty($staffPassword_err)) {
         // Prepare an insert statement
         $sql = "INSERT INTO staff (staffID, staffName, staffPhoneNo, staffEmail, staffPassword) VALUES (?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
+        if ($stmt = mysqli_prepare($conn, $sql)) {
             // Bind parameters
-            mysqli_stmt_bind_param($stmt, "sssss", $staffID, $staffName, $staffPhone, $staffEmail, $staffPassword);
+            mysqli_stmt_bind_param($stmt, "sssss", $param_staffID, $param_staffName, $param_staffPhone, $param_staffEmail, $param_staffPassword);
+            $param_staffID = $staffID;
+            $param_staffName = $staffName;
+            $param_staffPhone = $staffPhone;
+            $param_staffEmail = $staffEmail;
+            $param_staffPassword = $staffPassword;
 
             // Attempt to execute the prepared statement
             if (mysqli_stmt_execute($stmt)) {
@@ -81,7 +117,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 echo "Something went wrong. Please try again later.";
             }
-
             mysqli_stmt_close($stmt);
         }
     }
@@ -106,10 +141,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         width: 360px; 
         padding: 20px; 
         margin: auto;
-        margin-top: 100px;
-        background-color: whitesmoke; /* Dark Cyan Box Background */
+        margin-top: 20px;
+        background-color: whitesmoke; 
         border-radius: 10px;
-        box-shadow: 0px 0px 10px 0px #000000;
+        box-shadow: 0px 0px 5px 0px #000000 inset;
     }
 
     .form-control:focus {
@@ -171,8 +206,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <span class="invalid-feedback"><?php echo $staffEmail_err; ?></span>
             </div>
             <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Create">
                 <input type="reset" class="btn btn-secondary ml-2" value="Reset">
+                <input type="submit" class="btn btn-primary" value="Create">
             </div>
         </form>
     </div>
