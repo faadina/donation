@@ -2,8 +2,11 @@
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Fetch donation records from the database
-$sql = "SELECT * FROM Donation";
+$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationMethod, d.donationStatus, d.allocationID, a.allocationName
+        FROM Donation d
+        LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
 $result = $conn->query($sql);
+
 ?>
 
 <!DOCTYPE html>
@@ -23,6 +26,12 @@ $result = $conn->query($sql);
         .btn-mini-column {
             width: 85px;
         }
+        .mb-3 {
+            margin-bottom: 15px; /* Adjust margin bottom as needed */
+        }
+        .mb-3 form {
+            display: inline-block; /* Display the form inline */
+        }
     </style>
 </head>
 <body>
@@ -34,7 +43,22 @@ $result = $conn->query($sql);
         <div class="mb-3">
             <button class="btn btn-success mr-2" onclick="showAccepted()">List Accepted</button>
             <button class="btn btn-danger mr-2" onclick="showRejected()">List Rejected</button>
-            <button class="btn btn-warning" onclick="showPending()">List Pending</button>
+            <button class="btn btn-warning mr-2" onclick="showPending()">List Pending</button>
+            <button class="btn btn-primary" onclick="showAll()">View All</button>
+        </div>
+
+        <div class="mb-3" style="text-align: right;">
+            <form id="searchForm" onsubmit="return searchDonation()">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="donationID" name="donationID" placeholder="Enter Donation ID">
+                    <button type="submit" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                        </svg>
+                        Search
+                    </button>
+                </div>
+            </form>
         </div>
 
         <table id="donationTable" class="table table-striped">
@@ -46,7 +70,7 @@ $result = $conn->query($sql);
                     <th>Method</th>
                     <th>Status</th>
                     <th>Receipt</th>
-                    <th>Allocation ID</th>
+                    <th>Allocation Type</th>
                     <th colspan='2' style="text-align:center;">Action</th>
                     <th>Edit</th>
                 </tr>
@@ -65,7 +89,7 @@ $result = $conn->query($sql);
                         // Displaying receipt with a link to view PDF
                         echo "<td><a href='ReceiptView.php?donationID=" . $row["donationID"] . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
                         
-                        echo "<td>" . $row["allocationID"] . "</td>";
+                        echo "<td>" . $row["allocationName"] . "</td>";
 
                         // Check the donation status and display corresponding actions
                         if ($row["donationStatus"] == "pending") {
@@ -131,6 +155,38 @@ $result = $conn->query($sql);
                     rows[i].style.display = "";
                 }
             }
+        }
+
+        // JavaScript function to show all donations
+        function showAll() {
+            var table = document.getElementById("donationTable");
+            var rows = table.getElementsByTagName("tr");
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].style.display = "";
+            }
+        }
+
+        // JavaScript function to search donations by ID
+        function searchDonation() {
+            var input = document.getElementById("donationID").value.trim().toLowerCase();
+            var table = document.getElementById("donationTable");
+            var rows = table.getElementsByTagName("tr");
+            
+            for (var i = 0; i < rows.length; i++) {
+                var donationIDCell = rows[i].getElementsByTagName("td")[0]; // Assuming donationID is in the first column
+                
+                if (donationIDCell) {
+                    var textValue = donationIDCell.textContent || donationIDCell.innerText;
+                    
+                    if (textValue.trim().toLowerCase().indexOf(input) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }       
+            }
+            
+            return false; // Prevent form submission
         }
     </script>
 </body>

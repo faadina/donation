@@ -41,30 +41,35 @@ $donationDate = "";
 $donationMethod = "";
 $donationStatus = "";
 $donationReceipt = "";
-$allocationID = "";
+$allocationName = "";
 
 // Check if donationID is provided via GET parameter
 if (isset($_GET['donationID'])) {
     $donationID = $_GET['donationID'];
-
-   // Fetch existing donation details from the database
-$sql = "SELECT * FROM Donation WHERE donationID = '$donationID'";
+}
+// Fetch existing donation details from the database including allocationName
+$sql = "SELECT d.*, a.allocationName
+        FROM Donation d
+        LEFT JOIN Allocation a ON d.allocationID = a.allocationID
+        WHERE d.donationID = '$donationID'";
 $result = $conn->query($sql);
 
 if ($result->num_rows > 0) {
     // Populate variables with current values
     $row = $result->fetch_assoc();
     $donationAmount = $row["donationAmount"];
-    $donationDate = $row["donationDate"]; // Ensure this is correctly fetched
+    
+    // Ensure correct date format (YYYY-MM-DD) for HTML date input
+    $donationDate = date('Y-m-d', strtotime($row["donationDate"]));
+    
     $donationMethod = $row["donationMethod"];
     $donationStatus = $row["donationStatus"];
     $donationReceipt = $row["donationReceipt"];
-    $allocationID = $row["allocationID"];
+    $allocationName = $row["allocationName"];
 } else {
     echo "Donation not found.";
 }
 
-}
 
 // Process form submission for update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -87,8 +92,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             donationAmount = '$donationAmount',
             donationDate = '$donationDate',
             donationMethod = '$donationMethod',
-            donationStatus = '$donationStatus',
-            allocationID = '$allocationID'";
+            donationStatus = '$donationStatus'";
+
+    // Append allocationID update if necessary
+    if (!empty($allocationID)) {
+        $sql .= ", allocationID = '$allocationID'";
+    }
 
     // Append donationReceipt update if a receipt was uploaded
     if (!empty($donationReceipt)) {
@@ -137,9 +146,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
                             </div>
                             <div class="mb-3">
-                                <label for="donationDate" class="form-label">Donation Date</label>
-                                <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
-                            </div>
+    <label for="donationDate" class="form-label">Donation Date</label>
+    <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
+</div>
+
                             <div class="mb-3">
                                 <label for="donationMethod" class="form-label">Donation Method</label>
                                 <input type="text" class="form-control" id="donationMethod" name="donationMethod" value="<?php echo $donationMethod; ?>" required>
@@ -149,8 +159,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <input type="text" class="form-control" id="donationStatus" name="donationStatus" value="<?php echo $donationStatus; ?>" required>
                             </div>
                             <div class="mb-3">
-                                <label for="allocationID" class="form-label">Allocation ID</label>
-                                <input type="text" class="form-control" id="allocationID" name="allocationID" value="<?php echo $allocationID; ?>" required>
+                                <label for="allocationName" class="form-label">Allocation Name</label>
+                                <input type="text" class="form-control" id="allocationName" name="allocationName" value="<?php echo $allocationName; ?>" readonly>
                             </div>
                             <div class="mb-3">
                                 <label for="donationReceipt" class="form-label">Current Donation Receipt</label><br>
