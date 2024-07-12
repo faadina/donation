@@ -18,8 +18,6 @@ if ($conn->connect_error) {
 // Retrieve all allocations from the database
 $sql = "SELECT * FROM Allocation";
 $result = $conn->query($sql);
-
-
 ?>
 
 <!DOCTYPE html>
@@ -69,13 +67,25 @@ $result = $conn->query($sql);
             padding: 20px;
             background-color: #f9f9f9;
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
         }
         .raised, .goal {
             margin: 0;
         }
-        .donate-button {
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #28a745;
+            width: 0;
+        }
+        .donate-button, .closed-button {
             background-color: #28a745;
             color: white;
             padding: 10px 20px;
@@ -83,9 +93,16 @@ $result = $conn->query($sql);
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
+            margin-top: 10px;
         }
         .donate-button:hover {
             background-color: #218838;
+        }
+        .closed-button {
+            background-color: #dc3545;
+        }
+        .closed-button:hover {
+            background-color: #c82333;
         }
     </style>
 </head>
@@ -95,6 +112,7 @@ $result = $conn->query($sql);
     <?php
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
+            $progress = ($row["currentAmount"] / $row["targetAmount"]) * 100;
             echo '<div class="card">';
             echo '<img src="' . htmlspecialchars($row["allocationImage"]) . '" alt="' . htmlspecialchars($row["allocationName"]) . '">';
             echo '<div class="card-content">';
@@ -104,7 +122,14 @@ $result = $conn->query($sql);
             echo '<div class="card-footer">';
             echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
             echo '<div class="goal">Goal: MYR ' . ($row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite') . '</div>';
-            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
+            echo '<div class="progress-bar-container">';
+            echo '<div class="progress-bar" style="width:' . $progress . '%;"></div>';
+            echo '</div>';
+            if ($row["currentAmount"] >= $row["targetAmount"]) {
+                echo '<button class="closed-button" disabled>CLOSED</button>';
+            } else {
+                echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
+            }
             echo '</div>';
             echo '</div>';
         }

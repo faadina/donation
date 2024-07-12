@@ -2,7 +2,7 @@
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Fetch donation records from the database
-$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName
+$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
 $result = $conn->query($sql);
@@ -34,10 +34,10 @@ $result = $conn->query($sql);
         }
     </style>
 </head>
+<body>
     <?php include('staffHeader.php'); ?>
-    
+
     <div class="container">
-    
         <h2 class="my-4">Donation Records</h2>
         
         <!-- Buttons for filtering -->
@@ -60,8 +60,6 @@ $result = $conn->query($sql);
                 </div>
             </form>
         </div>
-<body>
-        
 
         <table id="donationTable" class="table table-striped">
             <thead>
@@ -80,8 +78,6 @@ $result = $conn->query($sql);
                 <?php
                 if ($result->num_rows > 0) {
                     while ($row = $result->fetch_assoc()) {
-                        
-
                         echo "<tr>";
                         echo "<td>" . $row["donationID"] . "</td>";
                         echo "<td>" . $row["donationAmount"] . "</td>";
@@ -89,7 +85,11 @@ $result = $conn->query($sql);
                         echo "<td>" . $row["donationStatus"] . "</td>";
                         
                         // Displaying receipt with a link to view PDF
-                        echo "<td><a href='ReceiptView.php?donationID=" . $row["donationID"] . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+                        if (!empty($row["donationReceipt"])) {
+                            echo "<td><a href='" . htmlspecialchars($row["donationReceipt"]) . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+                        } else {
+                            echo "<td>No Receipt</td>";
+                        }
                         
                         echo "<td>" . $row["allocationName"] . "</td>";
 
@@ -98,7 +98,7 @@ $result = $conn->query($sql);
                             echo "<td><a href='DonationAccept.php?donationID=" . $row["donationID"] . "' class='btn btn-success btn-mini-column'>Accept</a></td>";
                             echo "<td><a href='DonationReject.php?donationID=" . $row["donationID"] . "' class='btn btn-danger btn-mini-column'>Reject</a></td>";
                         } elseif ($row["donationStatus"] == "Accepted") {
-                            echo "<td colspan='2' style='text-align:center;'><a href='generate_receipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
+                            echo "<td colspan='2' style='text-align:center;'><a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
                         } elseif ($row["donationStatus"] == "Rejected") {
                             echo "<td colspan='2' style='text-align:center;'><button class='btn btn-secondary btn-mini-column' disabled>Rejected</button></td>";
                         }

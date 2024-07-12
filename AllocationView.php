@@ -84,4 +84,3 @@ $result = $conn->query($sql);
 <?php
 $conn->close();
 ?>
-
