@@ -1,7 +1,7 @@
 <?php
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
-// Function to handle file upload
+// Function to handle file upload (similar to the create script)
 function uploadImage($file)
 {
     $targetDir = "uploads/"; // Directory where uploaded images will be stored
@@ -47,43 +47,31 @@ function uploadImage($file)
     }
 }
 
-// Initialize variables to hold current values
-$allocationID = "";
+// Function to retrieve existing allocation data based on allocationID
+function getAllocationData($allocationID)
+{
+    global $conn;
+
+    $sql = "SELECT * FROM Allocation WHERE allocationID = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("s", $allocationID);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $allocationData = $result->fetch_assoc();
+    $stmt->close();
+
+    return $allocationData;
+}
+
+// Initialize variables to hold form data and allocationID (from URL parameter)
+$allocationID = $_GET['allocationID'] ?? '';
 $allocationName = "";
 $allocationStartDate = "";
 $allocationEndDate = "";
 $allocationStatus = "";
 $allocationDetails = "";
 $targetAmount = "";
-$currentAmount = "";
 $allocationImage = "";
-
-// Check if allocationID is provided via GET parameter
-if (isset($_GET['allocationID'])) {
-    $allocationID = $_GET['allocationID'];
-
-    // Fetch existing allocation details from the database
-    $sql = "SELECT * FROM Allocation WHERE allocationID = ?";
-    $stmt = $conn->prepare($sql);
-    $stmt->bind_param("i", $allocationID); // Assuming allocationID is an integer
-    $stmt->execute();
-    $result = $stmt->get_result();
-
-    if ($result->num_rows > 0) {
-        // Populate variables with current values
-        $row = $result->fetch_assoc();
-        $allocationName = $row["allocationName"];
-        $allocationStartDate = $row["allocationStartDate"];
-        $allocationEndDate = $row["allocationEndDate"];
-        $allocationStatus = $row["allocationStatus"];
-        $allocationDetails = $row["allocationDetails"];
-        $targetAmount = $row["targetAmount"];
-        $currentAmount = $row["currentAmount"];
-        $allocationImage = $row["allocationImage"];
-    } else {
-        echo "Allocation not found.";
-    }
-}
 
 // Process form submission for update
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -94,7 +82,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allocationStatus = $_POST["allocationStatus"];
     $allocationDetails = $_POST["allocationDetails"];
     $targetAmount = $_POST["targetAmount"];
-    $currentAmount = $_POST["currentAmount"];
 
     // Check if an image file was uploaded
     $allocationImage = "";
@@ -102,31 +89,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
     }
 
-    // Prepare SQL statement for update
-    $sql = "UPDATE Allocation SET
-            allocationName = ?,
-            allocationStartDate = ?,
-            allocationEndDate = ?,
-            allocationStatus = ?,
-            allocationDetails = ?,
-            targetAmount = ?,
-            currentAmount = ?";
-
-    // Append allocationImage update if an image was uploaded
-    $params = array($allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $currentAmount);
-
-    if (!empty($allocationImage)) {
-        $sql .= ", allocationImage = ?";
-        $params[] = $allocationImage;
-    }
-
-    $sql .= " WHERE allocationID = ?";
-    $params[] = $allocationID;
-
-    // Execute SQL statement
+    // Update the Allocation record in the database
+    $sql = "UPDATE Allocation SET allocationName=?, allocationStartDate=?, allocationEndDate=?, allocationStatus=?, allocationDetails=?, targetAmount=?, allocationImage=? WHERE allocationID=?";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
-        $stmt->bind_param("sssssssi", ...$params); // Adjust types accordingly
+        $stmt->bind_param("sssssdss", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $allocationImage, $allocationID);
         if ($stmt->execute()) {
             // Redirect to AllocationView.php after successful update
             header("Location: AllocationView.php");
@@ -134,14 +101,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             echo "Error updating record: " . $stmt->error;
         }
+        $stmt->close();
     } else {
         echo "Error preparing statement: " . $conn->error;
     }
 
-    $stmt->close(); // Close statement
     $conn->close(); // Close database connection
 }
+
+// Fetch existing allocation data based on allocationID
+if (!empty($allocationID)) {
+    $allocationData = getAllocationData($allocationID);
+    if ($allocationData) {
+        $allocationName = $allocationData['allocationName'];
+        $allocationStartDate = $allocationData['allocationStartDate'];
+        $allocationEndDate = $allocationData['allocationEndDate'];
+        $allocationStatus = $allocationData['allocationStatus'];
+        $allocationDetails = $allocationData['allocationDetails'];
+        $targetAmount = $allocationData['targetAmount'];
+        $allocationImage = $allocationData['allocationImage']; // This assumes you store the image path in the database
+    }
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -167,8 +149,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <body>
 
-<?php include('StaffHeader.php'); ?>
-
+<?php
+include('StaffHeader.php'); // Assuming you have a header include file for your staff section
+?>
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -177,7 +160,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <h2 class="card-title">Update Allocation</h2>
                 </div>
                 <div class="card-body">
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
+                        enctype="multipart/form-data">
+
                         <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
 
                         <div class="mb-3">
@@ -209,54 +194,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <label class="form-label d-block">Status</label>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" id="statusActive"
-                                    name="allocationStatus" value="Active"
-                                    <?php if ($allocationStatus === "Active") echo "checked"; ?> required>
+                                    name="allocationStatus" value="Active" <?php if ($allocationStatus == 'Active') echo 'checked'; ?> required>
                                 <label class="form-check-label" for="statusActive">Active</label>
                             </div>
                             <div class="form-check form-check-inline">
                                 <input class="form-check-input" type="radio" id="statusInactive"
-                                    name="allocationStatus" value="Inactive"
-                                    <?php if ($allocationStatus === "Inactive") echo "checked"; ?> required>
+                                    name="allocationStatus" value="Inactive" <?php if ($allocationStatus == 'Inactive') echo 'checked'; ?> required>
                                 <label class="form-check-label" for="statusInactive">Inactive</label>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="allocationDetails" class="form-label">Details</label>
-                            <textarea class="form-control" id="allocationDetails" name="allocationDetails"
-                                rows="4" required><?php echo htmlspecialchars($allocationDetails); ?></textarea>
+                            <textarea class="form-control" id="allocationDetails" name="allocationDetails" rows="4"
+                                required><?php echo htmlspecialchars($allocationDetails); ?></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="targetAmount" class="form-label">Target Amount (RM)</label>
                             <div class="input-group">
                                 <span class="input-group-text">RM</span>
-                                <input type="number" step="1.00" class="form-control" id="targetAmount"
+                                <input type="number" step="0.01" class="form-control" id="targetAmount"
                                     name="targetAmount"
                                     value="<?php echo htmlspecialchars($targetAmount); ?>" required>
                             </div>
                         </div>
 
                         <div class="mb-3">
-                            <label for="currentAmount" class="form-label">Current Amount (RM)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">RM</span>
-                                <input type="number" step="1.00" class="form-control" id="currentAmount"
-                                    name="currentAmount"
-                                    value="<?php echo htmlspecialchars($currentAmount); ?>" required>
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
                             <label for="allocationImage" class="form-label">Current Image</label><br>
-                            <?php if (!empty($allocationImage)) : ?>
-                                <img src="<?php echo htmlspecialchars($allocationImage); ?>"
-                                    class="img-fluid rounded" alt="Current Image" style="max-width: 200px;">
-                            <?php else : ?>
-                                No Image
+                            <?php if (!empty($allocationImage)): ?>
+                                <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
+                                <br><br>
                             <?php endif; ?>
-                            <input type="file" class="form-control mt-3" id="allocationImage"
-                                name="allocationImage">
+                            <input type="file" class="form-control" id="allocationImage" name="allocationImage">
                         </div>
 
                         <div class="mb-3 text-center">
@@ -272,8 +242,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </div>
 
 <!-- Bootstrap JavaScript and dependencies (optional if not needed for your form interactions) -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-</body>
-
-</html>
+<script src="https://cdn.jsdelivr.net/npm

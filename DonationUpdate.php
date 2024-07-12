@@ -75,8 +75,6 @@ if ($result->num_rows > 0) {
     
     // Ensure correct date format (YYYY-MM-DD) for HTML date input
     $donationDate = date('Y-m-d', strtotime($row["donationDate"]));
-    
-    $donationMethod = $row["donationMethod"];
     $donationStatus = $row["donationStatus"];
     $donationReceipt = $row["donationReceipt"];
     $allocationName = $row["allocationName"];
@@ -91,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $donationID = $_POST["donationID"];
     $donationAmount = $_POST["donationAmount"];
     $donationDate = $_POST["donationDate"]; // Ensure this is correctly fetched
-    $donationMethod = $_POST["donationMethod"];
     $donationStatus = $_POST["donationStatus"];
     $allocationID = $_POST["allocationID"];
 
@@ -109,7 +106,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sql = "UPDATE Donation SET
                 donationAmount = '$donationAmount',
                 donationDate = '$donationDate',
-                donationMethod = '$donationMethod',
                 donationStatus = '$donationStatus'";
 
         // Append allocationID update if necessary
@@ -130,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($donationStatus == 'Accepted') {
                 // Update current amount in Allocation table
                 $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
-                $stmt->bind_param('di', $donationAmount, $allocationID);
+                $stmt->bind_param('ds', $donationAmount, $allocationID);
                 $stmt->execute();
                 $stmt->close();
             }
@@ -183,10 +179,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <div class="mb-3">
                                 <label for="donationDate" class="form-label">Donation Date</label>
                                 <input type="date" class="form-control" id="donationDate" name="donationDate" value="<?php echo $donationDate; ?>" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="donationMethod" class="form-label">Donation Method</label>
-                                <input type="text" class="form-control" id="donationMethod" name="donationMethod" value="<?php echo $donationMethod; ?>" required>
                             </div>
                             <div class="mb-3">
                                 <label for="donationStatus" class="form-label">Donation Status</label>

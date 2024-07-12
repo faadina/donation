@@ -18,11 +18,13 @@ if (empty($allocationID)) {
 
 // Fetch allocation details for display
 $stmt = $conn->prepare("SELECT * FROM Allocation WHERE allocationID = ?");
-$stmt->bind_param('i', $allocationID);
+$stmt->bind_param('s', $allocationID);
 $stmt->execute();
 $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
+
+
 
 // Fetch allocation status from Allocation table
 $allocationStatus = $allocation['allocationStatus'] ?? '';
@@ -107,6 +109,33 @@ $conn->close();
         .btn-closed:hover {
             background-color: #c82333;
         }
+        .progress-container {
+            flex-basis: 55%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .progress-bar-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        .progress-bar {
+            height: 20px;
+            background-color: #28a745;
+            width: <?php echo ($allocation['currentAmount'] / $allocation['targetAmount']) * 100; ?>%;
+        }
+        .raised-goal {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+        .raised, .goal {
+            margin: 0;
+        }
     </style>
     <!-- Include SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
@@ -125,8 +154,13 @@ $conn->close();
             <div class="allocation-info">
                 <h2><b><?php echo htmlspecialchars($allocation['allocationName']); ?></b></h2>
                 <p><strong>Details:</strong> <?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
-                <p><strong>Raised: RM </strong> <?php echo htmlspecialchars($allocation['currentAmount']); ?></p>
-                <p><strong>Goal: RM </strong> <?php echo htmlspecialchars($allocation['targetAmount']); ?></p>
+                <div class="raised-goal">
+                    <div class="raised">Raised: RM <?php echo htmlspecialchars($allocation['currentAmount']); ?></div>
+                    <div class="goal">Goal: RM <?php echo htmlspecialchars($allocation['targetAmount']); ?></div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar"></div>
+                </div>
                 <form id="donationForm" enctype="multipart/form-data">
                     <input type="hidden" name="donorID" value="<?php echo htmlspecialchars($donorID); ?>">
                     <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
@@ -142,7 +176,7 @@ $conn->close();
                         <button type="button" class="btn btn-closed" disabled>CLOSED</button>
                         <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php else: ?>
-                        <button type="submit" class="btn btn-success">DONATE NOW</button>
+                        <button type="submit" class="btn btn-success">DONATE NOW</button> 
                         <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
                     <?php endif; ?>
                 </form>
@@ -207,7 +241,6 @@ $(document).ready(function() {
         });
     });
 });
-
     </script>
 </body>
 </html>

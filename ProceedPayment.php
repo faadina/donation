@@ -2,6 +2,8 @@
 session_start();
 include 'dbConnect.php';
 
+header('Content-Type: application/json');
+
 if (!isset($_SESSION['username'])) {
     echo json_encode(['status' => 'error', 'message' => 'User ID not found in session.']);
     exit();
@@ -12,14 +14,23 @@ $allocationID = $_POST['allocationID'] ?? '';
 $donationAmount = $_POST['donationAmount'] ?? 0;
 $donationReceipt = $_FILES['donationReceipt'] ?? null;
 
-// Validate the donation amount
+// Validate the donation amount and other inputs
 if (empty($allocationID) || $donationAmount <= 0 || empty($donationReceipt)) {
     echo json_encode(['status' => 'error', 'message' => 'Please fill in all required fields and ensure the donation amount is greater than 0.']);
     exit();
 }
 
+// File upload handling
 $target_dir = "uploads/";
 $target_file = $target_dir . basename($donationReceipt["name"]);
+$fileType = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
+
+// Validate file type if necessary
+$allowedTypes = ['jpg', 'jpeg', 'png', 'pdf']; // Example allowed file types
+if (!in_array($fileType, $allowedTypes)) {
+    echo json_encode(['status' => 'error', 'message' => 'Invalid file type.']);
+    exit();
+}
 
 if (!move_uploaded_file($donationReceipt["tmp_name"], $target_file)) {
     echo json_encode(['status' => 'error', 'message' => 'Error uploading file.']);
@@ -43,12 +54,28 @@ $stmt->close();
 $conn->begin_transaction();
 
 try {
+    // Fetch the last donation ID
+    $stmt = $conn->prepare("SELECT MAX(donationID) AS maxDonationID FROM Donation");
+    $stmt->execute();
+    $stmt->bind_result($maxDonationID);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Generate the next donation ID
+    $nextDonationID = $maxDonationID ? intval(substr($maxDonationID, 1)) + 1 : 1;
+    $donationID = 'D' . str_pad($nextDonationID, 3, '0', STR_PAD_LEFT);
+
     // Insert donation record
     $donationStatus = 'pending';
-    $stmt = $conn->prepare("INSERT INTO Donation (donorID, allocationID, donationAmount, donationReceipt, donationDate, donationStatus) VALUES (?, ?, ?, ?, NOW(), ?)");
-    $stmt->bind_param('siiss', $donorID, $allocationID, $donationAmount, $target_file, $donationStatus);
+    $stmt = $conn->prepare("INSERT INTO Donation (donationID, donorID, allocationID, donationAmount, donationReceipt, donationDate, donationStatus) VALUES (?, ?, ?, ?, ?, NOW(), ?)");
+    $stmt->bind_param('sssiss', $donationID, $donorID, $allocationID, $donationAmount, $target_file, $donationStatus);
     $stmt->execute();
-    $donationID = $stmt->insert_id; // Get the inserted donation ID
+    $stmt->close();
+
+    // Update the allocation's current amount
+    $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
+    $stmt->bind_param('ds', $donationAmount, $allocationID);
+    $stmt->execute();
     $stmt->close();
 
     // Commit transaction
