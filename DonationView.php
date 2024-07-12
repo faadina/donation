@@ -98,7 +98,7 @@ $result = $conn->query($sql);
                             echo "<td><a href='DonationAccept.php?donationID=" . $row["donationID"] . "' class='btn btn-success btn-mini-column'>Accept</a></td>";
                             echo "<td><a href='DonationReject.php?donationID=" . $row["donationID"] . "' class='btn btn-danger btn-mini-column'>Reject</a></td>";
                         } elseif ($row["donationStatus"] == "Accepted") {
-                            echo "<td colspan='2' style='text-align:center;'><a href='generate_receipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
+                            echo "<td colspan='2' style='text-align:center;'><a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
                         } elseif ($row["donationStatus"] == "Rejected") {
                             echo "<td colspan='2' style='text-align:center;'><button class='btn btn-secondary btn-mini-column' disabled>Rejected</button></td>";
                         }
