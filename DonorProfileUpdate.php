@@ -55,42 +55,86 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
 
 // Process form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate name
-    if (empty(trim($_POST['name']))) {
+// Validate name
+    if (empty(trim($_POST["name"]))) {
         $name_err = "Please enter your name.";
+    } elseif (!preg_match("/^[a-zA-Z@. ]*$/", $_POST["name"])) {
+        $name_err = "Name can only contain letters, spaces, '.', and '@'.";
+    } elseif (preg_match("/\d/", $_POST["name"])) {
+        $name_err = "Name cannot contain numbers.";
     } else {
-        $name = trim($_POST['name']);
+        $name = trim($_POST["name"]);
     }
 
     // Validate birthdate
-    if (empty(trim($_POST['birthdate']))) {
+    if (empty(trim($_POST["birthdate"]))) {
         $birthdate_err = "Please enter your birthdate.";
     } else {
-        $birthdate = date('Y-m-d', strtotime($_POST['birthdate'])); // Convert to Y-m-d format for MySQL
+        $birthdate = trim($_POST["birthdate"]);
     }
 
     // Validate address
-    if (empty(trim($_POST['address']))) {
+    if (empty(trim($_POST["address"]))) {
         $address_err = "Please enter your address.";
     } else {
-        $address = trim($_POST['address']);
+        $address = trim($_POST["address"]);
     }
 
     // Validate phone number
-    $phone = trim($_POST['phone']);
-    if (empty($phone)) {
+    if (empty(trim($_POST["phone"]))) {
         $phone_err = "Please enter your phone number.";
-    } elseif (!preg_match('/^\d{3}-\d{7}$/', $phone)) {
-        $phone_err = "Please enter a valid phone number in the format XXX-XXXXXXX.";
+    } elseif (!preg_match("/^[0-9-]*$/", $_POST["phone"])) {
+        $phone_err = "Phone number can only contain digits and hyphens (-).";
     } else {
-        $phone = trim($_POST['phone']);
+        $phone = trim($_POST["phone"]);
     }
 
     // Validate email
-    if (empty(trim($_POST['email']))) {
+    if (empty(trim($_POST["email"]))) {
         $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
     } else {
-        $email = trim($_POST['email']);
+        $email = trim($_POST["email"]);
+    }
+    // Validate email
+    if (empty(trim($_POST["email"]))) {
+        $email_err = "Please enter your email.";
+    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
+        $email_err = "Invalid email format.";
+    } else {
+        $email = trim($_POST["email"]);
+
+
+        // Check if email already exists in staff table
+        $sql_staff = "SELECT staffID FROM staff WHERE staffEmail = ?";
+        $stmt_staff = mysqli_prepare($conn, $sql_staff);
+        if ($stmt_staff) {
+            mysqli_stmt_bind_param($stmt_staff, "s", $email);
+            mysqli_stmt_execute($stmt_staff);
+            mysqli_stmt_store_result($stmt_staff);
+            if (mysqli_stmt_num_rows($stmt_staff) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_staff);
+        } else {
+            echo "Something went wrong with the staff table query.";
+        }
+
+        // Check if email already exists in manager table
+        $sql_manager = "SELECT managerID FROM manager WHERE managerEmail = ?";
+        $stmt_manager = mysqli_prepare($conn, $sql_manager);
+        if ($stmt_manager) {
+            mysqli_stmt_bind_param($stmt_manager, "s", $email);
+            mysqli_stmt_execute($stmt_manager);
+            mysqli_stmt_store_result($stmt_manager);
+            if (mysqli_stmt_num_rows($stmt_manager) > 0) {
+                $email_err = "This email is already registered.";
+            }
+            mysqli_stmt_close($stmt_manager);
+        } else {
+            echo "Something went wrong with the manager table query.";
+        }
     }
 
     // Check input errors before updating the database
