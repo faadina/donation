@@ -43,12 +43,22 @@ $stmt->close();
 $conn->begin_transaction();
 
 try {
+    // Fetch the last donation ID
+    $stmt = $conn->prepare("SELECT MAX(donationID) AS maxDonationID FROM Donation");
+    $stmt->execute();
+    $stmt->bind_result($maxDonationID);
+    $stmt->fetch();
+    $stmt->close();
+
+    // Generate the next donation ID
+    $nextDonationID = $maxDonationID ? $maxDonationID + 1 : 1;
+    $donationID = 'D' . str_pad($nextDonationID, 3, '0', STR_PAD_LEFT);
+
     // Insert donation record
     $donationStatus = 'pending';
-    $stmt = $conn->prepare("INSERT INTO Donation (donorID, allocationID, donationAmount, donationReceipt, donationDate, donationStatus) VALUES (?, ?, ?, ?, NOW(), ?)");
-    $stmt->bind_param('siiss', $donorID, $allocationID, $donationAmount, $target_file, $donationStatus);
+    $stmt = $conn->prepare("INSERT INTO Donation (donationID, donorID, allocationID, donationAmount, donationReceipt, donationDate, donationStatus) VALUES (?, ?, ?, ?, ?, NOW(), ?)");
+    $stmt->bind_param('sssiss', $donationID, $donorID, $allocationID, $donationAmount, $target_file, $donationStatus);
     $stmt->execute();
-    $donationID = $stmt->insert_id; // Get the inserted donation ID
     $stmt->close();
 
     // Commit transaction

@@ -68,7 +68,7 @@ if (isset($_GET['donationID'])) {
                                 <div class='col-12'>
                                     <div class='text-center text-150'>
                                         <i class='fa fa-book fa-2x text-success-m2 mr-1'></i>
-                                        <span class='text-default-d3'>Bootdey.com</span>
+                                        <span class='text-default-d3'>MADRASAH TARBIYYAH ISLAMIYYAH <br>DARUL HIJRAH</span>
                                     </div>
                                 </div>
                             </div>

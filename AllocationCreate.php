@@ -47,7 +47,31 @@ function uploadImage($file)
     }
 }
 
+// Function to generate sequential allocationID like A001, A002, A003, ...
+function generateUniqueID() {
+    // Implement logic to get the latest allocationID from database and generate the next one
+    global $conn;
+
+    $sql = "SELECT MAX(allocationID) AS maxID FROM Allocation";
+    $result = $conn->query($sql);
+
+    $currentID = "A001"; // Default starting ID if no records are found
+
+    if ($result && $row = $result->fetch_assoc()) {
+        $maxID = $row['maxID'];
+        if ($maxID) {
+            // Extract numeric part of ID, increment, and format back to A001, A002, ...
+            preg_match('/(\d+)$/', $maxID, $matches);
+            $number = intval($matches[0]) + 1;
+            $currentID = 'A' . str_pad($number, 3, '0', STR_PAD_LEFT);
+        }
+    }
+
+    return $currentID;
+}
+
 // Initialize variables to hold form data
+$allocationID = generateUniqueID(); // Generate allocationID
 $allocationName = "";
 $allocationStartDate = "";
 $allocationEndDate = "";
@@ -71,31 +95,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
     }
 
-    // Calculate total donated amount (replace with your actual calculation/query)
-    $allocationID = 1; // Replace with the actual allocation ID from your form or logic
-    $sql_total_donation = "SELECT SUM(donationAmount) AS totalDonorAmount FROM Donations WHERE allocationID = ?";
-    $stmt_total_donation = $conn->prepare($sql_total_donation);
-    if ($stmt_total_donation) {
-        $stmt_total_donation->bind_param("i", $allocationID);
-        $stmt_total_donation->execute();
-        $result_total_donation = $stmt_total_donation->get_result();
-        if ($result_total_donation->num_rows > 0) {
-            $row_total_donation = $result_total_donation->fetch_assoc();
-            $totalDonorAmount = $row_total_donation['totalDonorAmount'];
-        } else {
-            $totalDonorAmount = 0; // If no donations found, default to 0
-        }
-        $stmt_total_donation->close();
-    } else {
-        echo "Error preparing total donation statement: " . $conn->error;
-    }
-
-    // Prepare SQL statement for insertion
-    $sql = "INSERT INTO Allocation (allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    // Prepare and execute the INSERT statement
+    $sql = "INSERT INTO Allocation (allocationID, allocationName, allocationStartDate, allocationEndDate, allocationStatus, allocationDetails, targetAmount, currentAmount, allocationImage)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
-        $stmt->bind_param("ssssssds", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $totalDonorAmount, $allocationImage);
+        $defaultCurrentAmount = 0; // Assuming currentAmount can default to 0 if no donations are made yet
+        $stmt->bind_param("ssssssdss", $allocationID, $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $defaultCurrentAmount, $allocationImage);
         if ($stmt->execute()) {
             // Redirect to AllocationView.php after successful creation
             header("Location: AllocationView.php");
@@ -103,11 +109,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             echo "Error creating record: " . $stmt->error;
         }
+        $stmt->close();
     } else {
         echo "Error preparing statement: " . $conn->error;
     }
 
-    $stmt->close(); // Close statement
     $conn->close(); // Close database connection
 }
 ?>
@@ -137,7 +143,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
 
 <?php
-include('StaffHeader.php');
+include('StaffHeader.php'); // Assuming you have a header include file for your staff section
 ?>
 <div class="container my-4">
     <div class="row justify-content-center">
