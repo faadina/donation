@@ -2,7 +2,7 @@
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Fetch donation records from the database
-$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName
+$sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
 $result = $conn->query($sql);
@@ -85,7 +85,11 @@ $result = $conn->query($sql);
                         echo "<td>" . $row["donationStatus"] . "</td>";
                         
                         // Displaying receipt with a link to view PDF
-                        echo "<td><a href='ReceiptView.php?donationID=" . $row["donationID"] . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+                        if (!empty($row["donationReceipt"])) {
+                            echo "<td><a href='" . htmlspecialchars($row["donationReceipt"]) . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+                        } else {
+                            echo "<td>No Receipt</td>";
+                        }
                         
                         echo "<td>" . $row["allocationName"] . "</td>";
 
