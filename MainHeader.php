@@ -13,7 +13,7 @@
 
         body {
             margin: 0; 
-            font-family: 'Inter', sans-serif;      
+            font-family: 'Trebuchet MS', sans-serif;     
         }
 
         .header {

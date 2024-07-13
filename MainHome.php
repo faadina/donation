@@ -1,5 +1,5 @@
 <?php
-include 'dbConnect.php'; 
+include 'dbConnect.php';
 $title = "Home Page";
 include 'MainHeader.php';
 
@@ -25,9 +25,7 @@ $result = $conn->query($sql);
         }
 
         body {
-            font-family: 'Trebuchet MS', sans-serif;
-            margin: 0;
-            padding: 0;
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
         }
 
         .main {
@@ -45,7 +43,7 @@ $result = $conn->query($sql);
             text-align: center;
             overflow: hidden;
             padding-top: 60px;
-            transition: background-image 1s ease; 
+            transition: background-image 1s ease;
         }
 
         .main::before {
@@ -110,7 +108,7 @@ $result = $conn->query($sql);
             flex-wrap: wrap;
             justify-content: center;
             gap: 20px;
-            padding: 20px;
+            padding: 50px;
         }
 
         .card {
@@ -127,9 +125,11 @@ $result = $conn->query($sql);
 
         .card img {
             width: 100%;
-            height: 150px;
+            height: 120px;
             object-fit: cover;
+            display: block;
         }
+
 
         .card-content {
             padding: 10px;
@@ -143,6 +143,7 @@ $result = $conn->query($sql);
             font-size: 1.2rem;
             /* Adjusted font size */
         }
+
         .card:hover {
             transform: translateY(-10px);
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
@@ -224,7 +225,7 @@ $result = $conn->query($sql);
 
         .donate-button:hover {
             background-color: #1cf0b1;
-            color:black;
+            color: black;
         }
 
         .closed-button {
@@ -293,16 +294,16 @@ $result = $conn->query($sql);
                 'images/madrasah2.jpg',
                 'images/madrasah3.jpg'
             ];
-            
+
             var currentIndex = 0;
             var mainDiv = document.querySelector('.main');
-            
+
             // Function to change background image
             function changeBackground() {
                 mainDiv.style.backgroundImage = 'url("' + images[currentIndex] + '")';
                 currentIndex = (currentIndex + 1) % images.length; // Cycle through images
             }
-            
+
             // Call changeBackground every 8 seconds (adjust timing as needed)
             setInterval(changeBackground, 4000); // Change image every 8 seconds
         });
