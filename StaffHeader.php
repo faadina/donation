@@ -32,6 +32,7 @@ $staffID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown';
             z-index: 2;
             width: AUTO;
             margin: 0 auto; 
+            z-index: 999;
         }
 
         .logo {
