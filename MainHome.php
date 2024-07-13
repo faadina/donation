@@ -174,7 +174,7 @@ $result = $conn->query($sql);
             overflow: hidden;
             margin: 1px 0;
             filter: drop-shadow(0px 0px 2px #d0f0c0);
-            border: 1px solid black;
+            border: 1px solid yellow;
         }
 
         .progress-bar {
