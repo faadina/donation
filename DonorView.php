@@ -65,7 +65,7 @@ $result = $conn->query($sql);
         </div>
         <table class="table table-striped">
             <thead>
-                <tr>
+                <tr><th>No</th>
                     <th>Username</th>
                     <th>Name</th>
                     <th>Phone Number</th>
@@ -77,22 +77,25 @@ $result = $conn->query($sql);
             </thead>
             <tbody>
                 <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        $dob = date('d/m/y', strtotime($row["donorDOB"]));
-                        echo "<tr>";
-                        echo "<td>" . $row["donorID"] . "</td>";
-                        echo "<td>" . $row["donorName"] . "</td>";
-                        echo "<td>" . $row["donorPhoneNo"] . "</td>";
-                        echo "<td>" . $dob . "</td>";
-                        echo "<td>" . $row["donorAddress"] . "</td>";
-                        echo "<td>" . $row["donorEmail"] . "</td>";
-                        echo "<td><a href='DonorUpdate.php?donorID=" . $row["donorID"] . "' class='btn btn-primary btn-mini-column'><i class='bi bi-pencil'></i></a></td>";
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='9'>No donor records found</td></tr>";
+              if ($result->num_rows > 0) {
+                $count = 1; // Initialize a counter
+                while ($row = $result->fetch_assoc()) {
+                    $dob = date('d/m/y', strtotime($row["donorDOB"]));
+                    echo "<tr>";
+                    echo "<td>" . $count . "</td>"; // Display the row number
+                    echo "<td>" . $row["donorID"] . "</td>";
+                    echo "<td>" . $row["donorName"] . "</td>";
+                    echo "<td>" . $row["donorPhoneNo"] . "</td>";
+                    echo "<td>" . $dob . "</td>";
+                    echo "<td>" . $row["donorAddress"] . "</td>";
+                    echo "<td>" . $row["donorEmail"] . "</td>";
+                    echo "<td><a href='DonorUpdate.php?donorID=" . $row["donorID"] . "' class='btn btn-primary btn-mini-column'><i class='bi bi-pencil'></i></a></td>";
+                    echo "</tr>";
+                    $count++; // Increment the counter
                 }
+            } else {
+                echo "<tr><td colspan='7'>No donor records found</td></tr>";
+            }
                 ?>
             </tbody>
         </table>
