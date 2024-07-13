@@ -86,11 +86,8 @@ mysqli_close($conn);
             display: block;
             margin: 0 auto;
             image-rendering: -webkit-optimize-contrast;
-            /* For WebKit browsers */
             image-rendering: crisp-edges;
-            /* Modern browsers */
             filter: brightness(1.2) contrast(1.2);
-            /* Adjust values as needed */
         }
 
         .summary {

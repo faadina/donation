@@ -115,7 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            height: 80vh;
         }
 
         .wrapper {
@@ -125,7 +125,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             border-radius: 10px;
             box-shadow: 0px 0px 10px 0px #000000;
             overflow: hidden;
-            margin-top: 70px;
         }
 
         .image-container {
