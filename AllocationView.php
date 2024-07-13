@@ -29,52 +29,72 @@ $result = $conn->query($sql);
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
     <style>
-        .image-preview {
-            max-width: 100px;
-            max-height: 100px;
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa; 
+            z-index:1;
         }
-        /* Adjust search button */
+
+        .container {
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .page-title {
+            margin-top: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+            color: #454B1B; 
+            font-weight:800;
+        }
+
+        .btn-custom {
+            margin-top: 10px;
+        }
+
+        .table {
+            margin-top: 20px;
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+        }
+
+        .search-input {
+            width: 300px;
+        }
+
         .search-button {
-            min-width: 40px; /* Ensure minimum width */
-            flex: 0 0 auto; /* Fixing width */
-            
-        }
-        .input-group-append {
-            display: flex;
-            align-items: stretch; /* Ensuring alignment */
-            width:1000px;
-        }
-        .input-group .form-control {
-            width: 10px; /* Adjust width of input field */
+            min-width: 40px;
+            background-color: black;
+            border:none;
         }
     </style>
 </head>
 <body>
     <?php include('staffHeader.php'); ?>
     <div class="container">
-        <h2 class="my-4">Allocation Records</h2>
-        <a href="StaffDashboard.php" class="btn btn-primary mb-3">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
-                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
-            </svg>
-        </a>
-        <a href="AllocationCreate.php" class="btn btn-success mb-3">Create New Allocation</a>
+        <h2 class="page-title">Allocation Records</h2>
+        <div class="text-end mb-3">
+            <a href="AllocationCreate.php" class="btn btn-success btn-custom">Create New Allocation</a>
+        </div>
         
         <!-- Search field -->
         <div class="input-group mb-4">
-            <input type="text" id="allocationID" class="form-control" placeholder="Search for allocation ID..." onkeyup="searchAllocation()">
-            <div class="input-group-append">
-                <button class="btn btn-primary search-button" type="button" onclick="searchAllocation()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
-                    </svg>
-                </button>
-            </div>
+            <input type="text" id="allocationID" class="form-control search-input" placeholder="Search for allocation ID..." onkeyup="searchAllocation()">
+            <button class="btn btn-primary search-button" type="button" onclick="searchAllocation()">
+                <i class="bi bi-search"></i>
+            </button>
         </div>
         
         <table id="donationTable" class="table table-striped">
             <thead>
-                <tr><th>NO</th>
+                <tr>
+                    <th>NO</th>
                     <th>ID</th>
                     <th>NAME</th>
                     <th>START DATE</th>
@@ -82,48 +102,35 @@ $result = $conn->query($sql);
                     <th>STATUS</th>
                     <th>TARGET (RM)</th>
                     <th>CURRENT (RM)</th>
-                    <th colspan='3' style="text-align:center;">Actions</th>
+                    <th colspan='3'>ACTIONS</th>
                 </tr>
             </thead>
             <tbody>
             <?php
-if ($result->num_rows > 0) {
-    $count = 1; // Initialize a counter
-    while ($row = $result->fetch_assoc()) {
-        $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
-        $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
-        echo "<tr>";
-        echo "<td>" . $count . "</td>"; // Display the row number
-        echo "<td>" . $row["allocationID"] . "</td>";
-        echo "<td>" . $row["allocationName"] . "</td>";
-        echo "<td>" . $startDate . "</td>";
-        echo "<td>" . $endDate . "</td>";
-        echo "<td>" . $row["allocationStatus"] . "</td>";
-        echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
-        echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
-        echo "<td>";
-        echo "<a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'>";
-        echo "<i class='bi bi-eye'></i>";
-        echo "</a>";
-        echo "</td>";
-        echo "<td>";
-        echo "<a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'>";
-        echo "<i class='bi bi-pencil'></i>";
-        echo "</a>";
-        echo "</td>";
-        echo "<td>";
-        echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'>";
-        echo "<i class='bi bi-trash'></i>";
-        echo "</a>";
-        echo "</td>";
-        echo "</tr>";
-        $count++; // Increment the counter
-    }
-} else {
-    echo "<tr><td colspan='11'>No allocation records found</td></tr>";
-}
-?>
-
+            if ($result->num_rows > 0) {
+                $count = 1;
+                while ($row = $result->fetch_assoc()) {
+                    $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
+                    $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
+                    echo "<tr>";
+                    echo "<td>" . $count . "</td>";
+                    echo "<td>" . $row["allocationID"] . "</td>";
+                    echo "<td>" . $row["allocationName"] . "</td>";
+                    echo "<td>" . $startDate . "</td>";
+                    echo "<td>" . $endDate . "</td>";
+                    echo "<td>" . $row["allocationStatus"] . "</td>";
+                    echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
+                    echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
+                    echo "<td><a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i></a></td>";
+                    echo "<td><a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'><i class='bi bi-pencil'></i></a></td>";
+                    echo "<td><a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'><i class='bi bi-trash'></i></a></td>";
+                    echo "</tr>";
+                    $count++;
+                }
+            } else {
+                echo "<tr><td colspan='10' class='text-center'>No allocation records found</td></tr>";
+            }
+            ?>
             </tbody>
         </table>
     </div>
@@ -134,12 +141,12 @@ if ($result->num_rows > 0) {
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
 
-            for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
-                var allocationIDCell = rows[i].getElementsByTagName("td")[1]; // Assuming allocationID is in the first column
-                
+            for (var i = 1; i < rows.length; i++) {
+                var allocationIDCell = rows[i].getElementsByTagName("td")[1];
+
                 if (allocationIDCell) {
                     var textValue = allocationIDCell.textContent || allocationIDCell.innerText;
-                    
+
                     if (textValue.trim().toLowerCase().indexOf(input) > -1) {
                         rows[i].style.display = "";
                     } else {
@@ -150,35 +157,30 @@ if ($result->num_rows > 0) {
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-        // Select all elements with class 'delete-allocation'
-        var deleteButtons = document.querySelectorAll('.delete-allocation');
+            var deleteButtons = document.querySelectorAll('.delete-allocation');
 
-        // Loop through each delete button
-        deleteButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
 
-                // Get the allocation ID from the data-id attribute
-                var allocationID = this.getAttribute('data-id');
+                    var allocationID = this.getAttribute('data-id');
 
-                // Use SweetAlert to confirm deletion
-                Swal.fire({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#d33',
-                    cancelButtonColor: '#3085d6',
-                    confirmButtonText: 'Yes, delete it!'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Redirect to delete script
-                        window.location.href = 'AllocationDelete.php?allocationID=' + allocationID;
-                    }
+                    Swal.fire({
+                        title: 'Are you sure?',
+                        text: "You won't be able to revert this!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = 'AllocationDelete.php?allocationID=' + allocationID;
+                        }
+                    });
                 });
             });
         });
-    });
     </script>
 </body>
 </html>
