@@ -16,6 +16,11 @@ $username = $_SESSION['username'];
 // Fetch allocation records from the database
 $sql = "SELECT * FROM Allocation";
 $result = $conn->query($sql);
+
+// Fetch total number of allocation records
+$total_sql = "SELECT COUNT(*) AS total FROM Allocation";
+$total_result = $conn->query($total_sql);
+$total_rows = $total_result->fetch_assoc()['total'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,8 +36,7 @@ $result = $conn->query($sql);
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f8f9fa; 
-            z-index:1;
+            background-color: #f8f9fa;
         }
 
         .container {
@@ -41,18 +45,24 @@ $result = $conn->query($sql);
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin-top: 20px;
         }
 
         .page-title {
-            margin-top: 20px;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             text-align: center;
-            color: #454B1B; 
-            font-weight:800;
+            color: #454B1B;
+            font-weight: 800;
         }
 
         .btn-custom {
-            margin-top: 10px;
+            background-color: #454B1B;
+            color: #fff;
+            border: none;
+        }
+
+        .btn-custom:hover {
+            background-color: #3A3F15;
         }
 
         .table {
@@ -69,9 +79,22 @@ $result = $conn->query($sql);
         }
 
         .search-button {
-            min-width: 40px;
-            background-color: black;
-            border:none;
+            background-color: #454B1B;
+            border: none;
+        }
+
+        .search-button:hover {
+            background-color: #3A3F15;
+        }
+
+        .delete-allocation {
+            color: #fff;
+            background-color: #DC3545;
+            border: none;
+        }
+
+        .delete-allocation:hover {
+            background-color: #C82333;
         }
     </style>
 </head>
@@ -79,8 +102,8 @@ $result = $conn->query($sql);
     <?php include('staffHeader.php'); ?>
     <div class="container">
         <h2 class="page-title">Allocation Records</h2>
-        <div class="text-end mb-3">
-            <a href="AllocationCreate.php" class="btn btn-success btn-custom">Create New Allocation</a>
+        <div class="d-flex justify-content-end mb-3">
+            <a href="AllocationCreate.php" class="btn btn-success btn-custom">+ New Allocation</a>
         </div>
         
         <!-- Search field -->
@@ -90,6 +113,8 @@ $result = $conn->query($sql);
                 <i class="bi bi-search"></i>
             </button>
         </div>
+        
+        <div>Total Allocation Records: <b><?php echo $total_rows; ?></b></div> <!-- Display total number of allocation records -->
         
         <table id="donationTable" class="table table-striped">
             <thead>
@@ -123,7 +148,7 @@ $result = $conn->query($sql);
                     echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
                     echo "<td><a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i></a></td>";
                     echo "<td><a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'><i class='bi bi-pencil'></i></a></td>";
-                    echo "<td><a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'><i class='bi bi-trash'></i></a></td>";
+                    echo "<td><button class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'><i class='bi bi-trash'></i></button></td>";
                     echo "</tr>";
                     $count++;
                 }
