@@ -20,13 +20,14 @@ include 'MainHeader.php';
         margin: auto;
         box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2) inset;
         border-radius: 15px;
+        padding: 10px 20px;
     }
 
     .title {
         color: #4f8236;
         margin-bottom: 30px;
-        font-size: 2.5em;
-        font-weight: 700;
+        font-size: 2.4em;
+        font-weight: 800;
         text-align: center;
     }
 
@@ -47,7 +48,7 @@ include 'MainHeader.php';
         align-items: center;
         margin-bottom: 20px;
         transition: background-color 0.3s ease-in-out;
-        padding: 15px;
+        padding: 10px;
         border-radius: 10px;
     }
 
@@ -84,7 +85,7 @@ include 'MainHeader.php';
     }
 
     .contact-item a:hover {
-        color: #FF5751;
+        color: #589558;
     }
 
     .contact-image {
