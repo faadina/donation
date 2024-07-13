@@ -135,7 +135,7 @@ if ($result->num_rows > 0) {
             var rows = table.getElementsByTagName("tr");
 
             for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
-                var allocationIDCell = rows[i].getElementsByTagName("td")[0]; // Assuming allocationID is in the first column
+                var allocationIDCell = rows[i].getElementsByTagName("td")[1]; // Assuming allocationID is in the first column
                 
                 if (allocationIDCell) {
                     var textValue = allocationIDCell.textContent || allocationIDCell.innerText;

@@ -108,7 +108,7 @@ $result = $conn->query($sql);
             var rows = table.getElementsByTagName("tr");
 
             for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
-                var donorIDCell = rows[i].getElementsByTagName("td")[0]; // Assuming donorID is in the first column
+                var donorIDCell = rows[i].getElementsByTagName("td")[1]; // Assuming donorID is in the first column
                 
                 if (donorIDCell) {
                     var textValue = donorIDCell.textContent || donorIDCell.innerText;

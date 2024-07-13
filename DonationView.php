@@ -216,7 +216,7 @@ if ($result->num_rows > 0) {
             var rows = table.getElementsByTagName("tr");
             
             for (var i = 0; i < rows.length; i++) {
-                var donationIDCell = rows[i].getElementsByTagName("td")[0]; // Assuming donationID is in the first column
+                var donationIDCell = rows[i].getElementsByTagName("td")[1]; // Assuming donationID is in the first column
                 
                 if (donationIDCell) {
                     var textValue = donationIDCell.textContent || donationIDCell.innerText;
