@@ -32,12 +32,37 @@ $result = $conn->query($sql);
             max-width: 100px;
             max-height: 100px;
         }
+    
+        .input-group-append {
+            display: flex;
+            align-items: stretch; /* Ensuring alignment */
+            margin-left: 0px; /* Pushing to the right */
+            margin-right: 1000px; 
+        }
+        .input-group .form-control {
+            width: 200px; /* Adjust width of input field */
+        }
     </style>
 </head>
 <body>
     <?php include('staffHeader.php'); ?>
     <div class="container">
         <h2 class="my-4">Donor Records</h2>
+        <a href="StaffDashboard.php" class="btn btn-primary mb-3">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
+                <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+            </svg>
+        </a>
+        <div class="input-group mb-4">
+            <input type="text" id="donorID" class="form-control" placeholder="Search for donor ID..." onkeyup="searchDonor()">
+            <div class="input-group-append">
+                <button class="btn btn-primary search-button" type="button" onclick="searchDonor()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -72,6 +97,28 @@ $result = $conn->query($sql);
             </tbody>
         </table>
     </div>
+
+    <script>
+        function searchDonor() {
+            var input = document.getElementById("donorID").value.trim().toLowerCase();
+            var table = document.getElementsByTagName("table")[0];
+            var rows = table.getElementsByTagName("tr");
+
+            for (var i = 1; i < rows.length; i++) { // Start from 1 to skip the header row
+                var donorIDCell = rows[i].getElementsByTagName("td")[0]; // Assuming donorID is in the first column
+                
+                if (donorIDCell) {
+                    var textValue = donorIDCell.textContent || donorIDCell.innerText;
+                    
+                    if (textValue.trim().toLowerCase().indexOf(input) > -1) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }       
+            }
+        }
+    </script>
 </body>
 </html>
 

@@ -1,22 +1,17 @@
 <?php
 session_start();
 
-
 // Check if the user is logged in, if not then redirect to login page
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: MainLogin.php");
     exit;
 }
 
-
 // Include the database connection file
 require_once("dbConnect.php");
 
-
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
-
-//include 'dbConnect.php';
 
 $title = "Donation Page";
 include 'DonorHeader.php'; // Assuming this includes your header
@@ -40,6 +35,53 @@ $stmt->execute();
 $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
+
+// Check if allocation exists and fetch its currentAmount
+$currentAmount = $allocation['currentAmount'] ?? 0;
+
+// Fetch accepted donations related to this allocation
+$stmt_donations = $conn->prepare("SELECT SUM(donationAmount) AS totalDonation FROM Donation WHERE allocationID = ? AND donationStatus = 'Accepted'");
+$stmt_donations->bind_param('s', $allocationID);
+$stmt_donations->execute();
+$result_donations = $stmt_donations->get_result();
+$totalDonation = $result_donations->fetch_assoc()['totalDonation'] ?? 0;
+$stmt_donations->close();
+
+// Update the allocation's currentAmount with the total accepted donations
+$newCurrentAmount = $totalDonation; // Assuming you want to replace currentAmount with the sum of accepted donations
+$stmt_update = $conn->prepare("UPDATE Allocation SET currentAmount = ? WHERE allocationID = ?");
+$stmt_update->bind_param('ds', $newCurrentAmount, $allocationID);
+$stmt_update->execute();
+$stmt_update->close();
+
+// Function to process donation submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['donationAmount']) && isset($_POST['allocationID'])) {
+        $donationAmount = $_POST['donationAmount'];
+        $allocationID = $_POST['allocationID'];
+        
+        // Perform validation and other checks as needed
+
+        // Example: Insert donation into Donation table
+        $stmt_insert = $conn->prepare("INSERT INTO Donation (allocationID, donorID, donationAmount, donationStatus) VALUES (?, ?, ?, 'pending')");
+        $stmt_insert->bind_param('ssd', $allocationID, $donorID, $donationAmount);
+        if ($stmt_insert->execute()) {
+            // Donation successfully added, optionally update currentAmount again
+            $stmt_update = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
+            $stmt_update->bind_param('ds', $donationAmount, $allocationID);
+            $stmt_update->execute();
+            $stmt_update->close();
+
+            // Redirect or show success message
+            header("Location: DonationSuccess.php");
+            exit();
+        } else {
+            echo "Error inserting donation: " . $conn->error;
+        }
+        $stmt_insert->close();
+    }
+}
+
 
 // Fetch allocation status from Allocation table
 $allocationStatus = $allocation['allocationStatus'] ?? '';

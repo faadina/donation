@@ -13,23 +13,25 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
-
 // Fetch counts from respective tables
 $sqlAllocationCount = "SELECT COUNT(*) AS allocationCount FROM Allocation";
 $sqlDonationCount = "SELECT COUNT(*) AS donationCount FROM Donation";
 $sqlDonorCount = "SELECT COUNT(*) AS donorCount FROM Donor";
+$sqlAcceptedDonationCount = "SELECT COUNT(*) AS acceptedDonationCount FROM Donation WHERE donationStatus = 'Accepted'";
 
 $resultAllocation = $conn->query($sqlAllocationCount);
 $resultDonation = $conn->query($sqlDonationCount);
 $resultDonor = $conn->query($sqlDonorCount);
+$resultAcceptedDonationCount = $conn->query($sqlAcceptedDonationCount);
 
 // Initialize variables to hold counts
 $allocationCount = 0;
 $donationCount = 0;
 $donorCount = 0;
+$acceptedDonationCount = 0;
 
 // Fetch counts if queries are successful
-if ($resultAllocation && $resultDonation && $resultDonor) {
+if ($resultAllocation && $resultDonation && $resultDonor && $resultAcceptedDonationCount) {
     $rowAllocation = $resultAllocation->fetch_assoc();
     $allocationCount = $rowAllocation['allocationCount'];
 
@@ -38,6 +40,9 @@ if ($resultAllocation && $resultDonation && $resultDonor) {
 
     $rowDonor = $resultDonor->fetch_assoc();
     $donorCount = $rowDonor['donorCount'];
+
+    $rowAcceptedDonationCount = $resultAcceptedDonationCount->fetch_assoc();
+    $acceptedDonationCount = $rowAcceptedDonationCount['acceptedDonationCount'];
 } else {
     echo "Error fetching counts: " . $conn->error;
 }
@@ -46,7 +51,6 @@ $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -183,7 +187,7 @@ $conn->close();
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>ALLOCATION</h3>
+                <h3>ALLOCATIONS</h3>
                 <p><?php echo $allocationCount; ?></p>
                 <a href="AllocationView.php" class="btn btn-primary">View</a>
             </div>
@@ -191,16 +195,17 @@ $conn->close();
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>DONOR</h3>
+                <h3>DONORS</h3>
                 <p><?php echo $donorCount; ?></p>
                 <a href="DonorView.php" class="btn btn-primary">View</a>
             </div>
         </div>
+        
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>DONATION</h3>
-                <p><?php echo $donationCount; ?></p>
+                <h3>DONATIONS</h3>
+                <p><?php echo $acceptedDonationCount; ?></p>
                 <a href="DonationView.php" class="btn btn-primary">View</a>
             </div>
         </div>

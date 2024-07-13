@@ -20,10 +20,19 @@ if (isset($_GET['allocationID'])) {
         exit();
     }
 
-    // Fetch donations related to this allocation if 'viewDonations' is set
+    // Fetch currentAmount for donations with donationStatus = 'Accepted'
+    $sql_accepted_amount = "SELECT SUM(donationAmount) AS acceptedAmount FROM Donation WHERE allocationID = ? AND donationStatus = 'Accepted'";
+    $stmt_accepted_amount = $conn->prepare($sql_accepted_amount);
+    $stmt_accepted_amount->bind_param("s", $allocationID);
+    $stmt_accepted_amount->execute();
+    $result_accepted_amount = $stmt_accepted_amount->get_result();
+    $acceptedAmount = $result_accepted_amount->fetch_assoc()['acceptedAmount'] ?? 0;
+    $stmt_accepted_amount->close();
+
+    // Fetch accepted donations related to this allocation if 'viewDonations' is set
     $result_donations = null;
     if (isset($_GET['viewDonations']) && $_GET['viewDonations'] == 'true') {
-        $sql_donations = "SELECT * FROM Donation WHERE allocationID = ?";
+        $sql_donations = "SELECT donationID, donationAmount FROM Donation WHERE allocationID = ? AND donationStatus = 'Accepted'";
         $stmt_donations = $conn->prepare($sql_donations);
         $stmt_donations->bind_param("s", $allocationID); // Assuming allocationID is a string, adjust if it's an integer
         $stmt_donations->execute();
@@ -55,7 +64,7 @@ if (isset($_GET['allocationID'])) {
     <div class="container my-4">
         <h2 class="mb-4">View Allocation Details</h2>
         <a href="AllocationView.php" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> Back to Allocation Records</a>
-        <a href="AllocationRead.php?allocationID=<?php echo $allocationID; ?>&viewDonations=true" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> View Donations</a>
+        <a href="AllocationRead.php?allocationID=<?php echo $allocationID; ?>&viewDonations=true" class="btn btn-secondary mb-3"><i class="bi bi-arrow-left"></i> View Accepted Donations</a>
         <div class="card">
             <div class="card-header">
                 Allocation Details
@@ -68,7 +77,7 @@ if (isset($_GET['allocationID'])) {
                 <p><strong>Status:</strong> <?php echo $row['allocationStatus']; ?></p>
                 <p><strong>Details:</strong> <?php echo $row['allocationDetails']; ?></p>
                 <p><strong>Target Amount (RM):</strong> <?php echo number_format($row['targetAmount'], 2); ?></p>
-                <p><strong>Current Amount (RM):</strong> <?php echo number_format($row['currentAmount'], 2); ?></p>
+                <p><strong>Current Amount (RM):</strong> <?php echo number_format($acceptedAmount, 2); ?></p>
                 <p><strong>Image:</strong><br>
                     <?php
                     if (!empty($row['allocationImage'])) {
@@ -81,11 +90,11 @@ if (isset($_GET['allocationID'])) {
             </div>
         </div>
 
-        <!-- Display donations related to this allocation if 'viewDonations' is set -->
+        <!-- Display accepted donations related to this allocation if 'viewDonations' is set -->
         <?php if ($result_donations !== null): ?>
         <div class="card mt-4">
             <div class="card-header">
-                Donations for Allocation ID: <?php echo $allocationID; ?>
+                Accepted Donations for Allocation ID: <?php echo $allocationID; ?>
             </div>
             <div class="card-body">
                 <?php
@@ -93,11 +102,10 @@ if (isset($_GET['allocationID'])) {
                     while ($donation = $result_donations->fetch_assoc()) {
                         echo "<p><strong>Donation ID:</strong> " . $donation['donationID'] . "</p>";
                         echo "<p><strong>Amount (RM):</strong> " . number_format($donation['donationAmount'], 2) . "</p>";
-                        // Add more fields as needed
                         echo "<hr>";
                     }
                 } else {
-                    echo "<p>No donations found for this allocation.</p>";
+                    echo "<p>No accepted donations found for this allocation.</p>";
                 }
                 ?>
             </div>

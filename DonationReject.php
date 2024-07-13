@@ -1,13 +1,17 @@
 <?php
+session_start();
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
 // Check if donationID is set and not empty
 if (isset($_GET['donationID']) && !empty($_GET['donationID'])) {
     $donationID = $_GET['donationID'];
 
+    // Get the current staff username from the session
+    $staffID = $_SESSION['username'];
+
     // Prepare and bind
-    $stmt = $conn->prepare("UPDATE Donation SET donationStatus = 'Rejected' WHERE donationID = ?");
-    $stmt->bind_param("s", $donationID);
+    $stmt = $conn->prepare("UPDATE Donation SET donationStatus = 'Rejected', staffID = ? WHERE donationID = ?");
+    $stmt->bind_param("ss", $staffID, $donationID);
 
     // Execute the query
     if ($stmt->execute()) {
