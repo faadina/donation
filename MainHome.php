@@ -1,14 +1,12 @@
 <?php
-include 'dbConnect.php'; // Use the existing $conn variable for the connection
+include 'dbConnect.php'; 
 $title = "Home Page";
 include 'MainHeader.php';
 
-// Ensure the connection is properly established using $conn from dbConnect.php
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Retrieve all allocations from the database
 $sql = "SELECT * FROM Allocation";
 $result = $conn->query($sql);
 ?>
@@ -47,6 +45,7 @@ $result = $conn->query($sql);
             text-align: center;
             overflow: hidden;
             padding-top: 60px;
+            transition: background-image 1s ease; 
         }
 
         .main::before {
@@ -112,7 +111,6 @@ $result = $conn->query($sql);
             justify-content: center;
             gap: 20px;
             padding: 20px;
-            background-color: #f4f4f4;
         }
 
         .card {
@@ -130,7 +128,6 @@ $result = $conn->query($sql);
         .card img {
             width: 100%;
             height: 150px;
-            /* Adjusted height */
             object-fit: cover;
         }
 
@@ -145,6 +142,10 @@ $result = $conn->query($sql);
             margin-bottom: 10px;
             font-size: 1.2rem;
             /* Adjusted font size */
+        }
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .card-footer {
@@ -222,7 +223,8 @@ $result = $conn->query($sql);
         }
 
         .donate-button:hover {
-            background-color: #218838;
+            background-color: #1cf0b1;
+            color:black;
         }
 
         .closed-button {
@@ -283,6 +285,28 @@ $result = $conn->query($sql);
         $conn->close();
         ?>
     </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Array of image URLs to cycle through
+            var images = [
+                'images/madrasah1.jpg',
+                'images/madrasah2.jpg',
+                'images/madrasah3.jpg'
+            ];
+            
+            var currentIndex = 0;
+            var mainDiv = document.querySelector('.main');
+            
+            // Function to change background image
+            function changeBackground() {
+                mainDiv.style.backgroundImage = 'url("' + images[currentIndex] + '")';
+                currentIndex = (currentIndex + 1) % images.length; // Cycle through images
+            }
+            
+            // Call changeBackground every 8 seconds (adjust timing as needed)
+            setInterval(changeBackground, 4000); // Change image every 8 seconds
+        });
+    </script>
 
 </body>
 
