@@ -137,34 +137,45 @@ include 'DonorHeader.php';?>
             
 
             <table class="donation-table">
-                <thead>
-                    <tr>
-                        <th>Donation ID</th>
-                        <th>Donation Amount</th>
-                        <th>Donation Date</th>
-                        <th>Donation Status</th>
-                        <th>Donation Receipt</th>
-                        <th>Allocation Name</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php while ($row = $result->fetch_assoc()): ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
-                            <td>MYR <?php echo number_format($row['donationAmount'], 2); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
-                            <td>
-                                <?php if (!empty($row['donationReceipt'])): ?>
-                                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">View Receipt</button>
-                                <?php else: ?>
-                                    No Receipt
-                                <?php endif; ?>
-                            </td>
-                            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
-                        </tr>
-                    <?php endwhile; ?>
-                </tbody>
+            <thead>
+    <tr>
+        <th>Donation ID</th>
+        <th>Allocation Name</th>
+        <th>Donation Amount</th>
+        <th>Donation Date</th>
+        <th>Donation Status</th>
+        <th>Donation Receipt</th>
+        <th>Download Staff Receipt</th>
+    </tr>
+</thead>
+<tbody>
+    <?php while ($row = $result->fetch_assoc()): ?>
+        <tr>
+            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
+            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
+            <td>MYR <?php echo number_format($row['donationAmount'], 2); ?></td>
+            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
+            <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
+            <td>
+                <?php if (!empty($row['donationReceipt'])): ?>
+                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">View Receipt</button>
+                <?php else: ?>
+                    No Receipt
+                <?php endif; ?>
+            </td>
+            <td>
+                <?php if ($row['donationStatus'] === 'Accepted'): ?>
+                    <a href="DonationGenerateReceipt.php?donationID=<?php echo $row['donationID']; ?>" 
+                    <button class='btn bg-white btn-light mx-1px text-95' onclick='window.print()'>
+                                <i class='mr-1 fa fa-print text-primary-m1 text-120 w-2'></i>
+                                Print
+                            </button>
+                <?php endif; ?>
+            </td>
+        </tr>
+    <?php endwhile; ?>
+</tbody>
+
             </table>
         </div>
     </div>
