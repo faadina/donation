@@ -72,8 +72,8 @@ WHERE d.donationID = ?";
                             <div class='row'>
                                 <div class='col-12'>
                                     <div class='text-center text-150'>
-                                        <i class='fa fa-book fa-2x text-success-m2 mr-1'></i>
-                                        <span class='text-default-d3'>MADRASAH TARBIYYAH ISLAMIYYAH <br>DARUL HIJRAH</span>
+                                        <img src='images/madrasahLogo1.png' alt='Madrasah Logo' class='img-fluid' style='max-width: 80px;'>
+                                        <span class='text-default-d3'>MADRASAH TARBIYYAH ISLAMIYYAH DARUL HIJRAH</span>
                                     </div>
                                 </div>
                             </div>
@@ -82,22 +82,22 @@ WHERE d.donationID = ?";
                             <hr class='row brc-default-l1 mx-n1 mb-4' />
   
                             <div class='row'>
-                                  <div class='col-sm-6'>
-    <div>
-        <span class='text-sm text-grey-m2 align-middle'>To:</span>
-        <span class='text-600 text-110 text-blue align-middle'>{$row['donorName']}</span>
-    </div>
-    <div class='text-grey-m2'>
-        <div class='my-1'>
-            <!-- Address details if available -->
-        </div>
-        <div class='my-1'>
-            <i class='fa fa-phone fa-flip-horizontal text-secondary'></i>
-            <b class='text-600'>{$row['donorPhoneNo']}</b>
-        </div>
-    </div>
-</div>
-
+                                <div class='col-sm-6'>
+                                    <div>
+                                        <span class='text-sm text-grey-m2 align-middle'>To:</span>
+                                        <span class='text-600 text-110 text-blue align-middle'>{$row['donorName']}</span>
+                                    </div>
+                                    <div class='text-grey-m2'>
+                                        <div class='my-1'>
+                                            <!-- Address details if available -->
+                                        </div>
+                                        <div class='my-1'>
+                                            <i class='fa fa-phone fa-flip-horizontal text-secondary'></i>
+                                            <b class='text-600'>{$row['donorPhoneNo']}</b>
+                                        </div>
+                                    </div>
+                                </div>
+  
                                 <!-- /.col -->
   
                                 <div class='text-95 col-sm-6 align-self-start d-sm-flex justify-content-end'>

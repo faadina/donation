@@ -1,5 +1,13 @@
 <?php
-include 'dbConnect.php'; // Ensure this file includes your database connection details
+session_start();
+
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+include 'dbConnect.php'; // Include your database connection file
 
 // Function to handle file upload
 function uploadImage($file)
@@ -103,9 +111,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $defaultCurrentAmount = 0; // Assuming currentAmount can default to 0 if no donations are made yet
         $stmt->bind_param("ssssssdss", $allocationID, $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $defaultCurrentAmount, $allocationImage);
         if ($stmt->execute()) {
-            // Redirect to AllocationView.php after successful creation
-            header("Location: AllocationView.php");
-            exit();
+            // Set success flag for SweetAlert
+            $success = true;
         } else {
             echo "Error creating record: " . $stmt->error;
         }
@@ -125,19 +132,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Allocation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-check-inline {
-            margin-right: 1rem;
-        }
-
-        .input-group-text {
-            background-color: #f8f9fa;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -228,9 +225,19 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
     </div>
 </div>
 
-<!-- Bootstrap JavaScript and dependencies (optional if not needed for your form interactions) -->
-<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+<script>
+    <?php if (isset($success) && $success) : ?>
+    Swal.fire({
+        title: 'Success!',
+        text: 'Allocation created successfully.',
+        icon: 'success',
+        confirmButtonText: 'OK'
+    }).then(() => {
+        window.location.href = 'AllocationView.php';
+    });
+    <?php endif; ?>
+</script>
+
 </body>
 
 </html>

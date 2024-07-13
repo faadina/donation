@@ -132,6 +132,8 @@ if (!empty($allocationID)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Allocation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <style>
         .form-group {
             margin-bottom: 1rem;
@@ -221,13 +223,13 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
                         </div>
 
                         <div class="mb-3">
-                            <label for="allocationImage" class="form-label">Current Image</label><br>
-                            <?php if (!empty($allocationImage)): ?>
-                                <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
-                                <br><br>
-                            <?php endif; ?>
-                            <input type="file" class="form-control" id="allocationImage" name="allocationImage">
-                        </div>
+    <label for="allocationImage" class="form-label">Current Image</label><br>
+    <?php if (!empty($allocationImage)): ?>
+        <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
+        <br><br>
+    <?php endif; ?>
+    <input type="file" class="form-control" id="allocationImage" name="allocationImage">
+</div>
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Update</button>
@@ -240,6 +242,27 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
         </div>
     </div>
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
 
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to update the allocation details?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit the form if confirmed
+            }
+        });
+    });
+});
+</script>
 <!-- Bootstrap JavaScript and dependencies (optional if not needed for your form interactions) -->
 <script src="https://cdn.jsdelivr.net/npm

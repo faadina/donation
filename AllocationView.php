@@ -26,6 +26,8 @@ $result = $conn->query($sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
     <style>
         .image-preview {
             max-width: 100px;
@@ -108,10 +110,12 @@ $result = $conn->query($sql);
                         echo "</a>";
                         echo "</td>";
                         echo "<td>";
-                        echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this allocation?\");'>";
-                        echo "<i class='bi bi-trash'></i>";
-                        echo "</a>";
-                        echo "</td>";
+                        echo "<td>";
+echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'>";
+echo "<i class='bi bi-trash'></i>";
+echo "</a>";
+echo "</td>";
+
                         echo "</tr>";
                     }
                 } else {
@@ -142,7 +146,38 @@ $result = $conn->query($sql);
                 }       
             }
         }
-    </script>
+
+        document.addEventListener('DOMContentLoaded', function() {
+        // Select all elements with class 'delete-allocation'
+        var deleteButtons = document.querySelectorAll('.delete-allocation');
+
+        // Loop through each delete button
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+
+                // Get the allocation ID from the data-id attribute
+                var allocationID = this.getAttribute('data-id');
+
+                // Use SweetAlert to confirm deletion
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Redirect to delete script
+                        window.location.href = 'AllocationDelete.php?allocationID=' + allocationID;
+                    }
+                });
+            });
+        });
+    });
+</script>
 </body>
 </html>
 

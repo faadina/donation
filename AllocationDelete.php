@@ -1,26 +1,44 @@
 <?php
-include 'dbConnect.php'; // Ensure this file includes your database connection details
+session_start();
 
-// Check if allocationID is set in the query string
-if (isset($_GET['allocationID'])) {
+// Check if the user is logged in, if not then redirect to login page
+if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
+    header("location: MainLogin.php");
+    exit;
+}
+
+// Include the database connection file
+require_once("dbConnect.php");
+
+if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['allocationID'])) {
     $allocationID = $_GET['allocationID'];
 
-    // SQL statement for deletion
-    $sql = "DELETE FROM Allocation WHERE allocationID = '$allocationID'";
+    // Prepare and bind the parameter to avoid SQL injection
+    $deleteDonationsQuery = "DELETE FROM Donation WHERE allocationID = ?";
+    $deleteAllocationQuery = "DELETE FROM Allocation WHERE allocationID = ?";
 
-    // Execute SQL statement
-    if ($conn->query($sql) === TRUE) {
-        // Redirect to AllocationView.php
-        header("Location: AllocationView.php");
-        exit(); // Ensure the script stops executing after the redirection
+    // Use prepared statements to execute queries
+    $stmt = $conn->prepare($deleteDonationsQuery);
+    $stmt->bind_param("s", $allocationID);
+
+    if ($stmt->execute()) {
+        // Now delete the allocation
+        $stmt = $conn->prepare($deleteAllocationQuery);
+        $stmt->bind_param("s", $allocationID);
+
+        if ($stmt->execute()) {
+            // Redirect to allocation records page or another appropriate location
+            header("location: AllocationView.php");
+            exit;
+        } else {
+            echo "Error deleting allocation: " . $stmt->error;
+        }
     } else {
-        echo "Error deleting record: " . $conn->error;
+        echo "Error deleting donations: " . $stmt->error;
     }
 
-    $conn->close(); // Close database connection
-} else {
-    // Redirect to AllocationView.php if allocationID is not set
-    header("Location: AllocationView.php");
-    exit();
+    $stmt->close();
 }
+
+$conn->close();
 ?>

@@ -146,6 +146,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         echo $e->getMessage();
     }
 
+
+    
     $conn->close(); // Close database connection
 }
 ?>
@@ -156,6 +158,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Update Donation</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
     <?php include('staffHeader.php'); ?>
@@ -174,7 +178,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <div class="mb-3">
                                 <label for="donationAmount" class="form-label">Donation Amount</label>
-                                <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
+                                <div class="input-group">
+                                    <span class="input-group-text">RM</span>
+                                    <input type="number" step="0.01" class="form-control" id="donationAmount" name="donationAmount" value="<?php echo $donationAmount; ?>" required>
+                                </div>
                             </div>
                             <div class="mb-3">
                                 <label for="donationDate" class="form-label">Donation Date</label>
@@ -182,7 +189,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <div class="mb-3">
                                 <label for="donationStatus" class="form-label">Donation Status</label>
-                                <input type="text" class="form-control" id="donationStatus" name="donationStatus" value="<?php echo $donationStatus; ?>" required>
+                                <select class="form-control" id="donationStatus" name="donationStatus" required>
+                                    <option value="pending" <?php if ($donationStatus == 'pending') echo 'selected'; ?>>pending</option>
+                                    <option value="Accepted" <?php if ($donationStatus == 'Accepted') echo 'selected'; ?>>Accepted</option>
+                                    <option value="Rejected" <?php if ($donationStatus == 'Rejected') echo 'selected'; ?>>Rejected</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <label for="allocationName" class="form-label">Allocation Name</label>
@@ -200,12 +211,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             <button type="submit" class="btn btn-primary">
                                 <i class="bi bi-check"></i> Update
                             </button>
-                            <a href="DonationView.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Donation Records</a>
+                            <a href="DonationView.php" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Back to Donation Records
+                            </a>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    <script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to update the donation details?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit the form if confirmed
+            }
+        });
+    });
+});
+</script>
+
 </body>
 </html>
