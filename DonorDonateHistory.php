@@ -1,23 +1,23 @@
 <?php
 session_start();
-include 'dbConnect.php'; 
+include 'dbConnect.php'; // Include your database connection file
 
-
+// Check if user is logged in
 if (!isset($_SESSION['username'])) {
     die('User ID not found in session.');
 }
 
 $donorID = $_SESSION['username'];
 
-
+// Establish database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
-
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
+// Prepare SQL statement to fetch donation history
 $stmt = $conn->prepare("
-    SELECT d.donationID, d.donorID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
+    SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
     FROM Donation d 
     JOIN Allocation a ON d.allocationID = a.allocationID 
     WHERE d.donorID = ?
@@ -37,13 +37,15 @@ $result = $stmt->get_result();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donation History</title>
 
-    <!-- Include SweetAlert CSS -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
+    <!-- Include SweetAlert2 CSS and JS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-    <!-- Include SweetAlert JS -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
+    <!-- Include Bootstrap Icons CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
 
     <style>
+        /* Your existing CSS styles */
         body {
             font-family: 'Inter', sans-serif;
             background-color: #f4f4f4;
@@ -92,19 +94,6 @@ $result = $stmt->get_result();
             font-weight: bold;
         }
 
-        .btn-feedback {
-            background-color: darkcyan;
-            color: #fff;
-            padding: 8px 16px;
-            border-radius: 5px;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-feedback:hover {
-            background-color: #0d7a8a;
-        }
-
         .view-receipt-btn {
             background-color: #333;
             color: #fff;
@@ -126,130 +115,104 @@ $result = $stmt->get_result();
     </style>
 </head>
 <body>
-<?php
-include 'DonorHeader.php';?>
+    <?php include 'DonorHeader.php'; ?> <!-- Include your header file -->
+
     <div class="wrapper">
         <h2>Donation History</h2>
-        <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3> <!-- Display donor's ID -->
+        <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3>
+
         <div class="donation-container">
-            
-
             <table class="donation-table">
-            <thead>
-    <tr>
-        <th>Donation ID</th>
-        <th>Allocation Name</th>
-        <th>Donation Amount</th>
-        <th>Donation Date</th>
-        <th>Donation Status</th>
-        <th>Donation Receipt</th>
-        <th>Download Staff Receipt</th>
-    </tr>
-</thead>
-<tbody>
-    <?php while ($row = $result->fetch_assoc()): ?>
-        <tr>
-            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
-            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
-            <td>MYR <?php echo number_format($row['donationAmount'], 2); ?></td>
-            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
-            <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
-            <td>
-                <?php if (!empty($row['donationReceipt'])): ?>
-                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">View Receipt</button>
-                <?php else: ?>
-                    No Receipt
-                <?php endif; ?>
-            </td>
-            <td>
-                <?php if ($row['donationStatus'] === 'Accepted'): ?>
-                    <div class='page-tools'>
-                        <div class='action-buttons'>
-                            <a href='DonationGenerateReceipt.php?donationID=<?php echo urlencode($row['donationID']); ?>' class='btn bg-white btn-light mx-1px text-95'>
-                                <i class='mr-1 fa fa-print text-primary-m1 text-120 w-2'></i>
-                                Print Receipt
-                            </a>
-                        </div>
-                    </div>
-                <?php endif; ?>
-            </td>
-        </tr>
-    <?php endwhile; ?>
-</tbody>
-
-
-
-
+                <thead>
+                    <tr>
+                        <th>Donation ID</th>
+                        <th>Allocation Name</th>
+                        <th>Donation Amount</th>
+                        <th>Donation Date</th>
+                        <th>Donation Status</th>
+                        <th>Donation Receipt</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php while ($row = $result->fetch_assoc()): ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
+                            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
+                            <td>MYR <?php echo number_format($row['donationAmount'], 2); ?></td>
+                            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
+                            <td><?php echo htmlspecialchars($row['donationStatus']); ?></td>
+                            <td>
+                                <?php if (!empty($row['donationReceipt'])): ?>
+                                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">View Receipt</button>
+                                <?php else: ?>
+                                    No Receipt
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <?php if ($row['donationStatus'] === 'Accepted'): ?>
+                                    <div class='page-tools'>
+                                        <div class='action-buttons'>
+                                            <a href='DonationGenerateReceipt.php?donationID=<?php echo urlencode($row['donationID']); ?>' class='btn btn-light mx-1px text-95'>
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-printer text-primary-m1 text-120" viewBox="0 0 16 16">
+                                                    <path d="M11.5 5h-3v-.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 .5.5V5zm-1 4h1v3.5a1.5 1.5 0 0 1-1.5 1.5h-1A1.5 1.5 0 0 1 8 12.5V9zm-1-4H5v-.5A1.5 1.5 0 0 1 6.5 3h3A1.5 1.5 0 0 1 11 4.5V5zM3 5h1V3H3v2zm0 9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9H3v5zM2 8h12V7H2v1z"/>
+                                                </svg>
+                                                Receipt
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endwhile; ?>
+                </tbody>
             </table>
         </div>
     </div>
 
     <script>
         // JavaScript for handling receipt viewing with SweetAlert
-        const receiptButtons = document.querySelectorAll('.view-receipt-btn');
-        receiptButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const receiptUrl = this.getAttribute('data-receipt-url');
-                const fileExtension = receiptUrl.split('.').pop().toLowerCase();
+        document.addEventListener('DOMContentLoaded', function() {
+            const receiptButtons = document.querySelectorAll('.view-receipt-btn');
+            receiptButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const receiptUrl = this.getAttribute('data-receipt-url');
+                    const fileExtension = receiptUrl.split('.').pop().toLowerCase();
 
-                if (fileExtension === 'pdf') {
-                    // Show SweetAlert with embedded PDF viewer and print option
-                    swal({
-                        title: "View Receipt",
-                        content: {
-                            element: "iframe",
-                            attributes: {
-                                src: receiptUrl,
-                                class: "receipt-iframe"
-                            },
-                        },
-                        buttons: {
-                            cancel: "Close",
-                            confirm: {
-                                text: "Print",
-                                value: "print", // Custom value to distinguish print action
-                            },
-                        },
-                    }).then((value) => {
-                        if (value === "print") {
-                            // Open the receipt URL in a new tab for printing
-                            window.open(receiptUrl, '_blank');
-                        }
-                    });
-                } else {
-                    // Construct HTML content to embed receipt image in SweetAlert message
-                    const receiptHtml = `
-                        <div style="text-align: center;">
-                            <img src="${receiptUrl}" class="receipt-image" alt="Receipt">
-                        </div>
-                    `;
-
-                    // Show SweetAlert with embedded receipt image and print option
-                    swal({
-                        title: "View Receipt",
-                        content: {
-                            element: "div",
-                            attributes: {
-                                innerHTML: receiptHtml
-                            },
-                        },
-                        buttons: {
-                            cancel: "Close",
-                            confirm: {
-                                text: "Print",
-                                value: "print", // Custom value to distinguish print action
-                            },
-                        },
-                    }).then((value) => {
-                        if (value === "print") {
-                            // Open the receipt URL in a new tab for printing
-                            window.open(receiptUrl, '_blank');
-                        }
-                    });
-                }
+                    if (fileExtension === 'pdf') {
+                        // Show SweetAlert with embedded PDF viewer and print option
+                        Swal.fire({
+                            title: "View Receipt",
+                            html: `<iframe src="${receiptUrl}" class="receipt-iframe" frameborder="0"></iframe>`,
+                            showCancelButton: true,
+                            confirmButtonText: "Print",
+                            cancelButtonText: "Close",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Open the receipt URL in a new tab for printing
+                                window.open(receiptUrl, '_blank');
+                            }
+                        });
+                    } else {
+                        // Show SweetAlert with image preview and print option
+                        Swal.fire({
+                            title: "View Receipt",
+                            html: `<img src="${receiptUrl}" class="receipt-image" alt="Receipt">`,
+                            showCancelButton: true,
+                            confirmButtonText: "Print",
+                            cancelButtonText: "Close",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                // Open the receipt URL in a new tab for printing
+                                window.open(receiptUrl, '_blank');
+                            }
+                        });
+                    }
+                });
             });
         });
     </script>
+
 </body>
 </html>
 
