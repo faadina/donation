@@ -82,6 +82,7 @@ $result = $conn->query($sql);
                     <th>STATUS</th>
                     <th>TARGET (RM)</th>
                     <th>CURRENT (RM)</th>
+                    <th>DONATION</th>
                     <th colspan='3' style="text-align:center;">Actions</th>
                 </tr>
             </thead>
@@ -100,6 +101,11 @@ $result = $conn->query($sql);
                         echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
                         echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
                         echo "<td>";
+                        echo "<a href='DonationView.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'>";
+                        echo "View";
+                        echo "</a>";
+                        echo "</td>";
+                        echo "<td>";
                         echo "<a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'>";
                         echo "<i class='bi bi-eye'></i>";
                         echo "</a>";
@@ -110,16 +116,14 @@ $result = $conn->query($sql);
                         echo "</a>";
                         echo "</td>";
                         echo "<td>";
-                        echo "<td>";
-echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'>";
-echo "<i class='bi bi-trash'></i>";
-echo "</a>";
-echo "</td>";
-
+                        echo "<a href='AllocationDelete.php?allocationID=" . $row["allocationID"] . "' class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'>";
+                        echo "<i class='bi bi-trash'></i>";
+                        echo "</a>";
+                        echo "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='10'>No allocation records found</td></tr>";
+                    echo "<tr><td colspan='11'>No allocation records found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -177,7 +181,7 @@ echo "</td>";
             });
         });
     });
-</script>
+    </script>
 </body>
 </html>
 
