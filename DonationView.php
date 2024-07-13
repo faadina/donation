@@ -69,10 +69,10 @@ $allocationsResult = $conn->query($allocationsSql);
     <!-- Dropdown and button for filtering by allocation -->
 <div class="mb-3">
     <select class="form-select" id="allocationSelect" onchange="filterByAllocation()">
-        <option value="">Filter by Allocation</option>
+        <option value="">Allocation Type</option>
         <?php
         while ($row = $allocationsResult->fetch_assoc()) {
-            echo "<option value='" . $row["allocationID"] . "'>" . $row["allocationName"] . "</option>";
+            echo "<option value='" . $row["allocationName"] . "'>" . $row["allocationName"] . "</option>";
         }
         ?>
     </select>
@@ -99,9 +99,9 @@ $allocationsResult = $conn->query($allocationsSql);
 
         <table id="donationTable" class="table table-striped">
             <thead>
-                <tr>
+                <tr><th>No</th>
                     <th>Donation ID</th>
-                    <th>Allocation ID</th>
+                    <th>Allocation Name</th>
                     <th>Amount (RM)</th>
                     <th>Date</th>
                     <th>Status</th>
@@ -112,42 +112,47 @@ $allocationsResult = $conn->query($allocationsSql);
                 </tr>
             </thead>
             <tbody>
-                <?php
-                if ($result->num_rows > 0) {
-                    while ($row = $result->fetch_assoc()) {
-                        echo "<tr>";
-                        echo "<td>" . $row["donationID"] . "</td>";
-                        echo "<td>" . $row["allocationID"] . "</td>";
-                        echo "<td>" . $row["donationAmount"] . "</td>";
-                        echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
-                        echo "<td>" . $row["donationStatus"] . "</td>";
-                        //echo "<td>" . $row["allocationName"] . "</td>";
-                        // Displaying receipt with a link to view PDF
-                        if (!empty($row["donationReceipt"])) {
-                            echo "<td><a href='" . htmlspecialchars($row["donationReceipt"]) . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
-                        } else {
-                            echo "<td>No Receipt</td>";
-                        }
+            <?php
+if ($result->num_rows > 0) {
+    $count = 1; // Initialize a counter
+    while ($row = $result->fetch_assoc()) {
+        echo "<tr>";
+        echo "<td>" . $count . "</td>"; // Display the row number
+        echo "<td>" . $row["donationID"] . "</td>";
+        echo "<td>" . $row["allocationName"] . "</td>";
+        //echo "<td>" . $row["allocationID"] . "</td>";
+        echo "<td>" . $row["donationAmount"] . "</td>";
+        echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
+        echo "<td>" . $row["donationStatus"] . "</td>";
+        // Displaying receipt with a link to view PDF
+        if (!empty($row["donationReceipt"])) {
+            echo "<td><a href='" . htmlspecialchars($row["donationReceipt"]) . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
+        } else {
+            echo "<td>No Receipt</td>";
+        }
 
-                        // Check the donation status and display corresponding actions
-                        if ($row["donationStatus"] == "pending") {
-                            echo "<td><a href='DonationAccept.php?donationID=" . $row["donationID"] . "' class='btn btn-success btn-mini-column'>Accept</a></td>";
-                            echo "<td><a href='DonationReject.php?donationID=" . $row["donationID"] . "' class='btn btn-danger btn-mini-column'>Reject</a></td>";
-                        } elseif ($row["donationStatus"] == "Accepted") {
-                            echo "<td colspan='2' style='text-align:center;'><a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
-                        } elseif ($row["donationStatus"] == "Rejected") {
-                            echo "<td colspan='2' style='text-align:center;'><button class='btn btn-secondary btn-mini-column' disabled>Rejected</button></td>";
-                        }
+        // Check the donation status and display corresponding actions
+        if ($row["donationStatus"] == "pending") {
+            echo "<td><a href='DonationAccept.php?donationID=" . $row["donationID"] . "' class='btn btn-success btn-mini-column'>Accept</a></td>";
+            echo "<td><a href='DonationReject.php?donationID=" . $row["donationID"] . "' class='btn btn-danger btn-mini-column'>Reject</a></td>";
+        } elseif ($row["donationStatus"] == "Accepted") {
+            echo "<td colspan='2' style='text-align:center;'><a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' class='btn btn-secondary btn-mini-column'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a></td>";
+        } elseif ($row["donationStatus"] == "Rejected") {
+            echo "<td colspan='2' style='text-align:center;'><button class='btn btn-secondary btn-mini-column' disabled>Rejected</button></td>";
+        }
 
-                        // Icon-based edit button
-                        echo "<td><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' class='btn btn-info btn-mini-column'><i class='bi bi-pencil-square'></i></a></td>";
+        // Icon-based edit button
+        echo "<td><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' class='btn btn-info btn-mini-column'><i class='bi bi-pencil-square'></i></a></td>";
 
-                        echo "</tr>";
-                    }
-                } else {
-                    echo "<tr><td colspan='10'>No donation records found</td></tr>";
-                }
-                ?>
+        echo "</tr>";
+        $count++; // Increment the counter
+    }
+} else {
+    echo "<tr><td colspan='10'>No donation records found</td></tr>";
+}
+
+?>
+
             </tbody>
         </table>
     </div>
@@ -158,7 +163,7 @@ $allocationsResult = $conn->query($allocationsSql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[5];
                 if (statusCell && statusCell.innerText.trim() !== "Accepted") {
                     rows[i].style.display = "none";
                 } else {
@@ -172,7 +177,7 @@ $allocationsResult = $conn->query($allocationsSql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[5];
                 if (statusCell && statusCell.innerText.trim() !== "Rejected") {
                     rows[i].style.display = "none";
                 } else {
@@ -186,7 +191,7 @@ $allocationsResult = $conn->query($allocationsSql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[4];
+                var statusCell = rows[i].getElementsByTagName("td")[5];
                 if (statusCell && statusCell.innerText.trim() !== "pending") {
                     rows[i].style.display = "none";
                 } else {
@@ -234,7 +239,7 @@ function filterByAllocation() {
     var rows = table.getElementsByTagName("tr");
 
     for (var i = 0; i < rows.length; i++) {
-        var allocationCell = rows[i].getElementsByTagName("td")[1];
+        var allocationCell = rows[i].getElementsByTagName("td")[2];
 
         if (allocationCell) {
             var textValue = allocationCell.textContent || allocationCell.innerText;
