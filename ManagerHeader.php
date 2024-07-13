@@ -91,8 +91,8 @@ $managerID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown';
             background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
             z-index: 99;
             padding: 0;
-            top: 100%; /* Position it right under the manager-info element */
-            left: 0; /* Align it to the left of the manager-info element */
+            top: 100%; 
+            left: 0; 
             width: 150px;
         }
 
