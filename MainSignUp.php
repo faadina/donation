@@ -59,56 +59,53 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check if username already exists in donor table
     $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
     $stmt_donor = mysqli_prepare($conn, $sql_donor);
-    if ($stmt_donor) {
-        mysqli_stmt_bind_param($stmt_donor, "s", $username);
-        mysqli_stmt_execute($stmt_donor);
-        mysqli_stmt_store_result($stmt_donor);
-        if (mysqli_stmt_num_rows($stmt_donor) > 0) {
-            $username_err = "This username is already taken.";
-        }
-        mysqli_stmt_close($stmt_donor);
-    } else {
-        echo "Something went wrong with the donor table query.";
+    mysqli_stmt_bind_param($stmt_donor, "s", $param_username);
+    $param_username = $username;
+    mysqli_stmt_execute($stmt_donor);
+    mysqli_stmt_store_result($stmt_donor);
+
+    if (mysqli_stmt_num_rows($stmt_donor) == 1) {
+        $username_err = "This username is already taken.";
     }
+    mysqli_stmt_close($stmt_donor);
 
     // Validate password
     if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter a password.";
-    } elseif (strlen(trim($_POST["password"])) < 6) {
-        $password_err = "Password must have at least 6 characters.";
-    } elseif (strlen(trim($_POST["password"])) > 50) {
-        $password_err = "Password exceeds the maximum allowed length.";
+    } elseif (strlen(trim($_POST["password"])) < 8) {
+        $password_err = "Password must have at least 8 characters.";
     } else {
         $password = trim($_POST["password"]);
     }
 
     // Check input errors before inserting in database
     if (empty($username_err) && empty($password_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
+
         // Prepare an insert statement
-        $sql = "INSERT INTO donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
-            // Hash the password before storing
-            $param_password = password_hash($password, PASSWORD_DEFAULT);
+        $sql = "INSERT INTO donor (donorID, donorName, donorPassword, donorBirthDate, donorAddress, donorPhoneNo, donorEmail, role) VALUES (?, ?, ?, ?, ?, ?, ?, 'donor')";
+
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            // Bind variables to the prepared statement as parameters
+            mysqli_stmt_bind_param($stmt, "sssssss", $param_username, $param_name, $param_password, $param_birthdate, $param_address, $param_phone, $param_email);
+
+            // Set parameters
+            $param_username = $username;
             $param_name = $name;
+            $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
             $param_birthdate = $birthdate;
             $param_address = $address;
             $param_phone = $phone;
             $param_email = $email;
 
-            // Bind parameters
-            mysqli_stmt_bind_param($stmt, "sssssss", $username, $param_password, $param_name, $param_birthdate, $param_address, $param_phone, $param_email);
-
             // Attempt to execute the prepared statement
             if (mysqli_stmt_execute($stmt)) {
-                // Registration successful, redirect to login page
-                echo "<script>alert('Registration successful. Please login.');</script>";
-                echo "<script>location.href='MainLogin.php';</script>";
-                exit;
+                // Redirect to login page
+                header("location: MainLogin.php");
             } else {
                 echo "Something went wrong. Please try again later.";
             }
 
+            // Close statement
             mysqli_stmt_close($stmt);
         }
     }
@@ -140,7 +137,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             margin: auto;
             padding: 20px;
-            margin-top: 10%;
+            margin-top: 2%;
         }
 
         .form-container {
@@ -247,6 +244,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             color: #444C38;
 
         }
+        
+        .invalid-feedback {
+            color: red;
+            font-size: 12px;
+            position: absolute;
+            bottom: -20px; /* Adjusted to ensure visibility */
+            left: 20px;
+        }
     </style>
 </head>
 
@@ -259,48 +264,49 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <h2 style="text-align:center; color:#444C38; font-weight:700;">Sign Up</h2>
             <p style="text-align:center;">Please fill this form to create an account.</p>
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="text" name="username" required value="<?php echo $username; ?>">
                     <label>Username</label>
                     <span class="invalid-feedback"><?php echo $username_err; ?></span>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="password" name="password" required value="<?php echo $password; ?>">
                     <label>Password</label>
                     <span class="invalid-feedback"><?php echo $password_err; ?></span>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="text" name="name" required value="<?php echo $name; ?>">
                     <label>Name</label>
                     <span class="invalid-feedback"><?php echo $name_err; ?></span>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="date" name="birthdate" required value="<?php echo $birthdate; ?>">
+                    <label style="top: 5px; left: 15px; font-size: 12px;">Birthdate</label>
                     <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
-                    <label style="font-size:10px;">Date of Birth</label>
                 </div>
-                <div class="input-group">
-                    <textarea name="address" required><?php echo $address; ?></textarea>
+                <div class="input-group" style="position: relative;">
+                    <input type="text" name="address" required value="<?php echo $address; ?>">
                     <label>Address</label>
                     <span class="invalid-feedback"><?php echo $address_err; ?></span>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="text" name="phone" required value="<?php echo $phone; ?>">
-                    <label>Phone</label>
+                    <label>Phone Number</label>
                     <span class="invalid-feedback"><?php echo $phone_err; ?></span>
                 </div>
-                <div class="input-group">
+                <div class="input-group" style="position: relative;">
                     <input type="email" name="email" required value="<?php echo $email; ?>">
                     <label>Email</label>
                     <span class="invalid-feedback"><?php echo $email_err; ?></span>
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn-register" value="Register">
+                    <input type="submit" class="btn-register" value="Submit">
                 </div>
-                <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
             </form>
+            <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
         </div>
     </div>
+    
 </body>
 
 </html>

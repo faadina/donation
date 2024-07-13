@@ -51,6 +51,7 @@ $conn->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -59,116 +60,102 @@ $conn->close();
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
-    body {
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        background-color: #f9fcff;
-        background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
-        font-family: "Inter", sans-serif;
-    }
-
-    .detailIndex {
-        margin: 2% auto;
-        max-width: 100%;
-        padding: 10px;
-        position: relative;
-        z-index: 1;
-    }
-
-    .detailIndex h1 {
-        font-size: 40px;
-        color: #1a1649;
-        text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
-        text-align: center;
-        font-weight: 700;
-    }
-
-    .detailIndex h1,
-    .detailIndex h2 {
-        margin: 2px;
-    }
-
-    .detailIndex h2 {
-        font-size: 30px;
-        color: #1a1649;
-        text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
-        text-align: center;
-        font-weight: 700;
-    }
-
-    .detailIndex p {
-        color: #1a5172;
-        line-height: 22px;
-        text-align: center;
-    }
-
-    .summary {
-        margin-top: 20px;
-        padding: 10px;
-        color: white;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-    }
-
-    .summary-box {
-        margin: 20px 10px; /* Adjusted margin */
-        padding: 15px;
-        background-color: #4d4855;
-        background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
-        text-align: center;
-        width: 250px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        border-radius: 8px;
-        transition: transform 0.3s ease;
-    }
-
-    .summary-box img {
-        margin-bottom: 10px;
-        height: 60px;
-    }
-
-    .summary-box p {
-        font-size: 28px;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: white;
-    }
-
-    .summary-box h3 {
-        font-size: 16px;
-        margin-bottom: 10px;
-        color: white;
-    }
-
-    .summary-box:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn {
-        text-decoration: none;
-        color: #1f244a;
-        background-color: #ffc107;
-        padding: 6px 12px;
-        border-radius: 5px;
-        margin-top: 10px;
-        display: inline-block;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        transition: background-color 0.3s ease;
-    }
-
-    .btn:hover {
-        background-color: #ffa000;
-    }
-
-    @media (max-width: 768px) {
-        .summary-box {
-            width: 100%; /* Full width on smaller screens */
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background-color: #f9fcff;
+            background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
+            font-family: "Inter", sans-serif;
         }
-    }
-</style>
+        .detailIndex {
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            margin: 2% auto;
+            width: 90%;
+            height: 200px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detailIndex img {
+            max-width: 100%;
+            height: 100%;
+            display: block;
+            margin: 0 auto;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+            filter: brightness(1.2) contrast(1.2);
+        }
+        .summary {
+            margin-top: 20px;
+            padding: 10px;
+            color: white;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .summary-box {
+            margin: 20px 10px;
+            /* Adjusted margin */
+            padding: 15px;
+            background-color: #4d4855;
+            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
+            text-align: center;
+            width: 250px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            transition: transform 0.3s ease;
+        }
+
+        .summary-box img {
+            margin-bottom: 10px;
+            height: 60px;
+        }
+
+        .summary-box p {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .summary-box h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: white;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn {
+            text-decoration: none;
+            color: #1f244a;
+            background-color: #ffc107;
+            padding: 6px 12px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .btn:hover {
+            background-color: #ffa000;
+        }
+
+        @media (max-width: 768px) {
+            .summary-box {
+                width: 100%;
+            }
+        }
+    </style>
 
 </head>
 
@@ -178,9 +165,7 @@ $conn->close();
     ?>
 
     <div class="detailIndex">
-        <h1>MADRASAH TARBIYYAH ISLAMIYYAH <br>DARUL HIJRAH</h1>
-        <h2>DONATION SYSTEM</h2>
-        <p>Staff Dashboard</p>
+        <img src="images/staffHeader.png" alt="Manager Header Image">
     </div>
 
     <div class="summary">
@@ -200,7 +185,7 @@ $conn->close();
                 <a href="DonorView.php" class="btn btn-primary">View</a>
             </div>
         </div>
-        
+
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>

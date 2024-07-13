@@ -1,23 +1,21 @@
 <?php
 session_start();
-include 'dbConnect.php'; // Include your database connection file
+include 'dbConnect.php'; 
 
-// Check if user is logged in and retrieve donorID from session
+
 if (!isset($_SESSION['username'])) {
     die('User ID not found in session.');
 }
 
 $donorID = $_SESSION['username'];
 
-// Establish database connection
+
 $conn = new mysqli($servername, $username, $password, $dbname);
 
-// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare SQL statement to fetch donation history for the logged-in donor including donor ID
 $stmt = $conn->prepare("
     SELECT d.donationID, d.donorID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
     FROM Donation d 
