@@ -19,6 +19,9 @@ $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus,
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
 $result = $conn->query($sql);
 
+// Fetch allocation names for the dropdown
+$allocationsSql = "SELECT allocationID, allocationName FROM Allocation";
+$allocationsResult = $conn->query($allocationsSql);
 ?>
 
 <!DOCTYPE html>
@@ -32,18 +35,21 @@ $result = $conn->query($sql);
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .image-preview {
-            max-width: 100px;
-            max-height: 100px;
-        }
-        .btn-mini-column {
-            width: 85px;
-        }
-        .mb-3 {
-            margin-bottom: 15px; /* Adjust margin bottom as needed */
-        }
-        .mb-3 form {
-            display: inline-block; /* Display the form inline */
-        }
+        max-width: 100px;
+        max-height: 100px;
+    }
+    .btn-mini-column {
+        width: 85px;
+    }
+    .mb-3 {
+        margin-bottom: 15px; /* Adjust margin bottom as needed */
+    }
+    .mb-3 form {
+        display: inline-block; /* Display the form inline */
+    }
+    .mb-3 select {
+        width:350px;
+    }
     </style>
 </head>
 <body>
@@ -51,17 +57,27 @@ $result = $conn->query($sql);
 
     <div class="container">
         <h2 class="my-4">Donation Records</h2>
-      
         
         <!-- Buttons for filtering -->
         <div class="mb-3">
-        
             <button class="btn btn-success mr-2" onclick="showAccepted()">List Accepted</button>
             <button class="btn btn-danger mr-2" onclick="showRejected()">List Rejected</button>
             <button class="btn btn-warning mr-2" onclick="showPending()">List Pending</button>
             <button class="btn btn-primary" onclick="showAll()">View All</button>
-          
         </div>
+        
+    <!-- Dropdown and button for filtering by allocation -->
+<div class="mb-3">
+    <select class="form-select" id="allocationSelect" onchange="filterByAllocation()">
+        <option value="">Filter by Allocation</option>
+        <?php
+        while ($row = $allocationsResult->fetch_assoc()) {
+            echo "<option value='" . $row["allocationID"] . "'>" . $row["allocationName"] . "</option>";
+        }
+        ?>
+    </select>
+</div>
+
         <a href="StaffDashboard.php" class="btn btn-primary mb-3">
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left-circle-fill" viewBox="0 0 16 16">
                 <path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0m3.5 7.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
@@ -85,11 +101,12 @@ $result = $conn->query($sql);
             <thead>
                 <tr>
                     <th>Donation ID</th>
+                    <th>Allocation ID</th>
                     <th>Amount (RM)</th>
                     <th>Date</th>
                     <th>Status</th>
                     <th>Receipt</th>
-                    <th>Allocation Type</th>
+
                     <th colspan='2' style="text-align:center;">Action</th>
                     <th>Edit</th>
                 </tr>
@@ -100,18 +117,17 @@ $result = $conn->query($sql);
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . $row["donationID"] . "</td>";
+                        echo "<td>" . $row["allocationID"] . "</td>";
                         echo "<td>" . $row["donationAmount"] . "</td>";
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
                         echo "<td>" . $row["donationStatus"] . "</td>";
-                        
+                        //echo "<td>" . $row["allocationName"] . "</td>";
                         // Displaying receipt with a link to view PDF
                         if (!empty($row["donationReceipt"])) {
                             echo "<td><a href='" . htmlspecialchars($row["donationReceipt"]) . "' target='_blank' class='btn btn-primary btn-mini-column'>View</a></td>";
                         } else {
                             echo "<td>No Receipt</td>";
                         }
-                        
-                        echo "<td>" . $row["allocationName"] . "</td>";
 
                         // Check the donation status and display corresponding actions
                         if ($row["donationStatus"] == "pending") {
@@ -142,7 +158,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[3];
+                var statusCell = rows[i].getElementsByTagName("td")[4];
                 if (statusCell && statusCell.innerText.trim() !== "Accepted") {
                     rows[i].style.display = "none";
                 } else {
@@ -156,7 +172,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[3];
+                var statusCell = rows[i].getElementsByTagName("td")[4];
                 if (statusCell && statusCell.innerText.trim() !== "Rejected") {
                     rows[i].style.display = "none";
                 } else {
@@ -170,7 +186,7 @@ $result = $conn->query($sql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
             for (var i = 0; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[3];
+                var statusCell = rows[i].getElementsByTagName("td")[4];
                 if (statusCell && statusCell.innerText.trim() !== "pending") {
                     rows[i].style.display = "none";
                 } else {
@@ -210,6 +226,28 @@ $result = $conn->query($sql);
             
             return false; // Prevent form submission
         }
+      
+        // JavaScript function to filter donations by allocation
+function filterByAllocation() {
+    var selectedAllocation = document.getElementById("allocationSelect").value.trim().toLowerCase();
+    var table = document.getElementById("donationTable");
+    var rows = table.getElementsByTagName("tr");
+
+    for (var i = 0; i < rows.length; i++) {
+        var allocationCell = rows[i].getElementsByTagName("td")[1];
+
+        if (allocationCell) {
+            var textValue = allocationCell.textContent || allocationCell.innerText;
+
+            if (selectedAllocation === "" || textValue.trim().toLowerCase() === selectedAllocation) {
+                rows[i].style.display = "";
+            } else {
+                rows[i].style.display = "none";
+            }
+        }
+    }
+}
+
     </script>
 </body>
 </html>
