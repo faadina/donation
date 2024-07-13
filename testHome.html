@@ -1,0 +1,144 @@
+<?php
+$title = "Home Page";
+include 'MainHeader.php';
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <style>
+        /* General styling */
+        body {
+            font-family: 'Trebuchet MS', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .main {
+            position: relative;
+            background-image: url("images/madrasah3.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            height: 60vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+            overflow: hidden;
+            padding-top: 60px;
+        }
+
+        .main::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 1;
+        }
+
+        .main_content {
+            position: relative;
+            z-index: 2;
+            width: 80%;
+        }
+
+        .main h2 {
+            font-size: 3rem;
+            font-weight: bold;
+            line-height: 1.2;
+            color: white;
+            text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.9);
+        }
+
+        .main h2 span {
+            font-size: 0.4em;
+            opacity: 1;
+            font-weight: 350;
+            display: block;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .main .btn {
+            margin-top: 10px;
+            filter: drop-shadow( 2px 2px 10px rgba(0, 0, 1, 2));
+        }
+
+        .main .btn a {
+            text-decoration: none;
+            display: inline-block;
+            padding: 10px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #444C38;
+            background-color: #D0F0C0;
+            border: 2px solid transparent;
+            transition: all 0.3s ease;
+            border-radius: 10px;
+        }
+
+        .main .btn a:hover {
+            background-color: #444C38;
+            color: #D0F0C0;
+        }
+
+        .side {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 50px 0;
+            background-color: #f4f4f9;
+        }
+
+        .left img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .right {
+            max-width: 50%;
+            padding: 0 20px;
+        }
+
+        .right p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main">
+        <div class="main_content">
+            <h2> <div style="transform:scaleX(0.8);">Madrasah Tarbiyyah Islamiyyah Darul Hijrah</div> Donation System <hr>
+                <span>Donate to Educate: Support Education for Every Child in Need</span>
+            </h2>
+            <div class="btn">
+                <a href="MainLogin.php">JOIN US NOW</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="side">
+        <div class="left">
+            <img src="images/mengajar.jpg" alt="Mengajar Image">
+        </div>
+        <div class="right">
+            <p>Kompleks Anak Yatim Tahfiz Darul Hijrah is an independent educational institution established by Al Fadhil Ustaz Wan Muhammad Mizan bin Wan Abdul Latif in 2012. It was initiated to elevate an educational system based on the Quran and Sunnah, aiming to realize the aspiration of producing more Islamic scholars, particularly among orphans and the poor. This institution focuses on preventing dropouts and enabling these children to master the skills of memorizing, understanding the knowledge of the Quran, and comprehensively grasping Hadith.</p>
+        </div>
+    </div>
+</body>
+
+</html>
