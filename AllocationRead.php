@@ -20,6 +20,15 @@ if (isset($_GET['allocationID'])) {
         exit();
     }
 
+    // Fetch currentAmount for donations with donationStatus = 'Accepted'
+    $sql_accepted_amount = "SELECT SUM(donationAmount) AS acceptedAmount FROM Donation WHERE allocationID = ? AND donationStatus = 'Accepted'";
+    $stmt_accepted_amount = $conn->prepare($sql_accepted_amount);
+    $stmt_accepted_amount->bind_param("s", $allocationID);
+    $stmt_accepted_amount->execute();
+    $result_accepted_amount = $stmt_accepted_amount->get_result();
+    $acceptedAmount = $result_accepted_amount->fetch_assoc()['acceptedAmount'] ?? 0;
+    $stmt_accepted_amount->close();
+
     // Fetch accepted donations related to this allocation if 'viewDonations' is set
     $result_donations = null;
     if (isset($_GET['viewDonations']) && $_GET['viewDonations'] == 'true') {
@@ -68,7 +77,7 @@ if (isset($_GET['allocationID'])) {
                 <p><strong>Status:</strong> <?php echo $row['allocationStatus']; ?></p>
                 <p><strong>Details:</strong> <?php echo $row['allocationDetails']; ?></p>
                 <p><strong>Target Amount (RM):</strong> <?php echo number_format($row['targetAmount'], 2); ?></p>
-                <p><strong>Current Amount (RM):</strong> <?php echo number_format($row['currentAmount'], 2); ?></p>
+                <p><strong>Current Amount (RM):</strong> <?php echo number_format($acceptedAmount, 2); ?></p>
                 <p><strong>Image:</strong><br>
                     <?php
                     if (!empty($row['allocationImage'])) {
