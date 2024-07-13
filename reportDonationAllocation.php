@@ -153,7 +153,7 @@ $result = $conn->query($sql);
         <h2>DONATION ALLOCATION REPORT</h2>
     </div>
     <div class="generate-report">
-            <button class="btn" onclick="generateReport()">Generate Report</button>
+            <button class="btn" onclick="ManagerGenerateReport.php">Generate Report</button>
         </div>
     <div class="summary">
         
