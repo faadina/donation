@@ -128,6 +128,8 @@ $result = $stmt->get_result();
     </style>
 </head>
 <body>
+<?php
+include 'DonorHeader.php';?>
     <div class="wrapper">
         <h2>Donation History</h2>
         <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3> <!-- Display donor's ID -->

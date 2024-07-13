@@ -26,12 +26,7 @@ $result = $conn->query($sql);
     <meta charset="UTF-8">
     <title><?php echo $title; ?></title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 10%;
-            padding: 0;
-        }
+        
         .container {
             display: flex;
             flex-wrap: wrap;
