@@ -163,15 +163,19 @@ include 'DonorHeader.php';?>
             </td>
             <td>
                 <?php if ($row['donationStatus'] === 'Accepted'): ?>
-                    <a href="DonationGenerateReceipt.php?donationID=<?php echo $row['donationID']; ?>" class="btn btn-primary btn-mini-column" download >
-                        <i class="fa fa-download"></i> Download Staff Receipt
-                    </a>
+                    <div class='page-tools'>
+                        <div class='action-buttons'>
+                            <a href='DonationGenerateReceipt.php?donationID=<?php echo urlencode($row['donationID']); ?>' class='btn bg-white btn-light mx-1px text-95'>
+                                <i class='mr-1 fa fa-print text-primary-m1 text-120 w-2'></i>
+                                Print Receipt
+                            </a>
+                        </div>
+                    </div>
                 <?php endif; ?>
             </td>
         </tr>
     <?php endwhile; ?>
 </tbody>
-
 
 
 
