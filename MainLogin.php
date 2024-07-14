@@ -6,6 +6,10 @@ require_once "dbConnect.php";
 $username = $password = "";
 $message = "";
 
+if (isset($_GET['registration_success']) && $_GET['registration_success'] == '1') {
+    echo '<div class="alert alert-success">Registration successful. Please login with your credentials.</div>';
+}
+
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Start or resume a session
@@ -54,18 +58,24 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             $_SESSION["id"] = $id;
                             $_SESSION["username"] = $username;
 
-                            // Redirect user to the appropriate page based on user type
+                            // Display a JavaScript alert for successful login
+                            echo '<script>';
+                            echo 'alert("Login Successful!");';   // change to alert please
+                            echo 'window.location.href = "';
                             switch ($userType) {
                                 case "donor":
-                                    header("Location: DonorDonateAllocation.php");
-                                    exit;
+                                    echo 'DonorDonateAllocation.php';
+                                    break;
                                 case "manager":
-                                    header("Location: ManagerDashboard.php");
-                                    exit;
+                                    echo 'ManagerDashboard.php';
+                                    break;
                                 case "staff":
-                                    header("Location: StaffDashboard.php");
-                                    exit;
+                                    echo 'StaffDashboard.php';
+                                    break;
                             }
+                            echo '";';
+                            echo '</script>';
+                            exit;
                         } else {
                             // Display an error message if password is not valid
                             $message = "Wrong password.";
@@ -105,6 +115,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    
     <style type="text/css">
         body {
             font: 14px sans-serif;
@@ -316,5 +327,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </div>
     </div>
 </body>
-
 </html>

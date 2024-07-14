@@ -170,20 +170,13 @@ mysqli_close($conn);
 
     <div class="summary">
         <div class="summary-box">
-            <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>DONATION ALLOCATION REPORT</h3>
-            </div>
-            <a href="reportDonationAllocation.php" class="btn">View Report</a>
-        </div>
-        <div class="summary-box">
-            <div>
-                <h3 style="font-weight:800;">MONTHLY DONATION REPORT</h3>
+                <h3 style="font-weight:800;">MONTHLY DONATION STATUS</h3>
                 <div id="donationChartContainer">
                     <canvas id="donationChart"></canvas>
                 </div>
             </div>
-            <a href="reportDonationAllocation.php" class="btn">View Report</a>
+            
         </div>
     </div>
 

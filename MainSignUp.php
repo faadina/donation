@@ -5,6 +5,7 @@ require_once("dbConnect.php");
 $username = $password = $name = $birthdate = $address = $phone = $email = "";
 $username_err = $password_err = $name_err = $birthdate_err = $address_err = $phone_err = $email_err = "";
 
+
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate name
@@ -112,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // Attempt to execute the prepared statement
             if (mysqli_stmt_execute($stmt)) {
                 // Redirect to login page
-                header("location: MainLogin.php");
+                header("location: MainLogin.php?registration_success=1");
                 exit();
             } else {
                 echo "Something went wrong. Please try again later.";
@@ -189,6 +190,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <body>
     <?php include('MainHeader.php'); ?>
     <div class="wrapper">
+    <?php if (isset($_GET['registration_success']) && $_GET['registration_success'] == '1') {
+    echo '<div class="alert alert-success">Registration successful. Please login.</div>';
+    
+}?>
         <div class="form-container">
             <h2 style="text-align:center; color:#444C38; font-weight:700;">Sign Up</h2>
             <p style="text-align:center;">Please fill this form to create an account as donor.</p>
