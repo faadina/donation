@@ -104,6 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <style type="text/css">
         body {
             font: 14px sans-serif;
@@ -249,7 +250,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             flex: 1;
             margin: 0 0.5rem;
         }
+
+        .show-password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #104854;
+        }
     </style>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("password");
+            var toggleIcon = document.getElementById("togglePasswordVisibility");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                toggleIcon.classList.remove('fa-eye');
+                toggleIcon.classList.add('fa-eye-slash');
+            } else {
+                passwordInput.type = "password";
+                toggleIcon.classList.remove('fa-eye-slash');
+                toggleIcon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </head>
 
 <body>
@@ -275,10 +300,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <label>Username</label>
                     </div>
                     <div class="input-group">
-                        <input type="password" name="password" required>
+                        <input type="password" name="password" id="password" required>
                         <label>Password</label>
+                        <i id="togglePasswordVisibility" class="fas fa-eye show-password-toggle" onclick="togglePasswordVisibility()"></i>
                     </div>
-
                     <div class="form-group inline">
                         <input type="reset" class="btn-reset" value="Reset">
                         <input type="submit" class="btn-login" value="Login">
