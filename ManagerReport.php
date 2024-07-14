@@ -45,6 +45,28 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
     mysqli_stmt_close($stmt);
 }
 
+// Fetch report data from the database
+$sql = "SELECT reportID, reportName FROM report WHERE managerID = ?";
+if ($stmt = mysqli_prepare($conn, $sql)) {
+    mysqli_stmt_bind_param($stmt, "s", $param_managerID);
+    $param_managerID = $username;
+
+    if (mysqli_stmt_execute($stmt)) {
+        $result = mysqli_stmt_get_result($stmt);
+
+        if ($result === false) {
+            echo "Error fetching reports.";
+            exit;
+        }
+    } else {
+        echo "Error preparing the statement.";
+        exit;
+    }
+
+    // Close statement
+    mysqli_stmt_close($stmt);
+}
+
 // Close connection
 mysqli_close($conn);
 ?>
@@ -74,7 +96,7 @@ mysqli_close($conn);
             font-size: 50px;
             color: #1a1649;
             margin-bottom: 3px;
-            text-shadow: 2PX 3px 1px rgba(130, 9, 9, 0.1);
+            text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
             text-align: center;
             font-weight: 700;
         }
@@ -83,7 +105,7 @@ mysqli_close($conn);
             font-size: 35px;
             color: #1a1649;
             margin-bottom: 1%;
-            text-shadow: 2PX 3px 1px rgba(130, 9, 9, 0.1);
+            text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
             text-align: center;
             font-weight: 700;
         }
@@ -113,7 +135,7 @@ mysqli_close($conn);
             background-color: #4d4855;
             background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
             text-align: left;
-            width: 30%;
+            width: 80%;
         }
 
         .summary-box img {
@@ -153,7 +175,6 @@ mysqli_close($conn);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-
         .generate-report {
         margin-left: 1120px;           
         margin-top: 20px;
@@ -175,65 +196,24 @@ mysqli_close($conn);
     <div class="summary">
     <?php
     if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
+        while ($row = $result->fetch_assoc()) {
             echo '<div class="summary">';
             echo '<div class="card-content">';
             echo '<div class="summary-box" style="background-color:#2a3f45">';
             echo '<img src="images/reportIcon.png" alt="Report Icon">';
             echo '<div>';
-            echo '<h3>DONATION ALLOCATION REPORT</h3>';
-            echo '<a href="ManagerReportGenerated.php" class="btn">View Report</a>';
+            echo '<h3>' . htmlspecialchars($row["reportName"]) . '</h3>';
+            echo '<a href="ManagerReportGenerated.php?reportID=' . urlencode($row["reportID"]) . '" class="btn">View Report</a>';
             echo '</div>';
             echo '</div>';
-
-            echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
-            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '</p>';
-            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read More</a>';
-            echo '<p id="' . $row["allocationID"] . '-details" style="display: none;">' . htmlspecialchars($row["allocationDetails"]) . '</p>';
-            echo '</div>';
-            echo '<div class="card-footer">';
-            echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
-            echo '<div class="goal">Goal: MYR ' . ($row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite') . '</div>';
-            echo '<div class="progress-bar-container">';
-            echo '<div class="progress-bar" style="width:' . $progress . '%;"></div>';
-            echo '</div>';
-
-            // Check if allocation is closed or inactive
-            if ($row["allocationStatus"] == 'Inactive' || $row["currentAmount"] >= $row["targetAmount"]) {
-                echo '<button class="closed-button" disabled>CLOSED</button>';
-                $sql_update = "UPDATE Allocation SET allocationStatus = 'Inactive' WHERE allocationID = '" . $row["allocationID"] . "'";
-
-            } else {
-                echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
-                $sql_update = "UPDATE Allocation SET allocationStatus = 'Active' WHERE allocationID = '" . $row["allocationID"] . "'";
-            }
-
             echo '</div>'; // card-footer
             echo '</div>'; // card
         }
     } else {
-        echo "<p>No allocations found</p>";
+        echo "<p>No Report found</p>";
     }
-    $conn->close();
     ?>
-</div>
-    <div class="summary">
-        <div class="summary-box" style="background-color:#2a3f45">
-            <img src="images/reportIcon.png" alt="Report Icon">
-            <div>
-                <h3>DONATION ALLOCATION REPORT</h3>
-                <a href="ManagerReportGenerated.php" class="btn">View Report</a>
-            </div>
-        </div>
-        <div class="summary-box" style="background-color:#2a3f45">
-            <img src="images/reportIcon.png" alt="Report Icon">
-            <div>
-                <h3>MONTHLY DONATION REPORT</h3>
-                <a href="reportMonthlyDonation.php" class="btn">View Report</a>
-            </div>
-        </div>
     </div>
-
 </body>
 
 </html>

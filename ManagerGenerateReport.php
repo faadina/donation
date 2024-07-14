@@ -71,6 +71,7 @@ function generateUniqueID() {
 
 // Initialize variables to hold form data
 $reportID = generateUniqueID(); // Generate reportID
+$reportType = "";
 $reportName = "";
 $reportDate = "";
 
@@ -83,15 +84,16 @@ $donationID = "D001"; // Example default value, replace with actual retrieval me
 
 // Process form submission for creation
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $reportType = $_POST["reportType"];    
     $reportName = $_POST["reportName"];
     $reportDate = $_POST["reportDate"];
 
     // Prepare and execute the INSERT statement
-    $sql = "INSERT INTO Report (reportID, reportName, reportDate, managerID, donationID)
-            VALUES (?, ?, ?, ?, ?)";
+    $sql = "INSERT INTO Report (reportID, reportType, reportName, reportDate, managerID, donationID)
+            VALUES (?, ?, ?, ?,?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
-        $stmt->bind_param("sssss", $reportID, $reportName, $reportDate, $managerID, $donationID);
+        $stmt->bind_param("ssssss", $reportID, $reportType, $reportName, $reportDate, $managerID, $donationID);
         if ($stmt->execute()) {
             // Set success flag for SweetAlert
             $success = true;
@@ -136,6 +138,14 @@ include('ManagerHeader.php'); // Assuming you have a header include file for you
                         enctype="multipart/form-data">
 
                         <div class="mb-3">
+                            <label for="reportType" class="form-label">Report Type</label>
+                            <select class="form-control" id="reportType" name="reportType" required>
+                                <option value="Donation Allocation Report" <?php echo ($reportType == 'Donation Allocation Report') ? 'selected' : ''; ?>>Donation Allocation Report</option>
+                                <option value="Monthly Donation Report" <?php echo ($reportType == 'Monthly Donation Report') ? 'selected' : ''; ?>>Monthly Donation Report</option>
+                            </select>
+                        </div>
+                    
+                        <div class="mb-3">
                             <label for="reportName" class="form-label">Report Name</label>
                             <input type="text" class="form-control" id="reportName" name="reportName"
                                 value="<?php echo htmlspecialchars($reportName); ?>" required>
@@ -144,7 +154,7 @@ include('ManagerHeader.php'); // Assuming you have a header include file for you
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="reportDate" class="form-label">Start Date</label>
+                                    <label for="reportDate" class="form-label">Report Date</label>
                                     <input type="date" class="form-control" id="reportDate"
                                         name="reportDate"
                                         value="<?php echo htmlspecialchars($reportDate); ?>" required>
