@@ -87,7 +87,26 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $allocationImage = "";
     if (!empty($_FILES["allocationImage"]["name"])) {
         $allocationImage = uploadImage($_FILES["allocationImage"]);
+        echo "Uploaded Image Path: " . $allocationImage; // Debugging statement
+    } else {
+        // Keep existing image if no new image is uploaded
+        $existingData = getAllocationData($allocationID);
+        $allocationImage = $existingData['allocationImage'];
     }
+
+    // Debugging statement to check values before updating
+    echo "<pre>";
+    print_r([
+        'allocationID' => $allocationID,
+        'allocationName' => $allocationName,
+        'allocationStartDate' => $allocationStartDate,
+        'allocationEndDate' => $allocationEndDate,
+        'allocationStatus' => $allocationStatus,
+        'allocationDetails' => $allocationDetails,
+        'targetAmount' => $targetAmount,
+        'allocationImage' => $allocationImage
+    ]);
+    echo "</pre>";
 
     // Update the Allocation record in the database
     $sql = "UPDATE Allocation SET allocationName=?, allocationStartDate=?, allocationEndDate=?, allocationStatus=?, allocationDetails=?, targetAmount=?, allocationImage=? WHERE allocationID=?";
@@ -223,13 +242,13 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
                         </div>
 
                         <div class="mb-3">
-    <label for="allocationImage" class="form-label">Current Image</label><br>
-    <?php if (!empty($allocationImage)): ?>
-        <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
-        <br><br>
-    <?php endif; ?>
-    <input type="file" class="form-control" id="allocationImage" name="allocationImage">
-</div>
+                            <label for="allocationImage" class="form-label">Current Image</label><br>
+                            <?php if (!empty($allocationImage)): ?>
+                                <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
+                                <br><br>
+                            <?php endif; ?>
+                            <input type="file" class="form-control" id="allocationImage" name="allocationImage">
+                        </div>
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Update</button>
@@ -265,4 +284,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 <!-- Bootstrap JavaScript and dependencies (optional if not needed for your form interactions) -->
-<script src="https://cdn.jsdelivr.net/npm
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>
