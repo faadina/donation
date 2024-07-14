@@ -46,12 +46,10 @@ $allocationsResult = $conn->query($allocationsSql);
 
         .mb-3 {
             margin-bottom: 15px;
-            /* Adjust margin bottom as needed */
         }
 
         .mb-3 form {
             display: inline-block;
-            /* Display the form inline */
         }
 
         .mb-3 select {
@@ -91,7 +89,7 @@ $allocationsResult = $conn->query($allocationsSql);
             color: #454B1B;
             font-weight: 800;
         }
-        
+
         /* Button styles */
         .btn-accept {
             background-color: green;
@@ -102,8 +100,9 @@ $allocationsResult = $conn->query($allocationsSql);
             background-color: red;
             background-image: linear-gradient(315deg, red 0%, darkred 74%);
         }
+
         .btn-generate {
-            font-size:12px;
+            font-size: 12px;
             padding: 5px 5px;
         }
     </style>
@@ -123,8 +122,8 @@ $allocationsResult = $conn->query($allocationsSql);
                 <button class="btn btn-danger mx-2" onclick="showRejected()">☰ Rejected</button>
                 <button class="btn btn-warning mx-2" onclick="showPending()">☰ Pending</button>
             </div>
-            <div>
-                <select class="form-select" id="allocationSelect" onchange="filterByAllocation()">
+            <div class="d-flex">
+                <select class="form-select me-2" id="allocationSelect" onchange="filterByAllocation()">
                     <option value="">Allocation Name</option>
                     <?php
                     while ($row = $allocationsResult->fetch_assoc()) {
@@ -132,6 +131,10 @@ $allocationsResult = $conn->query($allocationsSql);
                     }
                     ?>
                 </select>
+                <div class="d-flex">
+                    <input type="text" class="form-control me-2" id="donationIDInput" placeholder="Search Donation ID">
+                    <button class="btn btn-primary" onclick="searchByDonationID()"><i class="bi bi-search"></i></button>
+                </div>
             </div>
         </div>
 
@@ -265,6 +268,27 @@ $allocationsResult = $conn->query($allocationsSql);
                     var textValue = allocationCell.textContent || allocationCell.innerText;
 
                     if (selectedAllocation === "" || textValue.trim().toLowerCase() === selectedAllocation) {
+                        rows[i].style.display = "";
+                    } else {
+                        rows[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
+        // JavaScript function to filter donations by donation ID
+        function searchByDonationID() {
+            var donationIDInput = document.getElementById("donationIDInput").value.trim().toLowerCase();
+            var table = document.getElementById("donationTable");
+            var rows = table.getElementsByTagName("tr");
+
+            for (var i = 0; i < rows.length; i++) {
+                var donationIDCell = rows[i].getElementsByTagName("td")[1];
+
+                if (donationIDCell) {
+                    var textValue = donationIDCell.textContent || donationIDCell.innerText;
+
+                    if (donationIDInput === "" || textValue.trim().toLowerCase().includes(donationIDInput)) {
                         rows[i].style.display = "";
                     } else {
                         rows[i].style.display = "none";
