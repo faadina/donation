@@ -65,11 +65,11 @@ mysqli_close($conn);
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
         .content_section {
-            margin-top: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
+            margin-top:3px;
         }
 
         .content_section h1 {
@@ -77,8 +77,7 @@ mysqli_close($conn);
             background: black;
             width: 50%;
             height: 40%;
-            font-weight: 700;
-            margin-top: 3%;
+            font-weight: 500;
             margin-bottom: 10px;
             text-align: center;
             box-shadow: black;
@@ -103,20 +102,20 @@ mysqli_close($conn);
         }
 
         .content_box table {
-            width: 100%;
+            width: 70%;
             border-collapse: collapse;
             table-layout: fixed;
         }
 
         .content_box th {
-            font-weight: 700;
-            font-size: 1.4em; /* Increased font size */
-            padding: 10px; /* Increased padding */
+            font-weight: 720;
+            font-size: 1;
+            padding: 10px; 
         }        
         
         .content_box td {
-            font-weight: 700;
-            font-size: 1.3em; /* Increased font size */
+            font-weight: 580;
+            font-size: 1em; /* Increased font size */
             padding: 10px; /* Increased padding */
         }
 

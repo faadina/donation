@@ -175,18 +175,6 @@ mysqli_close($conn);
     <link rel="stylesheet" href="css/gProfileUpdateStyletest.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
-
-        body {
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-            background: #f8f9fa;
-            font-family: "Inter", sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
         .content_section {
             margin-top: 100px;
             width: 60%;
