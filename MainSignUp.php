@@ -81,8 +81,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Check input errors before inserting in database
     if (empty($username_err) && empty($password_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
 
-        // Prepare an insert statement
-        $sql = "INSERT INTO donor (donorID, donorName, donorPassword, donorBirthDate, donorAddress, donorPhoneNo, donorEmail, role) VALUES (?, ?, ?, ?, ?, ?, ?, 'donor')";
+        // Prepare an insert statement without 'role' column
+        $sql = "INSERT INTO donor (donorID, donorName, donorPassword, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
 
         if ($stmt = mysqli_prepare($conn, $sql)) {
             // Bind variables to the prepared statement as parameters
@@ -306,7 +306,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
         </div>
     </div>
-    
 </body>
 
 </html>
