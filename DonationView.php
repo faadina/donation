@@ -127,8 +127,6 @@ $counts = $countResult->fetch_assoc();
     <?php include('staffHeader.php'); ?>
 
     <div class="container">
-     
-
         <h2 class="page-title">Donation Records</h2>
 
         <!-- Buttons for filtering and dropdown for allocation -->
@@ -154,6 +152,7 @@ $counts = $countResult->fetch_assoc();
                 </div>
             </div>
         </div>
+        
 
         <!-- Table for displaying donation records -->
         <table id="donationTable" class="table table-striped">
@@ -208,7 +207,6 @@ $counts = $countResult->fetch_assoc();
                             echo "No Receipt";
                         }
                         echo "</td>";
-                        
 
                         // Display actions based on donation status
                         echo "<td colspan='2' style='text-align:center;'>";
