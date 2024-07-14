@@ -18,20 +18,28 @@ $sqlAllocationCount = "SELECT COUNT(*) AS allocationCount FROM Allocation";
 $sqlDonationCount = "SELECT COUNT(*) AS donationCount FROM Donation";
 $sqlDonorCount = "SELECT COUNT(*) AS donorCount FROM Donor";
 $sqlAcceptedDonationCount = "SELECT COUNT(*) AS acceptedDonationCount FROM Donation WHERE donationStatus = 'Accepted'";
+$sqlTotalAcceptedDonationAmount = "
+    SELECT SUM(d.donationAmount) AS totalAcceptedAmount
+    FROM Donation d
+    INNER JOIN Allocation a ON d.allocationID = a.allocationID
+    WHERE d.donationStatus = 'Accepted'
+";
 
 $resultAllocation = $conn->query($sqlAllocationCount);
 $resultDonation = $conn->query($sqlDonationCount);
 $resultDonor = $conn->query($sqlDonorCount);
 $resultAcceptedDonationCount = $conn->query($sqlAcceptedDonationCount);
+$resultTotalAcceptedAmount = $conn->query($sqlTotalAcceptedDonationAmount);
 
-// Initialize variables to hold counts
+// Initialize variables to hold counts and amount
 $allocationCount = 0;
 $donationCount = 0;
 $donorCount = 0;
 $acceptedDonationCount = 0;
+$totalAcceptedAmount = 0;
 
 // Fetch counts if queries are successful
-if ($resultAllocation && $resultDonation && $resultDonor && $resultAcceptedDonationCount) {
+if ($resultAllocation && $resultDonation && $resultDonor && $resultAcceptedDonationCount && $resultTotalAcceptedAmount) {
     $rowAllocation = $resultAllocation->fetch_assoc();
     $allocationCount = $rowAllocation['allocationCount'];
 
@@ -43,6 +51,9 @@ if ($resultAllocation && $resultDonation && $resultDonor && $resultAcceptedDonat
 
     $rowAcceptedDonationCount = $resultAcceptedDonationCount->fetch_assoc();
     $acceptedDonationCount = $rowAcceptedDonationCount['acceptedDonationCount'];
+
+    $rowTotalAcceptedAmount = $resultTotalAcceptedAmount->fetch_assoc();
+    $totalAcceptedAmount = $rowTotalAcceptedAmount['totalAcceptedAmount'];
 } else {
     echo "Error fetching counts: " . $conn->error;
 }
@@ -68,6 +79,7 @@ $conn->close();
             background-image: linear-gradient(147deg, #f9fcff 0%, #dee4ea 74%);
             font-family: "Inter", sans-serif;
         }
+
         .detailIndex {
             color: white;
             text-align: center;
@@ -89,6 +101,7 @@ $conn->close();
             image-rendering: crisp-edges;
             filter: brightness(1.2) contrast(1.2);
         }
+
         .summary {
             margin-top: 20px;
             padding: 10px;
@@ -100,7 +113,6 @@ $conn->close();
 
         .summary-box {
             margin: 20px 10px;
-            /* Adjusted margin */
             padding: 15px;
             background-color: #4d4855;
             background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
@@ -155,6 +167,95 @@ $conn->close();
                 width: 100%;
             }
         }
+
+        .summary-donation {
+            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: left;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .summary-icon {
+            height: 50px;
+            margin-right: 20px;
+        }
+
+        .summary-content {
+            flex: 1;
+            padding-left: 20px;
+            /* Add padding for better alignment */
+        }
+
+        .summary-donation h3 {
+            font-size: 20px;
+            margin-bottom: 5px;
+            color: white;
+        }
+
+        .summary-donation p {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .summary-donation a.btn {
+            background-color: white;
+            color: #007bff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .summary-donation a.btn:hover {
+            background-color: #0056b3;
+            color: white;
+        }
+
+        .summary-count {
+            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto;
+            width: 80%;
+            max-width: 500px;
+            color: white;
+        }
+        .summary-icon {
+            height: 50px;
+            margin-right: 20px;
+        }
+
+        .summary-content {
+            padding-left: 20px;
+            text-align: left;
+            flex: 1;
+        }
+
+        .summary-content p {
+            font-size: 18px;
+            color: white;
+            margin-bottom: 10px;
+        }
+
+        .summary-content a.btn {
+            background-color: white;
+            color: #007bff;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .summary-content a.btn:hover {
+            background-color: #0056b3;
+            color: white;
+        }
     </style>
 
 </head>
@@ -166,6 +267,14 @@ $conn->close();
 
     <div class="detailIndex">
         <img src="images/staffHeader.png" alt="Manager Header Image">
+    </div>
+
+    <div class="summary-count">
+        <img src="images/reportIcon.png" alt="Report Icon" class="summary-icon">
+        <div class="summary-content"><br>
+            <p>Approved Donations: <?php echo $acceptedDonationCount; ?> | RM<?php echo number_format($totalAcceptedAmount, 2); ?> Collected </p>
+        </div>
+        <a href="DonationView.php" class="btn btn-primary">View</a>
     </div>
 
     <div class="summary">
@@ -183,15 +292,6 @@ $conn->close();
                 <h3>DONORS</h3>
                 <p><?php echo $donorCount; ?></p>
                 <a href="DonorView.php" class="btn btn-primary">View</a>
-            </div>
-        </div>
-
-        <div class="summary-box">
-            <img src="images/reportIcon.png" alt="Report Icon">
-            <div>
-                <h3>DONATIONS</h3>
-                <p><?php echo $acceptedDonationCount; ?></p>
-                <a href="DonationView.php" class="btn btn-primary">View</a>
             </div>
         </div>
     </div>
