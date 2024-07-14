@@ -7,7 +7,6 @@ $username_err = $password_err = $name_err = $birthdate_err = $address_err = $pho
 
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-
     // Validate name
     if (empty(trim($_POST["name"]))) {
         $name_err = "Please enter your name.";
@@ -85,8 +84,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate password
     if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter a password.";
-    } elseif (strlen(trim($_POST["password"])) < 8) {
-        $password_err = "Password must have at least 8 characters.";
+    } elseif (strlen(trim($_POST["password"])) < 6) {
+        $password_err = "Password must have at least 6 characters.";
     } else {
         $password = trim($_POST["password"]);
     }
@@ -150,121 +149,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             overflow: hidden;
             display: flex;
             margin: auto;
-            padding: 20px;
+            padding: 4px;
             margin-top: 2%;
         }
 
         .form-container {
             flex: 1;
-            padding: 20px;
+            padding: 10px;
         }
 
-        .form-control:focus {
-            background-color: whitesmoke;
-            color: #FFFFFF;
+        .form-control {
+            height: 40px;
         }
 
-        .btn-primary {
-            background-color: black;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #808080;
-        }
-
-        .btn-secondary {
-            background-color: black;
-            border: none;
-        }
-
-        .btn-secondary:hover {
-            background-color: #808080;
-        }
-
-        .message {
-            color: #808080;
-            font-size: 12px;
-            margin-top: 10px;
-        }
-
-        .input-group {
-            position: relative;
-            margin: 10px 0;
-        }
-
-        .input-group input,
-        .input-group textarea {
-            width: 100%;
-            height: 50px;
-            border-radius: 8px;
-            font-size: 18px;
-            padding: 0 10px;
-            border: 1px solid #1047548e;
-            background: transparent;
-            color: #104854;
-            outline: none;
-            margin-bottom: 10px;
-        }
-
-        .input-group label {
-            position: absolute;
-            top: 40%;
-            left: 20px;
-            transform: translateY(-50%);
-            color: #104854;
-            font-size: 15px;
-            pointer-events: none;
-            transition: 0.3s;
-        }
-
-        input:focus,
-        textarea:focus {
-            border: 2px solid #4D5D53;
-        }
-
-        input:focus~label,
-        textarea:focus~label,
-        input:valid~label,
-        textarea:valid~label {
-            top: 0;
-            left: 20px;
-            font-size: 16px;
-            padding: 0 2px;
-            background: whitesmoke;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-            position: relative;
-        }
-        
         .btn-register {
             background-color: #444C38;
             border: none;
             border-radius: 8px;
-            padding: 5px 100px;
+            padding: 5px 20px;
             font-weight: 600;
             color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 40px;
-            text-align: center;
-            margin: 0 auto;
+            display: block;
+            margin: 20px auto 0;
         }
 
         .btn-register:hover {
             background-color: #B2BEB5;
             color: #444C38;
         }
-        
+
         .invalid-feedback {
             color: red;
             font-size: 12px;
-            position: absolute;
-            bottom: -20px; /* Adjusted to ensure visibility */
-            left: 20px;
+            margin-top: 5px;
         }
     </style>
 </head>
@@ -274,12 +191,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <div class="wrapper">
         <div class="form-container">
             <h2 style="text-align:center; color:#444C38; font-weight:700;">Sign Up</h2>
-            <p style="text-align:center;">Please fill this form to create an account.</p>
-            
+            <p style="text-align:center;">Please fill this form to create an account as donor.</p>
+
             <!-- Display all validation errors here -->
             <?php if (!empty($username_err) || !empty($password_err) || !empty($name_err) || !empty($birthdate_err) || !empty($address_err) || !empty($phone_err) || !empty($email_err)) : ?>
                 <div class="alert alert-danger">
-                    <ul>
+                    <ul class="error-list">
                         <?php if (!empty($username_err)) : ?>
                             <li><?php echo $username_err; ?></li>
                         <?php endif; ?>
@@ -305,42 +222,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </div>
             <?php endif; ?>
 
+
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="form-group">
-                    <label>Username</label>
-                    <input type="text" name="username" class="form-control" value="<?php echo $username; ?>">
+                    <input type="text" name="username" class="form-control" placeholder="Username" value="<?php echo $username; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Password</label>
-                    <input type="password" name="password" class="form-control" value="<?php echo $password; ?>">
+                    <input type="password" name="password" class="form-control" placeholder="Password" value="<?php echo $password; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" name="name" class="form-control" value="<?php echo $name; ?>">
+                    <input type="text" name="name" class="form-control" placeholder="Full Name" value="<?php echo $name; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Birthdate</label>
-                    <input type="date" name="birthdate" class="form-control" value="<?php echo $birthdate; ?>">
+                    <input type="date" name="birthdate" class="form-control" placeholder="Birthdate" value="<?php echo $birthdate; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Address</label>
-                    <textarea name="address" class="form-control"><?php echo $address; ?></textarea>
+                    <input type="text" name="address" class="form-control" placeholder="Address" value="<?php echo $address; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="text" name="phone" class="form-control" value="<?php echo $phone; ?>">
+                    <input type="tel" name="phone" class="form-control" placeholder="Phone Number" value="<?php echo $phone; ?>">
                 </div>
                 <div class="form-group">
-                    <label>Email</label>
-                    <input type="text" name="email" class="form-control" value="<?php echo $email; ?>">
+                    <input type="email" name="email" class="form-control" placeholder="Email" value="<?php echo $email; ?>">
                 </div>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-register">Register</button>
+                    <button type="submit" class="btn-register">Register</button>
                 </div>
             </form>
             <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
         </div>
     </div>
+
 </body>
 
 </html>
