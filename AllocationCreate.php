@@ -150,30 +150,24 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
                     <h2 class="card-title">Create New Allocation</h2>
                 </div>
                 <div class="card-body">
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
-                        enctype="multipart/form-data">
+                    <form id="allocationForm" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
 
                         <div class="mb-3">
                             <label for="allocationName" class="form-label">Allocation Name</label>
-                            <input type="text" class="form-control" id="allocationName" name="allocationName"
-                                value="<?php echo htmlspecialchars($allocationName); ?>" required>
+                            <input type="text" class="form-control" id="allocationName" name="allocationName" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="allocationStartDate" class="form-label">Start Date</label>
-                                    <input type="date" class="form-control" id="allocationStartDate"
-                                        name="allocationStartDate"
-                                        value="<?php echo htmlspecialchars($allocationStartDate); ?>" required>
+                                    <input type="date" class="form-control" id="allocationStartDate" name="allocationStartDate" required>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="allocationEndDate" class="form-label">End Date</label>
-                                    <input type="date" class="form-control" id="allocationEndDate"
-                                        name="allocationEndDate"
-                                        value="<?php echo htmlspecialchars($allocationEndDate); ?>" required>
+                                    <input type="date" class="form-control" id="allocationEndDate" name="allocationEndDate" required>
                                 </div>
                             </div>
                         </div>
@@ -181,30 +175,25 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
                         <div class="mb-3">
                             <label class="form-label d-block">Status</label>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="statusActive"
-                                    name="allocationStatus" value="Active" checked required>
+                                <input class="form-check-input" type="radio" id="statusActive" name="allocationStatus" value="Active" checked required>
                                 <label class="form-check-label" for="statusActive">Active</label>
                             </div>
                             <div class="form-check form-check-inline">
-                                <input class="form-check-input" type="radio" id="statusInactive"
-                                    name="allocationStatus" value="Inactive" required>
+                                <input class="form-check-input" type="radio" id="statusInactive" name="allocationStatus" value="Inactive" required>
                                 <label class="form-check-label" for="statusInactive">Inactive</label>
                             </div>
                         </div>
 
                         <div class="mb-3">
                             <label for="allocationDetails" class="form-label">Details</label>
-                            <textarea class="form-control" id="allocationDetails" name="allocationDetails" rows="4"
-                                required><?php echo htmlspecialchars($allocationDetails); ?></textarea>
+                            <textarea class="form-control" id="allocationDetails" name="allocationDetails" rows="4" required></textarea>
                         </div>
 
                         <div class="mb-3">
                             <label for="targetAmount" class="form-label">Target Amount (RM)</label>
                             <div class="input-group">
                                 <span class="input-group-text">RM</span>
-                                <input type="number" step="0.01" class="form-control" id="targetAmount"
-                                    name="targetAmount"
-                                    value="<?php echo htmlspecialchars($targetAmount); ?>" required>
+                                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" required>
                             </div>
                         </div>
 
@@ -215,8 +204,7 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="AllocationView.php" class="btn btn-secondary"><i
-                                    class="bi bi-arrow-left"></i> Back to Allocation Records</a>
+                            <a href="AllocationView.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Allocation Records</a>
                         </div>
                     </form>
                 </div>
@@ -225,7 +213,53 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    document.getElementById('allocationForm').addEventListener('submit', function(event) {
+        // Get form values
+        const allocationStartDate = new Date(document.getElementById('allocationStartDate').value);
+        const allocationEndDate = new Date(document.getElementById('allocationEndDate').value);
+        const targetAmount = parseFloat(document.getElementById('targetAmount').value);
+        
+        // Check if targetAmount is greater than 0
+        if (targetAmount <= 0) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Target Amount must be greater than 0.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            event.preventDefault();
+            return;
+        }
+
+        // Check if allocationEndDate is after allocationStartDate
+        if (allocationEndDate <= allocationStartDate) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'End Date must be after Start Date.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            event.preventDefault();
+            return;
+        }
+
+        // Ensure all required fields are filled
+        const form = event.target;
+        if (!form.checkValidity()) {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Please fill in all required fields.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+            event.preventDefault();
+            return;
+        }
+    });
+
     <?php if (isset($success) && $success) : ?>
     Swal.fire({
         title: 'Success!',
