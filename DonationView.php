@@ -212,10 +212,10 @@ $counts = $countResult->fetch_assoc();
                         echo "<td colspan='2' style='text-align:center;'>";
                         switch ($row["donationStatus"]) {
                             case 'pending':
-                                echo "<a href='DonationAccept.php?donationID=" . $row["donationID"] . "' 
-                                class='btn btn-success btn-mini-column smaller-button btn-accept'>✓ Accept</a>";
+                                echo "<a href='DonationAccept.php?donationID=" . $row["donationID"] . "'  
+                                class='btn btn-success btn-mini-column smaller-button btn-accept'>✓ Accept</a>";  //add alert this donationID is Accepted
                                 echo "<a href='DonationReject.php?donationID=" . $row["donationID"] . "' 
-                                class='btn btn-danger btn-mini-column smaller-button btn-reject'>✗ Reject</a>";
+                                class='btn btn-danger btn-mini-column smaller-button btn-reject'>✗ Reject</a>";   //add alert this donationID is Rejected
                                 break;
                             case 'Accepted':
                                 echo "<a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' 
@@ -313,6 +313,7 @@ $counts = $countResult->fetch_assoc();
             }
         }
     </script>
+    
 </body>
 
 </html>
