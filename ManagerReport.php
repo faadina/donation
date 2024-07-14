@@ -58,6 +58,9 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             echo "Error fetching reports.";
             exit;
         }
+
+        // Count total reports
+        $totalReports = mysqli_num_rows($result);
     } else {
         echo "Error preparing the statement.";
         exit;
@@ -176,8 +179,14 @@ mysqli_close($conn);
         }
 
         .generate-report {
-        margin-left: 1120px;           
-        margin-top: 20px;
+            margin-left: 1120px;           
+            margin-top: 20px;
+        }
+
+        .total-reports {
+            text-align: center;
+            margin-bottom: 20px;
+            color: black;
         }
     </style>
 </head>
@@ -188,31 +197,36 @@ mysqli_close($conn);
     ?>
 
     <div class="detailIndex">
-    <h2>REPORT</h2>
+        <h2>REPORT</h2>
+    </div>
+    <div class="total-reports">
+        <?php
+        echo "<p>Total Reports: " . $totalReports . "</p>";
+        ?>
     </div>
     <div class="generate-report">
         <a href="ManagerGenerateReport.php" class="btn">Generate Report</a>
     </div>
     <div class="summary">
-    <?php
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo '<div class="summary">';
-            echo '<div class="card-content">';
-            echo '<div class="summary-box" style="background-color:#2a3f45">';
-            echo '<img src="images/reportIcon.png" alt="Report Icon">';
-            echo '<div>';
-            echo '<h3>' . htmlspecialchars($row["reportName"]) . '</h3>';
-            echo '<a href="ManagerReportGenerated.php?reportID=' . urlencode($row["reportID"]) . '" class="btn">View Report</a>';
-            echo '</div>';
-            echo '</div>';
-            echo '</div>'; // card-footer
-            echo '</div>'; // card
+        <?php
+        if ($result->num_rows > 0) {
+            while ($row = $result->fetch_assoc()) {
+                echo '<div class="summary">';
+                echo '<div class="card-content">';
+                echo '<div class="summary-box" style="background-color:#2a3f45">';
+                echo '<img src="images/reportIcon.png" alt="Report Icon">';
+                echo '<div>';
+                echo '<h3>' . htmlspecialchars($row["reportName"]) . '</h3>';
+                echo '<a href="ViewReport.php?reportID=' . urlencode($row["reportID"]) . '" class="btn">View Report</a>';
+                echo '</div>';
+                echo '</div>';
+                echo '</div>'; // card-footer
+                echo '</div>'; // card
+            }
+        } else {
+            echo "<p>No Report found</p>";
         }
-    } else {
-        echo "<p>No Report found</p>";
-    }
-    ?>
+        ?>
     </div>
 </body>
 

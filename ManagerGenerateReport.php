@@ -9,46 +9,8 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Include the database connection file
 require_once("dbConnect.php");
 
-// Get the current logged-in user's username from the session
-$username = $_SESSION['username'];
-
-// Fetch the user details from the database
-$sql = "SELECT managerID, managerName, managerPhoneNo, managerEmail FROM manager WHERE managerID = ?";
-if ($stmt = mysqli_prepare($conn, $sql)) {
-    // Bind variables to the prepared statement as parameters
-    mysqli_stmt_bind_param($stmt, "s", $param_username);
-
-    // Set parameters
-    $param_username = $username;
-
-    // Attempt to execute the prepared statement
-    if (mysqli_stmt_execute($stmt)) {
-        // Store result
-        mysqli_stmt_store_result($stmt);
-
-        // Check if the user exists, if yes then fetch the details
-        if (mysqli_stmt_num_rows($stmt) == 1) {
-            // Bind result variables
-            mysqli_stmt_bind_result($stmt, $id, $name, $phone, $email);
-            mysqli_stmt_fetch($stmt);
-        } else {
-            // User doesn't exist
-            echo "User doesn't exist.";
-            exit;
-        }
-    } else {
-        echo "Oops! Something went wrong. Please try again later.";
-        exit;
-    }
-
-    // Close statement
-    mysqli_stmt_close($stmt);
-}
-
-
-// Function to generate sequential reportID like R001, R002, R003, ...
-function generateUniqueID() {
-    // Implement logic to get the latest reportID from database and generate the next one
+// Function to generate sequential IDs for reports (R001, R002, ...)
+function generateReportID() {
     global $conn;
 
     $sql = "SELECT MAX(reportID) AS maxID FROM Report";
@@ -59,7 +21,7 @@ function generateUniqueID() {
     if ($result && $row = $result->fetch_assoc()) {
         $maxID = $row['maxID'];
         if ($maxID) {
-            // Extract numeric part of ID, increment, and format back to A001, A002, ...
+            // Extract numeric part of ID, increment, and format back to R001, R002, ...
             preg_match('/(\d+)$/', $maxID, $matches);
             $number = intval($matches[0]) + 1;
             $currentID = 'R' . str_pad($number, 3, '0', STR_PAD_LEFT);
@@ -69,63 +31,134 @@ function generateUniqueID() {
     return $currentID;
 }
 
+// Fetch allocation IDs from the Allocation table for dropdown
+$allocationOptions = "";
+$sql = "SELECT allocationID, allocationName FROM Allocation";
+$result = $conn->query($sql);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $allocationOptions .= "<option value='{$row['allocationID']}'>{$row['allocationName']} ({$row['allocationID']})</option>";
+    }
+    // Add an option for selecting all allocations
+    $allocationOptions .= "<option value='All'>All</option>";
+}
+
+// Fetch distinct donation months from the Donation table for dropdown
+$reportMonthOptions = "";
+$sql = "SELECT DISTINCT DATE_FORMAT(donationDate, '%Y-%m') AS reportMonth FROM Donation ORDER BY reportMonth";
+$result = $conn->query($sql);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $reportMonthOptions .= "<option value='{$row['reportMonth']}'>{$row['reportMonth']}</option>";
+    }
+}
+
 // Initialize variables to hold form data
-$reportID = generateUniqueID(); // Generate reportID
+$reportID = generateReportID();
 $reportType = "";
 $reportName = "";
 $reportDate = "";
+$reportMonth = "";
+$allocationID = ""; // Initialize allocation ID to be empty
 
-// Retrieve managerID from session
-$managerID = $_SESSION['username'];
+// Initialize variable to hold donation IDs
+$donationIDs = "";
 
-
-// Retrieve donationID from database or session (update this according to your actual data retrieval method)
-$donationID = "D001"; // Example default value, replace with actual retrieval method
-
-// Process form submission for creation
+// Process form submission for report creation
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $reportType = $_POST["reportType"];    
+    $reportType = $_POST["reportType"];
     $reportName = $_POST["reportName"];
     $reportDate = $_POST["reportDate"];
+    $reportMonth = $_POST["reportMonth"];
+    
+    // Handle allocation ID based on report type
+    if ($reportType === 'Monthly Donation Report') {
+        // Fetch donation IDs for the selected report month
+        $sql = "SELECT donationID FROM Donation WHERE DATE_FORMAT(donationDate, '%Y-%m') = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $reportMonth);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $donationIDs .= $row['donationID'] . "<br>";
+        }
+        $stmt->close();
+
+        // Set allocationID to empty for Monthly Donation Report
+        $allocationID = '';
+    } else {
+        $allocationID = $_POST["allocationID"]; // Directly assign allocation ID for other report types
+    }
+
+    // Retrieve managerID from session
+    $managerID = $_SESSION['username'];
 
     // Prepare and execute the INSERT statement
-    $sql = "INSERT INTO Report (reportID, reportType, reportName, reportDate, managerID, donationID)
-            VALUES (?, ?, ?, ?,?, ?)";
+    $sql = "INSERT INTO Report (reportID, reportType, reportName, reportDate, managerID, allocationID, reportMonth)
+            VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
-        $stmt->bind_param("ssssss", $reportID, $reportType, $reportName, $reportDate, $managerID, $donationID);
+        $stmt->bind_param("sssssss", $reportID, $reportType, $reportName, $reportDate, $managerID, $allocationID, $reportMonth);
         if ($stmt->execute()) {
-            // Set success flag for SweetAlert
+            // Report creation success
             $success = true;
+            $message = "Report created successfully!";
         } else {
-            echo "Error creating record: " . $stmt->error;
+            $message = "Error creating record: " . $stmt->error;
         }
         $stmt->close();
     } else {
-        echo "Error preparing statement: " . $conn->error;
+        $message = "Error preparing statement: " . $conn->error;
     }
-
-    $conn->close(); // Close database connection
 }
+
+$conn->close(); // Close database connection
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Allocation</title>
+    <title>Create Report</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function toggleReportOptions() {
+            const reportType = document.getElementById('reportType').value;
+            const reportMonthField = document.getElementById('reportMonthField');
+            const allocationIDField = document.getElementById('allocationIDField');
+            const donationIDsField = document.getElementById('donationIDsField');
+
+            if (reportType === 'Monthly Donation Report') {
+                reportMonthField.style.display = 'block';
+                allocationIDField.style.display = 'none';
+                donationIDsField.style.display = 'block';
+            } else if (reportType === 'Donation Allocation Report') {
+                reportMonthField.style.display = 'none';
+                allocationIDField.style.display = 'block';
+                donationIDsField.style.display = 'none';
+            } else {
+                reportMonthField.style.display = 'none';
+                allocationIDField.style.display = 'none';
+                donationIDsField.style.display = 'none';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            toggleReportOptions();
+        });
+    </script>
 </head>
 
 <body>
 
-<?php
-include('ManagerHeader.php'); // Assuming you have a header include file for your staff section
-?>
+<?php include('ManagerHeader.php'); ?>
+
 <div class="container my-4">
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -134,38 +167,54 @@ include('ManagerHeader.php'); // Assuming you have a header include file for you
                     <h2 class="card-title">Generate New Report</h2>
                 </div>
                 <div class="card-body">
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post"
-                        enctype="multipart/form-data">
+                    <?php if (isset($message)): ?>
+                        <div class="alert alert-info">
+                            <?php echo $message; ?>
+                        </div>
+                    <?php endif; ?>
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
 
                         <div class="mb-3">
                             <label for="reportType" class="form-label">Report Type</label>
-                            <select class="form-control" id="reportType" name="reportType" required>
+                            <select class="form-control" id="reportType" name="reportType" required onchange="toggleReportOptions()">
                                 <option value="Donation Allocation Report" <?php echo ($reportType == 'Donation Allocation Report') ? 'selected' : ''; ?>>Donation Allocation Report</option>
                                 <option value="Monthly Donation Report" <?php echo ($reportType == 'Monthly Donation Report') ? 'selected' : ''; ?>>Monthly Donation Report</option>
                             </select>
                         </div>
-                    
+
                         <div class="mb-3">
                             <label for="reportName" class="form-label">Report Name</label>
-                            <input type="text" class="form-control" id="reportName" name="reportName"
-                                value="<?php echo htmlspecialchars($reportName); ?>" required>
+                            <input type="text" class="form-control" id="reportName" name="reportName" value="<?php echo htmlspecialchars($reportName); ?>" required>
                         </div>
 
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="mb-3">
                                     <label for="reportDate" class="form-label">Report Date</label>
-                                    <input type="date" class="form-control" id="reportDate"
-                                        name="reportDate"
-                                        value="<?php echo htmlspecialchars($reportDate); ?>" required>
+                                    <input type="date" class="form-control" id="reportDate" name="reportDate" value="<?php echo htmlspecialchars(date('Y-m-d')); ?>" required>
                                 </div>
                             </div>
                         </div>
 
+                        <div class="mb-3" id="reportMonthField" style="display:none;">
+                            <label for="reportMonth" class="form-label">Report Month</label>
+                            <select class="form-control" id="reportMonth" name="reportMonth">
+                                <?php echo $reportMonthOptions; ?>
+                            </select>
+                        </div>
+
+                        <div class="mb-3" id="allocationIDField">
+                            <label for="allocationID" class="form-label">Allocation ID</label>
+                            <select class="form-control" id="allocationID" name="allocationID">
+                                <?php echo $allocationOptions; ?>
+                            </select>
+                        </div>
+
+                
+
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>
-                            <a href="ManagerReport.php" class="btn btn-secondary"><i
-                                    class="bi bi-arrow-left"></i> Back to Report Page</a>
+                            <a href="ManagerReport.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Report Page</a>
                         </div>
                     </form>
                 </div>
@@ -173,19 +222,6 @@ include('ManagerHeader.php'); // Assuming you have a header include file for you
         </div>
     </div>
 </div>
-
-<script>
-    <?php if (isset($success) && $success) : ?>
-    Swal.fire({
-        title: 'Success!',
-        text: 'Report generated successfully.',
-        icon: 'success',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.href = 'ManagerReport.php';
-    });
-    <?php endif; ?>
-</script>
 
 </body>
 
