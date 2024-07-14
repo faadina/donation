@@ -142,6 +142,39 @@ include 'MainHeader.php';
             text-align: justify;
             margin: 0;
         }
+
+        .update-section {
+            padding: 50px 0;
+            text-align: center;
+        }
+
+        .update-section h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: white;
+            font-weight: 670;
+        }
+
+        .update-images {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .update-images img {
+            max-width: 100%;
+            max-height: 200px;
+            /* Adjust height as needed */
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .update-images img:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 
@@ -158,7 +191,7 @@ include 'MainHeader.php';
 
     <div class="product product_about">
         <h2 style="text-align: center; color: rgb(243, 170, 11); font-weight: 900; font-size: 40px;">Every Contribution Matters</h2>
-        <h3  style="text-align: center; color: white; font-weight: 500; font-size: 20px; ">
+        <h3 style="text-align: center; color: white; font-weight: 500; font-size: 20px; ">
             Donations help us provide essential services and support to the children at Kompleks Anak Yatim Tahfiz Darul Hijrah.<br> By contributing to our cause, you help us in:</h3>
 
         <div class="product_container">
@@ -202,12 +235,23 @@ include 'MainHeader.php';
                 </div>
             </div>
         </div>
-        
+
     </div>
 
-    <div class="donation-section">
-        <p>Your generosity helps us nurture the potential of each child, empowering them to grow into knowledgeable and compassionate individuals. Together, we can build a brighter future for those in need.</p>
-    </div>
+    <section class="update-section" style="box-shadow: 0 4px 4px rgba(0, 0, 0, 0.4) inset;">
+        <div class="container">
+            <h2>See How Your Donations Are Making a Difference</h2>
+            <div class="video-container">
+                <iframe src="https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1269043860302506&show_text=0&width=560" width="530" height="300" style="border:none;overflow:hidden; border-radius:8px;" scrolling="no" frameborder="0" allowfullscreen="true" allow="autoplay; clipboard-write; encrypted-media; picture-in-picture; web-share"></iframe>
+            </div>
+            <div class="update-images">
+                <img src="images/madrasah4.jpg" alt="Update Image 1">
+                <img src="images/madrasah5.jpg" alt="Update Image 2">
+                <img src="images/madrasah6.jpg" alt="Update Image 3">
+                <img src="images/madrasah7.jpg" alt="Update Image 4">
+            </div>
+        </div><br>
+    </section>
 </body>
 
 </html>
