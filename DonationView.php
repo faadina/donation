@@ -10,9 +10,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Include the database connection file
 require_once("dbConnect.php");
 
-// Get the current logged-in user's username from the session
-$username = $_SESSION['username'];
-
 // Fetch donation records from the database
 $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
@@ -32,6 +29,9 @@ $countSql = "SELECT
              FROM Donation";
 $countResult = $conn->query($countSql);
 $counts = $countResult->fetch_assoc();
+
+// Fetch total count of donation records
+$total_rows = $counts['total'];
 ?>
 
 <!DOCTYPE html>
@@ -128,6 +128,8 @@ $counts = $countResult->fetch_assoc();
 
     <div class="container">
         <h2 class="page-title">Donation Records</h2>
+        <!-- Display donation records categorized by allocation names -->
+       
 
         <!-- Buttons for filtering and dropdown for allocation -->
         <div class="mb-3 d-flex align-items-center justify-content-between">
@@ -141,6 +143,7 @@ $counts = $countResult->fetch_assoc();
                 <select class="form-select me-2" id="allocationSelect" onchange="filterByAllocation()">
                     <option value="">Allocation Name</option>
                     <?php
+                    $allocationsResult->data_seek(0); // Reset the result pointer
                     while ($row = $allocationsResult->fetch_assoc()) {
                         echo "<option value='" . $row["allocationName"] . "'>" . $row["allocationName"] . "</option>";
                     }
@@ -152,7 +155,6 @@ $counts = $countResult->fetch_assoc();
                 </div>
             </div>
         </div>
-        
 
         <!-- Table for displaying donation records -->
         <table id="donationTable" class="table table-striped">
@@ -313,7 +315,7 @@ $counts = $countResult->fetch_assoc();
             }
         }
     </script>
-    
+
 </body>
 
 </html>
