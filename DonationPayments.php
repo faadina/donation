@@ -36,6 +36,7 @@ $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
 
+
 // Check if allocation exists and fetch its currentAmount
 $currentAmount = $allocation['currentAmount'] ?? 0;
 
@@ -59,7 +60,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['donationAmount']) && isset($_POST['allocationID'])) {
         $donationAmount = $_POST['donationAmount'];
         $allocationID = $_POST['allocationID'];
-        
+
         // Perform validation and other checks as needed
 
         // Example: Insert donation into Donation table
@@ -94,100 +95,53 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title><?php echo htmlspecialchars($title); ?></title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            margin: 10%;
-            padding: 0;
-        }
         .main-content {
-            padding: 20px;
             max-width: 800px;
-            margin: 0 auto;
-        }
-        .allocation-details {
-            background-color: #f9f9f9;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff;
             border: 1px solid #ddd;
             border-radius: 5px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .allocation-details {
             display: flex;
             flex-direction: row;
+            margin-bottom: 20px;
         }
-        .allocation-qr {
-            max-width: 40%;
-            margin-right: 20px;
-        }    
-        .qr-info h2 {
-            margin-top: 0;
-            font-size: 70px;
-            font-family: 'Times New Roman', Times, serif;
-            text-align: right;
-            margin-right: 20px;
-        } 
-        .allocation-qr img {
-            width: 100%;
-            border-radius: 5px;
-        }
+
         .allocation-image {
             max-width: 40%;
             margin-right: 20px;
         }
+
         .allocation-image img {
             width: 100%;
             border-radius: 5px;
         }
+
         .allocation-info {
             flex-grow: 1;
         }
+
         .allocation-info h2 {
-            margin-top: 0;
             font-size: 24px;
+            margin: 0;
             color: #333;
         }
-        .allocation-info p {
-            margin: 5px 0;
-        }
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .btn-success {
-            background-color: #28a745;
-            color: white;
-        }
-        .btn-success:hover {
-            background-color: #218838;
-        }
-        .btn-back {
-            background-color: #007bff;
-            color: white;
-        }
-        .btn-back:hover {
-            background-color: #0056b3;
-        }
-        .btn-closed {
-            background-color: #dc3545;
-            color: white;
-        }
-        .btn-closed:hover {
-            background-color: #c82333;
-        }
-        .progress-container {
-            flex-basis: 55%;
+
+        .raised-goal {
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 10px;
         }
+
         .progress-bar-container {
             width: 100%;
             background-color: #e0e0e0;
@@ -195,98 +149,186 @@ $conn->close();
             overflow: hidden;
             margin: 10px 0;
         }
+
         .progress-bar {
             height: 20px;
-            background-color: #28a745;
+            background-color: #40E0D0;
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            animation: progress-stripes 1s linear infinite;
             width: <?php echo ($allocation['currentAmount'] / $allocation['targetAmount']) * 100; ?>%;
         }
-        .raised-goal {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
+
+        @keyframes progress-stripes {
+            0% {
+                background-position: 40px 0;
+            }
+
+            100% {
+                background-position: 0 0;
+            }
         }
-        .raised, .goal {
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-success {
+            background-color: #3A5A40;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #218838;
+        }
+
+        .btn-back {
+            background-color: lightgray;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-closed {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-closed:hover {
+            background-color: #c82333;
+        }
+
+        .qr-info {
+            display: flex;
+            align-items: left;
+            margin-top: 10px;
+        }
+
+        .qr-info img {
+            max-width: 80px;
+            border-radius: 5px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .qr-info h3 {
+            font-size: 17px;
+            font-weight: 660;
             margin: 0;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input[type="number"],
+        .form-group input[type="file"] {
+            width: calc(100% - 20px);
+            /* Adjust as needed */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
     </style>
     <!-- Include SweetAlert CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.css">
 </head>
+
 <body>
     <div class="main-content">
-        <?php if ($allocation): ?>
-        <div class="allocation-details">
-            <div class="allocation-image">
-                <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
+        <?php if ($allocation) : ?>
+            <div class="main-content" style="text-align: center; font-size: 17px;background: linear-gradient(to top, #c1dfc4 0%, #deecdd 100%); color:#454B1B; padding:0px 1px;">
+                <h2><?php echo htmlspecialchars($allocation['allocationName']); ?></h2>
+
             </div>
-            <div class="allocation-info">
-                <h2><b><?php echo htmlspecialchars($allocation['allocationName']); ?></b></h2>
-                <div class="raised-goal">
-                    <div class="raised">Raised: RM <?php echo htmlspecialchars($allocation['currentAmount']); ?></div>
-                    <div class="goal">Goal: RM <?php echo htmlspecialchars($allocation['targetAmount']); ?></div>
+            <div class="allocation-details">
+                <div class="allocation-image">
+                    <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
+                
                 </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar"></div>
+                <div class="allocation-info">
+                    <div class="raised-goal">
+                        <div class="raised">Raised: RM <?php echo htmlspecialchars($allocation['currentAmount']); ?></div>
+                        <div class="goal">Goal: RM <?php echo htmlspecialchars($allocation['targetAmount']); ?></div>
+                    </div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar"></div>
+                    </div>
+                    <form id="donationForm" enctype="multipart/form-data" method="POST">
+                        <input type="hidden" name="donorID" value="<?php echo htmlspecialchars($donorID); ?>">
+                        <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
+                        <div class="form-group">
+                            <label for="donationAmount">Donation Amount (RM):</label>
+                            <input type="number" id="donationAmount" name="donationAmount" min="1" required>
+                        </div>
+                        <div class="qr-info" style="box-shadow: 0 0 7px rgba(0, 0, 0, 0.3) inset; border-radius:8px; padding:5px 9px;">
+                            <div>
+                                <h3>Donate through this account:</h3>
+                                <p>(Madrasah Bank)<br>Acc Number: 1234 5678 9012 3456 | <button id="viewQRButton" type="button" class="btn btn-success">⌞ QR ⌝</button></p>
+                            </div>
+                        </div><br>
+
+                        <div class="form-group">
+                            <label for="donationReceipt">Donation Receipt (PDF only):</label>
+                            <input type="file" id="donationReceipt" name="donationReceipt" accept="application/pdf" required>
+                        </div>
+                        <?php if ($isInactive) : ?>
+                            <button type="button" class="btn btn-closed " disabled>CLOSED</button>
+                            <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
+                        <?php else : ?>
+                            <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
+                            <button type="submit" class="btn btn-success">DONATE</button>
+                        <?php endif; ?>
+                    </form>
                 </div>
-                <form id="donationForm" enctype="multipart/form-data">
-                    <input type="hidden" name="donorID" value="<?php echo htmlspecialchars($donorID); ?>">
-                    <input type="hidden" name="allocationID" value="<?php echo htmlspecialchars($allocationID); ?>">
-                    <div class="form-group">
-                        <label for="donationAmount">Donation Amount (RM):</label>
-                        <input type="number" id="donationAmount" name="donationAmount" min="1" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="donationReceipt">Donation Receipt (PDF only):</label>
-                        <input type="file" id="donationReceipt" name="donationReceipt" accept="application/pdf" required>
-                    </div>
-                    <?php if ($isInactive): ?>
-                        <button type="button" class="btn btn-closed" disabled>CLOSED</button>
-                        <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
-                    <?php else: ?>
-                        <button type="submit" class="btn btn-success">DONATE NOW</button> 
-                        <button type="button" class="btn btn-back" onclick="history.back()">BACK</button>
-                    <?php endif; ?>
-                </form>
+                
             </div>
-        </div>
-        <?php else: ?>
-        <p>No allocation found or selected.</p>
+        <?php else : ?>
+            <p>No allocation found or selected.</p>
         <?php endif; ?>
     </div>
+
 
     <div class="main-content d-flex justify-content-center">
-        <?php if ($allocation): ?>
-        <div class="allocation-details d-flex justify-content-center">
-
-
-            <div class="allocation-info">
-                <h2><strong>Details:</strong></h2>
-                <p><?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
+        <?php if ($allocation) : ?>
+            <div class="allocation-details d-flex justify-content-center">
+                <h4 style="font-weight:300; text-align:center;">Status: <?php echo htmlspecialchars($allocation['allocationStatus']); ?> |&nbsp;</h4>
+                <h4 style="font-weight:300; text-align:center;">Start Date: <?php echo date('d M y', strtotime($allocation['allocationStartDate'])); ?> |&nbsp;</h4>
+                <h4 style="font-weight:300; text-align:center;">End Date: <?php echo date('d M y', strtotime($allocation['allocationEndDate'])); ?></h4>
             </div>
-        </div>
-        <?php else: ?>
-        <p>No allocation found or selected.</p>
+            <div class="allocation-details d-flex justify-content-center">
+                <div class="allocation-info">
+                    <h2><strong>Details:</strong></h2>
+                    <p><?php echo htmlspecialchars($allocation['allocationDetails']); ?></p>
+                </div>
+            </div>
+        <?php else : ?>
+            <p>No allocation found or selected.</p>
         <?php endif; ?>
     </div>
 
-    <div class="main-content d-flex justify-content-center">
-        <?php if ($allocation): ?>
-        <div class="allocation-details d-flex justify-content-center">
-            <div class="allocation-qr">
-            <img src="images/qrbank.jpg" >
-            </div>
-            <div class="qr-info">
-                <h2>Donate <br>Here</h2>
-            </div>
-        </div>
-        <?php else: ?>
-        <p>No allocation found or selected.</p>
-        <?php endif; ?>
-    </div>
 
     <!-- Include SweetAlert JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/2.1.2/sweetalert.min.js"></script>
     <script>
+        // Function to open QR code in a new window
+        document.getElementById('viewQRButton').addEventListener('click', function() {
+            window.open('images/qrbank.jpg', '_blank', 'width=600,height=400');
+        });
         document.addEventListener('DOMContentLoaded', function() {
             var donationForm = document.getElementById('donationForm');
 
@@ -309,40 +351,41 @@ $conn->close();
                 var formData = new FormData(donationForm);
 
                 fetch('ProceedPayment.php', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(response => response.json())
-                .then(data => {
-                    var status = data.status;
-                    var message = data.message;
-                    var donationID = data.donationID;
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        var status = data.status;
+                        var message = data.message;
+                        var donationID = data.donationID;
 
-                    swal({
-                        title: status === 'success' ? "Thank You for Your Donation!" : "Error",
-                        text: message + (donationID ? "\nYour Donation ID is: " + donationID : ""),
-                        icon: status,
-                        buttons: {
-                            confirm: {
-                                text: "Return to History",
-                                value: true,
-                                visible: true,
-                                className: "btn btn-primary",
-                                closeModal: true
+                        swal({
+                            title: status === 'success' ? "Thank You for Your Donation!" : "Error",
+                            text: message + (donationID ? "\nYour Donation ID is: " + donationID : ""),
+                            icon: status,
+                            buttons: {
+                                confirm: {
+                                    text: "Return to History",
+                                    value: true,
+                                    visible: true,
+                                    className: "btn btn-primary",
+                                    closeModal: true
+                                }
                             }
-                        }
-                    }).then((willGoToHistory) => {
-                        if (willGoToHistory) {
-                            window.location.href = "DonorDonateHistory.php";
-                        }
+                        }).then((willGoToHistory) => {
+                            if (willGoToHistory) {
+                                window.location.href = "DonorDonateHistory.php";
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        swal("Error", "An error occurred while processing your donation.", "error");
                     });
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    swal("Error", "An error occurred while processing your donation.", "error");
-                });
             });
         });
     </script>
 </body>
+
 </html>

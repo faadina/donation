@@ -1,10 +1,8 @@
 <?php
-
-$staffID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown'; 
-
-$current_page = isset($current_page) ? $current_page : '';
-
+$current_page = basename($_SERVER['PHP_SELF']);
+$staffID = isset($_SESSION["id"]) ? $_SESSION["id"] : 'Unknown';
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,13 +14,25 @@ $current_page = isset($current_page) ? $current_page : '';
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
 
+        body {
+            margin: 0; 
+            font-family: 'Inter', sans-serif;      
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: black;
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
             font-weight: 600;
             padding: 10px 20px;
+            position: -webkit-sticky; 
+            position: sticky;
+            top: 0;
+            z-index: 2;
+            width: AUTO;
+            margin: 0 auto; 
+            z-index: 999;
         }
 
         .logo {
@@ -49,28 +59,29 @@ $current_page = isset($current_page) ? $current_page : '';
             padding: 5px 10px;
             border: 1px solid transparent;
             text-decoration: none;
-            color: #fdfdfb;
+            color:lightgrey;
             font-weight: bold;
-            border-bottom: 2px solid transparent;
         }
 
         ul li a:hover,
         ul li a:focus {
-            color: #e4b909;
+            color: #b9e3c7;
+            text-decoration: none;
         }
 
         ul li a.active {
-            color: #e4b909;
-            border-bottom: 2px solid #e4b909;
+            font-weight: 980;
+            color:white;
         }
 
-        .manager-info {
+        .staff-info {
             display: flex;
             align-items: center;
             margin-right: 20px;
+            position: relative; /* Add this line */
         }
 
-        .manager-username {
+        .staff-username {
             color: #e4b909;
             margin-left: 10px;
         }
@@ -78,24 +89,24 @@ $current_page = isset($current_page) ? $current_page : '';
         .dropdown-menu {
             display: none;
             position: absolute;
-            background-color: #fff;
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
             z-index: 99;
             padding: 0;
-            margin-top: 10%;
-            margin-left: 2%;
-            width: 13%;
+            top: 100%; 
+            left: 0; 
+            width: 150px;
         }
 
         .dropdown-menu a {
-            color: #000;
-            padding: 5px 10px;
+            color: white;
+            padding: 8px 10px;
             text-decoration: none;
             display: block;
             white-space: nowrap;
         }
 
         .dropdown-menu a:hover {
-            background: #104854;
+            background: #37383a;
             color: white;
         }
     </style>
@@ -125,17 +136,17 @@ $current_page = isset($current_page) ? $current_page : '';
         <div class="nav__content">
             <nav>
                 <ul>
-                    <li><a href="StaffDashboard.php" class="<?php echo ($current_page == 'StaffDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
+                <li><a href="StaffDashboard.php" class="<?php echo ($current_page == 'StaffDashboard.php') ? 'active' : ''; ?>">Dashboard</a></li>
                     <li><a href="AllocationView.php" class="<?php echo ($current_page == 'AllocationView.php') ? 'active' : ''; ?>">Allocation</a></li>
                     <li><a href="DonorView.php" class="<?php echo ($current_page == 'DonorView.php') ? 'active' : ''; ?>">Donor</a></li>
-                    <li><a href="DonationView.php" class="<?php echo ($current_page == 'DonationView.php') ? 'active' : ''; ?>">Donation</a></li>
-                    <li class="dropdown manager-info">
-                        <a href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Report') === 0) ? 'active' : ''; ?>">
-                        <img src="images/userIcon1.png" alt="User Icon" height="20" width="20"> Staff: <?php echo $staffID; ?>
+                    <li><a href="DonationView.php" class="<?php echo ($current_page == 'DonationView.php') ? 'active' : ''; ?>">Donation</a></li>             
+                    <li class="dropdown staff-info">
+                        <a style="background-color:#1e1d1d; border:#fff; border-radius:8px; box-shadow: inset 0px 0px 3px rgba(0, 0, 0,5); border:none;" href="#" class="dropdown-toggle <?php echo (strpos($current_page, 'Profile') === 0) ? 'active' : ''; ?>">
+                            <img src="images/userIcon1.png" alt="User Icon" height="18" width="18"> Staff
                         </a>
                         <div class="dropdown-menu" aria-labelledby="navbarDropdownProfile">
-                            <a class="dropdown-item" href="StaffProfile.php">🗝 Profile</a>
-                            <a class="dropdown-item" href="Logout.php">🗝 Log Out</a>
+                            <a class="dropdown-item" href="StaffProfile.php">• User: <?php echo $staffID; ?></a>
+                            <a class="dropdown-item" href="Logout.php">• Log Out</a>
                         </div>
                     </li>
                 </ul>
@@ -143,5 +154,4 @@ $current_page = isset($current_page) ? $current_page : '';
         </div>
     </div>
 </body>
-
 </html>

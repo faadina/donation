@@ -166,7 +166,6 @@ $result = $conn->query($sql);
             width: 100%;
         }
 
-
         .progress-bar-container {
             width: 100%;
             background-color: #e0e0e0;

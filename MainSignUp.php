@@ -47,6 +47,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $email_err = "Invalid email format.";
     } else {
         $email = trim($_POST["email"]);
+
+        // Check if email already exists in donor table
+        $sql_email = "SELECT donorID FROM donor WHERE donorEmail = ?";
+        $stmt_email = mysqli_prepare($conn, $sql_email);
+        mysqli_stmt_bind_param($stmt_email, "s", $param_email);
+        $param_email = $email;
+        mysqli_stmt_execute($stmt_email);
+        mysqli_stmt_store_result($stmt_email);
+
+        if (mysqli_stmt_num_rows($stmt_email) == 1) {
+            $email_err = "This email is already taken.";
+        }
+        mysqli_stmt_close($stmt_email);
     }
 
     // Validate username
@@ -54,61 +67,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username_err = "Please enter a username.";
     } else {
         $username = trim($_POST["username"]);
-    }
 
-    // Check if username already exists in donor table
-    $sql_donor = "SELECT donorID FROM donor WHERE donorID = ?";
-    $stmt_donor = mysqli_prepare($conn, $sql_donor);
-    if ($stmt_donor) {
-        mysqli_stmt_bind_param($stmt_donor, "s", $username);
-        mysqli_stmt_execute($stmt_donor);
-        mysqli_stmt_store_result($stmt_donor);
-        if (mysqli_stmt_num_rows($stmt_donor) > 0) {
+        // Check if username already exists in donor table
+        $sql_username = "SELECT donorID FROM donor WHERE donorID = ?";
+        $stmt_username = mysqli_prepare($conn, $sql_username);
+        mysqli_stmt_bind_param($stmt_username, "s", $param_username);
+        $param_username = $username;
+        mysqli_stmt_execute($stmt_username);
+        mysqli_stmt_store_result($stmt_username);
+
+        if (mysqli_stmt_num_rows($stmt_username) == 1) {
             $username_err = "This username is already taken.";
         }
-        mysqli_stmt_close($stmt_donor);
-    } else {
-        echo "Something went wrong with the donor table query.";
+        mysqli_stmt_close($stmt_username);
     }
 
     // Validate password
     if (empty(trim($_POST["password"]))) {
         $password_err = "Please enter a password.";
-    } elseif (strlen(trim($_POST["password"])) < 6) {
-        $password_err = "Password must have at least 6 characters.";
-    } elseif (strlen(trim($_POST["password"])) > 50) {
-        $password_err = "Password exceeds the maximum allowed length.";
+    } elseif (strlen(trim($_POST["password"])) < 8) {
+        $password_err = "Password must have at least 8 characters.";
     } else {
         $password = trim($_POST["password"]);
     }
 
     // Check input errors before inserting in database
     if (empty($username_err) && empty($password_err) && empty($name_err) && empty($birthdate_err) && empty($address_err) && empty($phone_err) && empty($email_err)) {
-        // Prepare an insert statement
-        $sql = "INSERT INTO donor (donorID, donorPassword, donorName, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $sql);
-        if ($stmt) {
-            // Hash the password before storing
-            $param_password = password_hash($password, PASSWORD_DEFAULT);
+        // Prepare an insert statement without 'role' column
+        $sql = "INSERT INTO donor (donorID, donorName, donorPassword, donorDOB, donorAddress, donorPhoneNo, donorEmail) VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        if ($stmt = mysqli_prepare($conn, $sql)) {
+            // Bind variables to the prepared statement as parameters
+            mysqli_stmt_bind_param($stmt, "sssssss", $param_username, $param_name, $param_password, $param_birthdate, $param_address, $param_phone, $param_email);
+
+            // Set parameters
+            $param_username = $username;
             $param_name = $name;
+            // Directly assign password from $_POST without hashing (for demonstration purposes)
+            $param_password = $_POST["password"];
             $param_birthdate = $birthdate;
             $param_address = $address;
             $param_phone = $phone;
             $param_email = $email;
 
-            // Bind parameters
-            mysqli_stmt_bind_param($stmt, "sssssss", $username, $param_password, $param_name, $param_birthdate, $param_address, $param_phone, $param_email);
-
             // Attempt to execute the prepared statement
             if (mysqli_stmt_execute($stmt)) {
-                // Registration successful, redirect to login page
-                echo "<script>alert('Registration successful. Please login.');</script>";
-                echo "<script>location.href='MainLogin.php';</script>";
-                exit;
+                // Redirect to login page
+                header("location: MainLogin.php");
+                exit();
             } else {
                 echo "Something went wrong. Please try again later.";
             }
 
+            // Close statement
             mysqli_stmt_close($stmt);
         }
     }
@@ -140,7 +151,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             display: flex;
             margin: auto;
             padding: 20px;
-            margin-top: 10%;
+            margin-top: 2%;
         }
 
         .form-container {
@@ -225,6 +236,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         .form-group {
             margin-bottom: 1rem;
+            position: relative;
         }
         
         .btn-register {
@@ -245,60 +257,88 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .btn-register:hover {
             background-color: #B2BEB5;
             color: #444C38;
-
+        }
+        
+        .invalid-feedback {
+            color: red;
+            font-size: 12px;
+            position: absolute;
+            bottom: -20px; /* Adjusted to ensure visibility */
+            left: 20px;
         }
     </style>
 </head>
 
 <body>
-    <?php
-    include('MainHeader.php');
-    ?>
+    <?php include('MainHeader.php'); ?>
     <div class="wrapper">
         <div class="form-container">
             <h2 style="text-align:center; color:#444C38; font-weight:700;">Sign Up</h2>
             <p style="text-align:center;">Please fill this form to create an account.</p>
+            
+            <!-- Display all validation errors here -->
+            <?php if (!empty($username_err) || !empty($password_err) || !empty($name_err) || !empty($birthdate_err) || !empty($address_err) || !empty($phone_err) || !empty($email_err)) : ?>
+                <div class="alert alert-danger">
+                    <ul>
+                        <?php if (!empty($username_err)) : ?>
+                            <li><?php echo $username_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($password_err)) : ?>
+                            <li><?php echo $password_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($name_err)) : ?>
+                            <li><?php echo $name_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($birthdate_err)) : ?>
+                            <li><?php echo $birthdate_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($address_err)) : ?>
+                            <li><?php echo $address_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($phone_err)) : ?>
+                            <li><?php echo $phone_err; ?></li>
+                        <?php endif; ?>
+                        <?php if (!empty($email_err)) : ?>
+                            <li><?php echo $email_err; ?></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                <div class="input-group">
-                    <input type="text" name="username" required value="<?php echo $username; ?>">
+                <div class="form-group">
                     <label>Username</label>
-                    <span class="invalid-feedback"><?php echo $username_err; ?></span>
-                </div>
-                <div class="input-group">
-                    <input type="password" name="password" required value="<?php echo $password; ?>">
-                    <label>Password</label>
-                    <span class="invalid-feedback"><?php echo $password_err; ?></span>
-                </div>
-                <div class="input-group">
-                    <input type="text" name="name" required value="<?php echo $name; ?>">
-                    <label>Name</label>
-                    <span class="invalid-feedback"><?php echo $name_err; ?></span>
-                </div>
-                <div class="input-group">
-                    <input type="date" name="birthdate" required value="<?php echo $birthdate; ?>">
-                    <span class="invalid-feedback"><?php echo $birthdate_err; ?></span>
-                    <label style="font-size:10px;">Date of Birth</label>
-                </div>
-                <div class="input-group">
-                    <textarea name="address" required><?php echo $address; ?></textarea>
-                    <label>Address</label>
-                    <span class="invalid-feedback"><?php echo $address_err; ?></span>
-                </div>
-                <div class="input-group">
-                    <input type="text" name="phone" required value="<?php echo $phone; ?>">
-                    <label>Phone</label>
-                    <span class="invalid-feedback"><?php echo $phone_err; ?></span>
-                </div>
-                <div class="input-group">
-                    <input type="email" name="email" required value="<?php echo $email; ?>">
-                    <label>Email</label>
-                    <span class="invalid-feedback"><?php echo $email_err; ?></span>
+                    <input type="text" name="username" class="form-control" value="<?php echo $username; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="submit" class="btn-register" value="Register">
+                    <label>Password</label>
+                    <input type="password" name="password" class="form-control" value="<?php echo $password; ?>">
                 </div>
-                <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" name="name" class="form-control" value="<?php echo $name; ?>">
+                </div>
+                <div class="form-group">
+                    <label>Birthdate</label>
+                    <input type="date" name="birthdate" class="form-control" value="<?php echo $birthdate; ?>">
+                </div>
+                <div class="form-group">
+                    <label>Address</label>
+                    <textarea name="address" class="form-control"><?php echo $address; ?></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="text" name="phone" class="form-control" value="<?php echo $phone; ?>">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="text" name="email" class="form-control" value="<?php echo $email; ?>">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-register">Register</button>
+                </div>
             </form>
+            <p style="text-align:center;">Already have an account? <a href="MainLogin.php" style="text-decoration: none; color: #6B8E23; font-weight:700;">Login Here</a>.</p>
         </div>
     </div>
 </body>
