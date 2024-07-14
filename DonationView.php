@@ -22,6 +22,16 @@ $result = $conn->query($sql);
 // Fetch allocation names for the dropdown
 $allocationsSql = "SELECT allocationID, allocationName FROM Allocation";
 $allocationsResult = $conn->query($allocationsSql);
+
+// Fetch counts for filtering buttons
+$countSql = "SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN donationStatus = 'Accepted' THEN 1 ELSE 0 END) as accepted,
+                SUM(CASE WHEN donationStatus = 'Rejected' THEN 1 ELSE 0 END) as rejected,
+                SUM(CASE WHEN donationStatus = 'pending' THEN 1 ELSE 0 END) as pending
+             FROM Donation";
+$countResult = $conn->query($countSql);
+$counts = $countResult->fetch_assoc();
 ?>
 
 <!DOCTYPE html>
@@ -105,6 +115,11 @@ $allocationsResult = $conn->query($allocationsSql);
             font-size: 12px;
             padding: 5px 5px;
         }
+
+        /* Adjustments for the back button */
+        .btn-back {
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 
@@ -112,15 +127,17 @@ $allocationsResult = $conn->query($allocationsSql);
     <?php include('staffHeader.php'); ?>
 
     <div class="container">
+     
+
         <h2 class="page-title">Donation Records</h2>
 
         <!-- Buttons for filtering and dropdown for allocation -->
         <div class="mb-3 d-flex align-items-center justify-content-between">
             <div>
-                <button class="btn btn-primary" onclick="showAll()">☰ All</button>
-                <button class="btn btn-success mx-2" onclick="showAccepted()">☰ Accepted</button>
-                <button class="btn btn-danger mx-2" onclick="showRejected()">☰ Rejected</button>
-                <button class="btn btn-warning mx-2" onclick="showPending()">☰ Pending</button>
+                <button class="btn btn-primary" onclick="showAll()">☰ All (<?php echo $counts['total']; ?>)</button>
+                <button class="btn btn-success mx-2" onclick="showAccepted()">☰ Accepted (<?php echo $counts['accepted']; ?>)</button>
+                <button class="btn btn-danger mx-2" onclick="showRejected()">☰ Rejected (<?php echo $counts['rejected']; ?>)</button>
+                <button class="btn btn-warning mx-2" onclick="showPending()">☰ Pending (<?php echo $counts['pending']; ?>)</button>
             </div>
             <div class="d-flex">
                 <select class="form-select me-2" id="allocationSelect" onchange="filterByAllocation()">
@@ -183,7 +200,7 @@ $allocationsResult = $conn->query($allocationsSql);
                         echo "<td style='color: " . $statusColor . "; font-weight: bold;'>" . $row["donationStatus"] . "</td>";
 
                         // Displaying receipt with a link to view PDF
-                        echo "<td>";
+                        echo "<td style='text-align: center;'>"; // Center-align the content in the table cell
                         if (!empty($row["donationReceipt"])) {
                             echo "<a href='" . htmlspecialchars($row["donationReceipt"]) . "' 
                             target='_blank' class='btn btn-primary btn-mini-column smaller-button'>⌞view⌝</a>";
@@ -191,6 +208,7 @@ $allocationsResult = $conn->query($allocationsSql);
                             echo "No Receipt";
                         }
                         echo "</td>";
+                        
 
                         // Display actions based on donation status
                         echo "<td colspan='2' style='text-align:center;'>";
@@ -245,7 +263,7 @@ $allocationsResult = $conn->query($allocationsSql);
         function filterByStatus(status) {
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
-            for (var i = 0; i < rows.length; i++) {
+            for (var i = 1; i < rows.length; i++) {
                 var statusCell = rows[i].getElementsByTagName("td")[5];
                 if (statusCell && status !== '' && statusCell.innerText.trim() !== status) {
                     rows[i].style.display = "none";
@@ -261,7 +279,7 @@ $allocationsResult = $conn->query($allocationsSql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
 
-            for (var i = 0; i < rows.length; i++) {
+            for (var i = 1; i < rows.length; i++) {
                 var allocationCell = rows[i].getElementsByTagName("td")[2];
 
                 if (allocationCell) {
@@ -282,7 +300,7 @@ $allocationsResult = $conn->query($allocationsSql);
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
 
-            for (var i = 0; i < rows.length; i++) {
+            for (var i = 1; i < rows.length; i++) {
                 var donationIDCell = rows[i].getElementsByTagName("td")[1];
 
                 if (donationIDCell) {
