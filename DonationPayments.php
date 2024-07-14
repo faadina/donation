@@ -36,6 +36,7 @@ $result = $stmt->get_result();
 $allocation = $result->fetch_assoc();
 $stmt->close();
 
+
 // Check if allocation exists and fetch its currentAmount
 $currentAmount = $allocation['currentAmount'] ?? 0;
 
@@ -252,11 +253,12 @@ $conn->close();
         <?php if ($allocation) : ?>
             <div class="main-content" style="text-align: center; font-size: 17px;background: linear-gradient(to top, #c1dfc4 0%, #deecdd 100%); color:#454B1B; padding:0px 1px;">
                 <h2><?php echo htmlspecialchars($allocation['allocationName']); ?></h2>
-            </div>
 
+            </div>
             <div class="allocation-details">
                 <div class="allocation-image">
                     <img src="<?php echo htmlspecialchars($allocation['allocationImage']); ?>" alt="Allocation Image">
+                
                 </div>
                 <div class="allocation-info">
                     <div class="raised-goal">
@@ -293,6 +295,7 @@ $conn->close();
                         <?php endif; ?>
                     </form>
                 </div>
+                
             </div>
         <?php else : ?>
             <p>No allocation found or selected.</p>
@@ -302,6 +305,11 @@ $conn->close();
 
     <div class="main-content d-flex justify-content-center">
         <?php if ($allocation) : ?>
+            <div class="allocation-details d-flex justify-content-center">
+                <h4 style="font-weight:300; text-align:center;">Status: <?php echo htmlspecialchars($allocation['allocationStatus']); ?> |&nbsp;</h4>
+                <h4 style="font-weight:300; text-align:center;">Start Date: <?php echo date('d M y', strtotime($allocation['allocationStartDate'])); ?> |&nbsp;</h4>
+                <h4 style="font-weight:300; text-align:center;">End Date: <?php echo date('d M y', strtotime($allocation['allocationEndDate'])); ?></h4>
+            </div>
             <div class="allocation-details d-flex justify-content-center">
                 <div class="allocation-info">
                     <h2><strong>Details:</strong></h2>
