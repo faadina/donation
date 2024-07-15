@@ -177,8 +177,8 @@ while ($row = $result->fetch_assoc()) {
                         <th>Donation Amount </th>
                         <th>Donation Date</th>
                         <th>Donation Status</th>
+                        <th>Bank Receipt</th>
                         <th>Donation Receipt</th>
-                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
