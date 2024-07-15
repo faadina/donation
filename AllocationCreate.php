@@ -7,8 +7,11 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     exit;
 }
 
-include 'dbConnect.php'; // Include your database connection file
+// Include the database connection file
+require_once("dbConnect.php");
 
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
 // Function to handle file upload
 function uploadImage($file)
 {
