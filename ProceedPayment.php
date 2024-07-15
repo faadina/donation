@@ -73,6 +73,7 @@ try {
     $stmt->close();
 
     // Update the allocation's current amount
+    when allocationStatus='inactivate' stop count currentAmount
     $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
     $stmt->bind_param('ds', $donationAmount, $allocationID);
     $stmt->execute();
