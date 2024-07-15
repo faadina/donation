@@ -72,7 +72,6 @@ try {
     $stmt->execute();
     $stmt->close();
 
-<<<<<<< HEAD
     // Update the allocation's current amount (if donation status is accepted)
     if ($donationStatus === 'Accepted') {
         $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
@@ -80,14 +79,6 @@ try {
         $stmt->execute();
         $stmt->close();
     }
-=======
-    // Update the allocation's current amount
-    when allocationStatus='inactivate' stop count currentAmount
-    $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
-    $stmt->bind_param('ds', $donationAmount, $allocationID);
-    $stmt->execute();
-    $stmt->close();
->>>>>>> 1818dfd4cfc6f857f522b538065f28a32c0782b3
 
     // Commit transaction
     $conn->commit();
