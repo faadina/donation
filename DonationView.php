@@ -10,10 +10,25 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Include the database connection file
 require_once("dbConnect.php");
 
-// Fetch donation records from the database
+// Pagination variables
+$limit = 10; // Number of records per page
+
+// Calculate total pages
+$countSql = "SELECT COUNT(*) as total FROM Donation";
+$countResult = $conn->query($countSql);
+$total_rows = $countResult->fetch_assoc()['total'];
+$total_pages = ceil($total_rows / $limit);
+
+// Current page calculation
+$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
+$start = ($current_page - 1) * $limit;
+
+// Fetch donation records with pagination and sorting
 $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
-        LEFT JOIN Allocation a ON d.allocationID = a.allocationID";
+        LEFT JOIN Allocation a ON d.allocationID = a.allocationID
+        ORDER BY d.donationDate DESC
+        LIMIT $start, $limit";
 $result = $conn->query($sql);
 
 // Fetch allocation names for the dropdown
@@ -173,7 +188,7 @@ $total_rows = $counts['total'];
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
-                    $count = 1; // Initialize a counter
+                    $count = $start + 1;  // Initialize a counter
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . $count . "</td>"; // Display the row number
@@ -240,6 +255,16 @@ $total_rows = $counts['total'];
                 ?>
             </tbody>
         </table>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <?php for ($page = 1; $page <= $total_pages; $page++) : ?>
+                    <li class="page-item <?php if ($page == $current_page) echo 'active'; ?>">
+                        <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
     </div>
 
     <script>
