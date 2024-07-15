@@ -10,6 +10,9 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Include the database connection file
 require_once("dbConnect.php");
 
+// Get the current logged-in user's username from the session
+$username = $_SESSION['username'];
+
 if ($_SERVER["REQUEST_METHOD"] == "GET" && isset($_GET['allocationID'])) {
     $allocationID = $_GET['allocationID'];
 
