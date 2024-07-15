@@ -72,11 +72,13 @@ try {
     $stmt->execute();
     $stmt->close();
 
-    // Update the allocation's current amount
-    $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
-    $stmt->bind_param('ds', $donationAmount, $allocationID);
-    $stmt->execute();
-    $stmt->close();
+    // Update the allocation's current amount (if donation status is accepted)
+    if ($donationStatus === 'Accepted') {
+        $stmt = $conn->prepare("UPDATE Allocation SET currentAmount = currentAmount + ? WHERE allocationID = ?");
+        $stmt->bind_param('ds', $donationAmount, $allocationID);
+        $stmt->execute();
+        $stmt->close();
+    }
 
     // Commit transaction
     $conn->commit();
