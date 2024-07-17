@@ -39,7 +39,6 @@ $allocationsResult = $conn->query($allocationsSql);
 $countSql = "SELECT 
                 COUNT(*) as total,
                 SUM(CASE WHEN donationStatus = 'Accepted' THEN 1 ELSE 0 END) as accepted,
-                SUM(CASE WHEN donationStatus = 'Rejected' THEN 1 ELSE 0 END) as rejected,
                 SUM(CASE WHEN donationStatus = 'pending' THEN 1 ELSE 0 END) as pending
              FROM Donation";
 $countResult = $conn->query($countSql);
@@ -135,6 +134,15 @@ $total_rows = $counts['total'];
         .btn-back {
             margin-bottom: 20px;
         }
+        
+        .btn-update {
+            width: 30px;
+            height: 30px;
+            padding: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 
@@ -144,26 +152,15 @@ $total_rows = $counts['total'];
     <div class="container">
         <h2 class="page-title">Donation Records</h2>
         <!-- Display donation records categorized by allocation names -->
-       
 
         <!-- Buttons for filtering and dropdown for allocation -->
         <div class="mb-3 d-flex align-items-center justify-content-between">
             <div>
                 <button class="btn btn-primary" onclick="showAll()">☰ All (<?php echo $counts['total']; ?>)</button>
                 <button class="btn btn-success mx-2" onclick="showAccepted()">☰ Accepted (<?php echo $counts['accepted']; ?>)</button>
-                <button class="btn btn-danger mx-2" onclick="showRejected()">☰ Rejected (<?php echo $counts['rejected']; ?>)</button>
                 <button class="btn btn-warning mx-2" onclick="showPending()">☰ Pending (<?php echo $counts['pending']; ?>)</button>
             </div>
             <div class="d-flex">
-                <select class="form-select me-2" id="allocationSelect" onchange="filterByAllocation()">
-                    <option value="">Allocation Name</option>
-                    <?php
-                    $allocationsResult->data_seek(0); // Reset the result pointer
-                    while ($row = $allocationsResult->fetch_assoc()) {
-                        echo "<option value='" . $row["allocationName"] . "'>" . $row["allocationName"] . "</option>";
-                    }
-                    ?>
-                </select>
                 <div class="d-flex">
                     <input type="text" class="form-control me-2" id="donationIDInput" placeholder="Search Donation ID">
                     <button class="btn btn-primary" onclick="searchByDonationID()"><i class="bi bi-search"></i></button>
@@ -183,6 +180,7 @@ $total_rows = $counts['total'];
                     <th>Status</th>
                     <th>Receipt</th>
                     <th colspan='2' style="text-align:center;">Action</th>
+                    <th>Update</th>
                 </tr>
             </thead>
             <tbody>
@@ -231,26 +229,25 @@ $total_rows = $counts['total'];
                             case 'pending':
                                 echo "<a href='DonationAccept.php?donationID=" . $row["donationID"] . "'  
                                 class='btn btn-success btn-mini-column smaller-button btn-accept'>✓ Accept</a>";  //add alert this donationID is Accepted
-                                echo "<a href='DonationReject.php?donationID=" . $row["donationID"] . "' 
-                                class='btn btn-danger btn-mini-column smaller-button btn-reject'>✗ Reject</a>";   //add alert this donationID is Rejected
                                 break;
                             case 'Accepted':
                                 echo "<a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' 
                                 class='btn btn-secondary btn-mini-column smaller-button btn-generate'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a>";
                                 break;
-                            case 'Rejected':
-                                echo "<button class='btn btn-secondary btn-mini-column smaller-button' disabled>Rejected</button>";
-                                break;
                             default:
+                                echo "N/A";
                                 break;
                         }
                         echo "</td>";
 
+                        // Add the update button here with adjusted width and icon
+                        echo "<td colspan='2' style='text-align:center;'><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' 
+                        class='btn btn-primary btn-update'><i class='bi bi-pencil'></i></a></td>";
                         echo "</tr>";
                         $count++; // Increment the counter
                     }
                 } else {
-                    echo "<tr><td colspan='8'>No donation records found</td></tr>";
+                    echo "<tr><td colspan='10'>No donation records found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -271,10 +268,6 @@ $total_rows = $counts['total'];
         // JavaScript functions for filtering donations
         function showAccepted() {
             filterByStatus('Accepted');
-        }
-
-        function showRejected() {
-            filterByStatus('Rejected');
         }
 
         function showPending() {
@@ -298,40 +291,20 @@ $total_rows = $counts['total'];
             }
         }
 
-        // JavaScript function to filter donations by allocation name
-        function filterByAllocation() {
-            var selectedAllocation = document.getElementById("allocationSelect").value.trim().toLowerCase();
-            var table = document.getElementById("donationTable");
-            var rows = table.getElementsByTagName("tr");
-
-            for (var i = 1; i < rows.length; i++) {
-                var allocationCell = rows[i].getElementsByTagName("td")[2];
-
-                if (allocationCell) {
-                    var textValue = allocationCell.textContent || allocationCell.innerText;
-
-                    if (selectedAllocation === "" || textValue.trim().toLowerCase() === selectedAllocation) {
-                        rows[i].style.display = "";
-                    } else {
-                        rows[i].style.display = "none";
-                    }
-                }
-            }
-        }
-
-        // JavaScript function to filter donations by donation ID
+    
+        // JavaScript function to search donations by ID
         function searchByDonationID() {
-            var donationIDInput = document.getElementById("donationIDInput").value.trim().toLowerCase();
+            var input = document.getElementById("donationIDInput").value.trim().toLowerCase();
             var table = document.getElementById("donationTable");
             var rows = table.getElementsByTagName("tr");
 
             for (var i = 1; i < rows.length; i++) {
-                var donationIDCell = rows[i].getElementsByTagName("td")[1];
+                var idCell = rows[i].getElementsByTagName("td")[1];
 
-                if (donationIDCell) {
-                    var textValue = donationIDCell.textContent || donationIDCell.innerText;
+                if (idCell) {
+                    var textValue = idCell.textContent || idCell.innerText;
 
-                    if (donationIDInput === "" || textValue.trim().toLowerCase().includes(donationIDInput)) {
+                    if (input === "" || textValue.trim().toLowerCase() === input) {
                         rows[i].style.display = "";
                     } else {
                         rows[i].style.display = "none";
@@ -340,11 +313,6 @@ $total_rows = $counts['total'];
             }
         }
     </script>
-
 </body>
 
 </html>
-
-<?php
-$conn->close();
-?>

@@ -167,95 +167,6 @@ $conn->close();
                 width: 100%;
             }
         }
-
-        .summary-donation {
-            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: left;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .summary-icon {
-            height: 50px;
-            margin-right: 20px;
-        }
-
-        .summary-content {
-            flex: 1;
-            padding-left: 20px;
-            /* Add padding for better alignment */
-        }
-
-        .summary-donation h3 {
-            font-size: 20px;
-            margin-bottom: 5px;
-            color: white;
-        }
-
-        .summary-donation p {
-            font-size: 18px;
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .summary-donation a.btn {
-            background-color: white;
-            color: #007bff;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .summary-donation a.btn:hover {
-            background-color: #0056b3;
-            color: white;
-        }
-
-        .summary-count {
-            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto;
-            width: 80%;
-            max-width: 500px;
-            color: white;
-        }
-        .summary-icon {
-            height: 50px;
-            margin-right: 20px;
-        }
-
-        .summary-content {
-            padding-left: 20px;
-            text-align: left;
-            flex: 1;
-        }
-
-        .summary-content p {
-            font-size: 18px;
-            color: white;
-            margin-bottom: 10px;
-        }
-
-        .summary-content a.btn {
-            background-color: white;
-            color: #007bff;
-            transition: background-color 0.3s ease, color 0.3s ease;
-        }
-
-        .summary-content a.btn:hover {
-            background-color: #0056b3;
-            color: white;
-        }
     </style>
 
 </head>
@@ -269,19 +180,20 @@ $conn->close();
         <img src="images/staffHeader.png" alt="Manager Header Image">
     </div>
 
-    <div class="summary-count">
-        <img src="images/reportIcon.png" alt="Report Icon" class="summary-icon">
-        <div class="summary-content"><br>
-            <p>Approved Donations: <?php echo $acceptedDonationCount; ?> | RM<?php echo number_format($totalAcceptedAmount, 2); ?> Collected </p>
-        </div>
-        <a href="DonationView.php" class="btn btn-primary">View</a>
-    </div>
-
     <div class="summary">
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>ALLOCATIONS</h3>
+                <h3>Donations</h3>
+                <p><?php echo $acceptedDonationCount; ?></p>
+                <s>RM<?php echo number_format($totalAcceptedAmount, 2); ?> Collected</s>
+                <a href="DonationView.php" class="btn btn-primary">View</a>
+            </div>
+        </div>
+        <div class="summary-box">
+            <img src="images/reportIcon.png" alt="Report Icon">
+            <div>
+                <h3>Allocations</h3>
                 <p><?php echo $allocationCount; ?></p>
                 <a href="AllocationView.php" class="btn btn-primary">View</a>
             </div>
@@ -289,7 +201,7 @@ $conn->close();
         <div class="summary-box">
             <img src="images/reportIcon.png" alt="Report Icon">
             <div>
-                <h3>DONORS</h3>
+                <h3>Donors</h3>
                 <p><?php echo $donorCount; ?></p>
                 <a href="DonorView.php" class="btn btn-primary">View</a>
             </div>
