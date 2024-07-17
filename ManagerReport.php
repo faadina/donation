@@ -15,24 +15,16 @@ $username = $_SESSION['username'];
 // Fetch the user details from the database
 $sql = "SELECT managerID, managerName, managerPhoneNo, managerEmail FROM manager WHERE managerID = ?";
 if ($stmt = mysqli_prepare($conn, $sql)) {
-    // Bind variables to the prepared statement as parameters
     mysqli_stmt_bind_param($stmt, "s", $param_username);
-
-    // Set parameters
     $param_username = $username;
 
-    // Attempt to execute the prepared statement
     if (mysqli_stmt_execute($stmt)) {
-        // Store result
         mysqli_stmt_store_result($stmt);
 
-        // Check if the user exists, if yes then fetch the details
         if (mysqli_stmt_num_rows($stmt) == 1) {
-            // Bind result variables
             mysqli_stmt_bind_result($stmt, $id, $name, $phone, $email);
             mysqli_stmt_fetch($stmt);
         } else {
-            // User doesn't exist
             echo "User doesn't exist.";
             exit;
         }
@@ -41,12 +33,21 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
         exit;
     }
 
-    // Close statement
     mysqli_stmt_close($stmt);
 }
 
-// Fetch report data from the database
-$sql = "SELECT reportID, reportName FROM report WHERE managerID = ?";
+// Determine which type of report to fetch
+$reportType = isset($_GET['reportType']) ? $_GET['reportType'] : 'all';
+
+// Fetch report data from the database based on the selected report type
+if ($reportType == 'donation') {
+    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ? AND reportType = 'Donation Allocation Report'";
+} elseif ($reportType == 'monthly') {
+    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ? AND reportType = 'Monthly Donation Report'";
+} else {
+    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ?";
+}
+
 if ($stmt = mysqli_prepare($conn, $sql)) {
     mysqli_stmt_bind_param($stmt, "s", $param_managerID);
     $param_managerID = $username;
@@ -59,18 +60,15 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
             exit;
         }
 
-        // Count total reports
         $totalReports = mysqli_num_rows($result);
     } else {
         echo "Error preparing the statement.";
         exit;
     }
 
-    // Close statement
     mysqli_stmt_close($stmt);
 }
 
-// Close connection
 mysqli_close($conn);
 ?>
 <!DOCTYPE html>
@@ -83,9 +81,9 @@ mysqli_close($conn);
     <link rel="stylesheet" href="donor/style.css">
     <title>Manager Dashboard</title>
     <style>
-        body { 
-            background-color: whitesmoke; /* Dark Cyan Theme Background */
-            color: #FFFFFF; /* White text for contrast */
+        body {
+            background-color: whitesmoke;
+            color: #FFFFFF;
         }
 
         .detailIndex {
@@ -167,7 +165,7 @@ mysqli_close($conn);
             filter: drop-shadow(1px 1px 2px rgba(244, 242, 239, 0.8));
         }
 
-        .btn {
+        .btn_report {
             text-decoration: none;
             color: #1f244a;
             background-color: #ffc107;
@@ -178,8 +176,19 @@ mysqli_close($conn);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
+        .btn_view {
+            text-decoration: none;
+            color: #1f244a;
+            background-color: whitesmoke;
+            padding: 5px 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            display: inline-block;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
         .generate-report {
-            margin-left: 1120px;           
+            margin-left: 1120px;
             margin-top: 20px;
         }
 
@@ -188,13 +197,36 @@ mysqli_close($conn);
             margin-bottom: 20px;
             color: black;
         }
+
+        .filter-buttons {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .filter-buttons a {
+            text-decoration: none;
+            color: white;
+            background-color: #1f244a;
+            padding: 10px 20px;
+            margin: 0 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-buttons a:hover {
+            background-color: #ffc107;
+            color: #1f244a;
+        }
     </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
 
 <body>
-    <?php
-    include('managerHeader.php');
-    ?>
+    <?php include('managerHeader.php'); ?>
 
     <div class="detailIndex">
         <h2>REPORT</h2>
@@ -204,8 +236,13 @@ mysqli_close($conn);
         echo "<p>Total Reports: " . $totalReports . "</p>";
         ?>
     </div>
+    <div class="filter-buttons">
+        <a href="?reportType=all">All Reports</a>
+        <a href="?reportType=donation">Donation Allocation Reports</a>
+        <a href="?reportType=monthly">Monthly Donation Reports</a>
+    </div>
     <div class="generate-report">
-        <a href="ManagerGenerateReport.php" class="btn">Generate Report</a>
+        <a href="ManagerGenerateReport.php" class="btn_report">Generate Report</a>
     </div>
     <div class="summary">
         <?php
@@ -217,17 +254,67 @@ mysqli_close($conn);
                 echo '<img src="images/reportIcon.png" alt="Report Icon">';
                 echo '<div>';
                 echo '<h3>' . htmlspecialchars($row["reportName"]) . '</h3>';
-                echo '<a href="ViewReport.php?reportID=' . urlencode($row["reportID"]) . '" class="btn">View Report</a>';
+                echo '<a href="ViewReport.php?reportID=' . urlencode($row["reportID"]) . '" class="btn_view">View Report</a>';
+                echo '<button class="btn btn-danger" onclick="showDeleteModal(' . htmlspecialchars(json_encode($row["reportID"])) . ')">Delete</button>';
                 echo '</div>';
                 echo '</div>';
-                echo '</div>'; // card-footer
-                echo '</div>'; // card
+                echo '</div>'; 
+                echo '</div>'; 
             }
         } else {
             echo "<p>No Report found</p>";
         }
         ?>
     </div>
+
+      <!-- Delete Modal -->
+      <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirm Delete Report</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to delete this report?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showDeleteModal(reportID) {
+            $('#confirmDeleteButton').data('reportid', reportID);
+            $('#deleteModal').modal('show');
+        }
+
+        $('#confirmDeleteButton').click(function() {
+            var reportID = $(this).data('reportid');
+
+            $.ajax({
+                url: 'deleteReport.php',
+                type: 'POST',
+                data: { id: reportID },
+                success: function(response) {
+                    if (response === 'success') {
+                        $('#deleteModal').modal('hide');
+                        location.reload();
+                    } else {
+                        alert('Error deleting report.');
+                    }
+                },
+                error: function() {
+                    alert('Error deleting report.');
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

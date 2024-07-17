@@ -12,6 +12,7 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
+
 // Fetch the user details from the database
 $sql = "SELECT managerID, managerName, managerPhoneNo, managerEmail FROM manager WHERE managerID = ?";
 if ($stmt = mysqli_prepare($conn, $sql)) {
@@ -181,54 +182,67 @@ mysqli_close($conn);
     </div>
 
     <script>
-        <?php
-        include 'dbConnect.php';
+    <?php
+    include 'dbConnect.php';
 
-        // Fetch monthly donations
-        $sql = "SELECT 
-                    DATE_FORMAT(donationDate, '%M') AS month,
-                    SUM(donationAmount) AS donationAmount
-                FROM 
-                    donation
-                WHERE 
-                    YEAR(donationDate) = 2024
-                GROUP BY 
-                    month
-                ORDER BY 
-                    STR_TO_DATE(CONCAT('0001 ', month, ' 01'), '%Y %M %d')";
-        $result = $conn->query($sql);
+    // Fetch monthly donations
+    $sql = "SELECT 
+                DATE_FORMAT(donationDate, '%M') AS month,
+                SUM(donationAmount) AS donationAmount
+            FROM 
+                donation
+            WHERE 
+                YEAR(donationDate) = 2024
+            GROUP BY 
+                month
+            ORDER BY 
+                STR_TO_DATE(CONCAT('0001 ', month, ' 01'), '%Y %M %d')";
+    $result = $conn->query($sql);
 
-        $months = [];
-        $amounts = [];
+    $months = [];
+    $amounts = [];
 
-        while ($row = $result->fetch_assoc()) {
-            $months[] = $row['month'];
-            $amounts[] = $row['donationAmount'];
-        }
-        ?>
+    while ($row = $result->fetch_assoc()) {
+        $months[] = $row['month'];
+        $amounts[] = $row['donationAmount'];
+    }
+    ?>
 
-        const ctx = document.getElementById('donationChart').getContext('2d');
-        const donationChart = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: <?php echo json_encode($months); ?>,
-                datasets: [{
-                    label: 'Donation Amount (RM)',
-                    data: <?php echo json_encode($amounts); ?>,
-                    backgroundColor: '#264d26',
-                    borderColor: 'grey',
-                    borderWidth: 1
-                }]
-            },
-            options: {
-                scales: {
-                    y: {
-                        beginAtZero: true
+const ctx = document.getElementById('donationChart').getContext('2d');
+    const donationChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <?php echo json_encode($months); ?>,
+            datasets: [{
+                label: 'Donation Amount (RM)',
+                data: <?php echo json_encode($amounts); ?>,
+                backgroundColor: '#264d26',
+                borderColor: 'grey',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    ticks: {
+                        // Include only one tick value
+                        stepSize: <?php echo max($amounts); ?>, // Set step size to the max amount
+                        callback: function(value, index, values) {
+                            // Format the tick value as needed
+                            return value ; // Example formatting
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Donation Amount (RM)'
                     }
                 }
             }
-        });
-    </script>
+        }
+    });
+</script>
+
+
 </body>
 
 </html>

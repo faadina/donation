@@ -46,7 +46,7 @@ if ($result) {
 
 // Fetch distinct donation months from the Donation table for dropdown
 $reportMonthOptions = "";
-$sql = "SELECT DISTINCT DATE_FORMAT(donationDate, '%Y-%m') AS reportMonth FROM Donation ORDER BY reportMonth";
+$sql = "SELECT DISTINCT DATE_FORMAT(donationDate, '%Y-%M') AS reportMonth FROM Donation ORDER BY reportMonth";
 $result = $conn->query($sql);
 
 if ($result) {
@@ -59,7 +59,6 @@ if ($result) {
 $reportID = generateReportID();
 $reportType = "";
 $reportName = "";
-$reportDate = "";
 $reportMonth = "";
 $allocationID = ""; // Initialize allocation ID to be empty
 
@@ -70,13 +69,12 @@ $donationIDs = "";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $reportType = $_POST["reportType"];
     $reportName = $_POST["reportName"];
-    $reportDate = $_POST["reportDate"];
     $reportMonth = $_POST["reportMonth"];
     
     // Handle allocation ID based on report type
     if ($reportType === 'Monthly Donation Report') {
         // Fetch donation IDs for the selected report month
-        $sql = "SELECT donationID FROM Donation WHERE DATE_FORMAT(donationDate, '%Y-%m') = ?";
+        $sql = "SELECT donationID FROM Donation WHERE DATE_FORMAT(donationDate, '%Y-%M') = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $reportMonth);
         $stmt->execute();
@@ -94,6 +92,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Retrieve managerID from session
     $managerID = $_SESSION['username'];
+
+    // Get the current date
+    $reportDate = date('Y-m-d');
 
     // Prepare and execute the INSERT statement
     $sql = "INSERT INTO Report (reportID, reportType, reportName, reportDate, managerID, allocationID, reportMonth)
@@ -187,15 +188,6 @@ $conn->close(); // Close database connection
                             <input type="text" class="form-control" id="reportName" name="reportName" value="<?php echo htmlspecialchars($reportName); ?>" required>
                         </div>
 
-                        <div class="row">
-                            <div class="col-md-6">
-                                <div class="mb-3">
-                                    <label for="reportDate" class="form-label">Report Date</label>
-                                    <input type="date" class="form-control" id="reportDate" name="reportDate" value="<?php echo htmlspecialchars(date('Y-m-d')); ?>" required>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="mb-3" id="reportMonthField" style="display:none;">
                             <label for="reportMonth" class="form-label">Report Month</label>
                             <select class="form-control" id="reportMonth" name="reportMonth">
@@ -209,8 +201,6 @@ $conn->close(); // Close database connection
                                 <?php echo $allocationOptions; ?>
                             </select>
                         </div>
-
-                
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>
