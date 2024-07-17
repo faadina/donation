@@ -192,7 +192,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                 <select class="form-control" id="donationStatus" name="donationStatus" required>
                                     <option value="pending" <?php if ($donationStatus == 'pending') echo 'selected'; ?>>pending</option>
                                     <option value="Accepted" <?php if ($donationStatus == 'Accepted') echo 'selected'; ?>>Accepted</option>
-                                    <option value="Rejected" <?php if ($donationStatus == 'Rejected') echo 'selected'; ?>>Rejected</option>
                                 </select>
                             </div>
                             <div class="mb-3">
