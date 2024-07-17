@@ -12,29 +12,8 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
-// Fetch the user details from the database
-$sql = "SELECT managerID, managerName, managerPhoneNo, managerEmail FROM manager WHERE managerID = ?";
-if ($stmt = mysqli_prepare($conn, $sql)) {
-    mysqli_stmt_bind_param($stmt, "s", $param_username);
-    $param_username = $username;
-
-    if (mysqli_stmt_execute($stmt)) {
-        mysqli_stmt_store_result($stmt);
-
-        if (mysqli_stmt_num_rows($stmt) == 1) {
-            mysqli_stmt_bind_result($stmt, $id, $name, $phone, $email);
-            mysqli_stmt_fetch($stmt);
-        } else {
-            echo "User doesn't exist.";
-            exit;
-        }
-    } else {
-        echo "Oops! Something went wrong. Please try again later.";
-        exit;
-    }
-
-    mysqli_stmt_close($stmt);
-}
+// Initialize an empty array to store report data
+$reportData = array();
 
 // Determine which type of report to fetch
 $reportType = isset($_GET['reportType']) ? $_GET['reportType'] : 'all';
@@ -55,14 +34,16 @@ if ($stmt = mysqli_prepare($conn, $sql)) {
     if (mysqli_stmt_execute($stmt)) {
         $result = mysqli_stmt_get_result($stmt);
 
-        if ($result === false) {
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $reportData[] = $row;
+            }
+        } else {
             echo "Error fetching reports.";
             exit;
         }
-
-        $totalReports = mysqli_num_rows($result);
     } else {
-        echo "Error preparing the statement.";
+        echo "Error executing statement.";
         exit;
     }
 
@@ -77,95 +58,36 @@ mysqli_close($conn);
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="initial-scale=1.0">
-    <link rel="stylesheet" href="donor/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manager Dashboard</title>
     <style>
         body {
             background-color: whitesmoke;
             color: #FFFFFF;
+            font-family: Arial, sans-serif;
         }
 
-        .detailIndex {
-            margin: 2% auto;
-            padding: 10px;
-            position: relative;
-            z-index: 1;
-        }
-
-        .detailIndex h1 {
-            font-size: 50px;
-            color: #1a1649;
-            margin-bottom: 3px;
-            text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .detailIndex h2 {
-            font-size: 35px;
-            color: #1a1649;
-            margin-bottom: 1%;
-            text-shadow: 2px 3px 1px rgba(130, 9, 9, 0.1);
-            text-align: center;
-            font-weight: 700;
-        }
-
-        .detailIndex p {
-            color: #1a5172;
-            line-height: 22px;
-            text-align: center;
-        }
-
-        .summary {
-            margin-top: 20px;
-            padding: 10px;
-            border: 1px transparent #ccc;
-            color: white;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-
-        .summary-box {
-            display: flex;
-            align-items: center;
-            margin: 15px;
-            padding: 20px;
-            border: 1px transparent #ccc;
-            background-color: #4d4855;
-            background-image: linear-gradient(147deg, #4d4855 0%, #000000 74%);
-            text-align: left;
+        table {
             width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
         }
 
-        .summary-box img {
-            margin-right: 15px;
-            height: 80px;
+        table,
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
         }
 
-        .summary-box div {
-            text-align: center;
+        th {
+            background-color: #f2f2f2;
+            color: black;
         }
 
-        .summary-box p {
-            font-size: 35px;
-            font-weight: bold;
-            margin-bottom: 0;
-        }
-
-        .summary-box h3 {
-            font-size: 15px;
-        }
-
-        .summary-box:hover {
-            transform: translateY(-10px);
-            border-top-left-radius: 15px;
-            border-bottom-left-radius: 15px;
-            filter: drop-shadow(1px 1px 2px rgba(244, 242, 239, 0.8));
-        }
-
-        .btn_report {
+        .btn_report,
+        .btn_view {
             text-decoration: none;
             color: #1f244a;
             background-color: #ffc107;
@@ -176,31 +98,19 @@ mysqli_close($conn);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
-        .btn_view {
-            text-decoration: none;
-            color: #1f244a;
-            background-color: whitesmoke;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: inline-block;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .btn_report:hover,
+        .btn_view:hover {
+            background-color: #ffd000;
         }
 
         .generate-report {
-            margin-left: 1120px;
-            margin-top: 20px;
-        }
-
-        .total-reports {
-            text-align: center;
-            margin-bottom: 20px;
-            color: black;
+            text-align: right;
+            margin-right: 20px;
+            margin-top: 10px;
         }
 
         .filter-buttons {
-            display: flex;
-            justify-content: center;
+            text-align: center;
             margin-bottom: 20px;
         }
 
@@ -219,8 +129,13 @@ mysqli_close($conn);
             color: #1f244a;
         }
     </style>
+    <!-- Ensure jQuery is included before any scripts -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <!-- Ensure Bootstrap CSS is included -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <!-- Ensure Popper.js and Bootstrap JS are included -->
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
@@ -228,47 +143,42 @@ mysqli_close($conn);
 <body>
     <?php include('managerHeader.php'); ?>
 
-    <div class="detailIndex">
-        <h2>REPORT</h2>
+    <h2 style="text-align: center;">REPORTS</h2>
+
+    <div class="generate-report">
+        <a href="ManagerGenerateReport.php" class="btn_report">Generate Report</a>
     </div>
-    <div class="total-reports">
-        <?php
-        echo "<p>Total Reports: " . $totalReports . "</p>";
-        ?>
-    </div>
+
     <div class="filter-buttons">
         <a href="?reportType=all">All Reports</a>
         <a href="?reportType=donation">Donation Allocation Reports</a>
         <a href="?reportType=monthly">Monthly Donation Reports</a>
     </div>
-    <div class="generate-report">
-        <a href="ManagerGenerateReport.php" class="btn_report">Generate Report</a>
-    </div>
-    <div class="summary">
-        <?php
-        if ($result->num_rows > 0) {
-            while ($row = $result->fetch_assoc()) {
-                echo '<div class="summary">';
-                echo '<div class="card-content">';
-                echo '<div class="summary-box" style="background-color:#2a3f45">';
-                echo '<img src="images/reportIcon.png" alt="Report Icon">';
-                echo '<div>';
-                echo '<h3>' . htmlspecialchars($row["reportName"]) . '</h3>';
-                echo '<a href="ViewReport.php?reportID=' . urlencode($row["reportID"]) . '" class="btn_view">View Report</a>';
-                echo '<button class="btn btn-danger" onclick="showDeleteModal(' . htmlspecialchars(json_encode($row["reportID"])) . ')">Delete</button>';
-                echo '</div>';
-                echo '</div>';
-                echo '</div>'; 
-                echo '</div>'; 
-            }
-        } else {
-            echo "<p>No Report found</p>";
-        }
-        ?>
-    </div>
 
-      <!-- Delete Modal -->
-      <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
+    <table>
+        <thead>
+            <tr>
+                <th>Report ID</th>
+                <th>Report Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($reportData as $report) : ?>
+                <tr>
+                    <td><?php echo htmlspecialchars($report['reportID']); ?></td>
+                    <td><?php echo htmlspecialchars($report['reportName']); ?></td>
+                    <td>
+                        <a href="ViewReport.php?reportID=<?php echo urlencode($report['reportID']); ?>" class="btn_view">View Report</a>
+                        <button class="btn btn-danger" onclick="showDeleteModal('<?php echo htmlspecialchars(json_encode($report['reportID'])); ?>')">Delete</button>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -287,6 +197,11 @@ mysqli_close($conn);
             </div>
         </div>
     </div>
+    <!-- Include Bootstrap JS for modal functionality -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+
 
     <script>
         function showDeleteModal(reportID) {
@@ -297,6 +212,7 @@ mysqli_close($conn);
         $('#confirmDeleteButton').click(function() {
             var reportID = $(this).data('reportid');
 
+            // AJAX call to deleteReport.php
             $.ajax({
                 url: 'deleteReport.php',
                 type: 'POST',
@@ -304,7 +220,7 @@ mysqli_close($conn);
                 success: function(response) {
                     if (response === 'success') {
                         $('#deleteModal').modal('hide');
-                        location.reload();
+                        location.reload(); // Reload the page to update the report list
                     } else {
                         alert('Error deleting report.');
                     }
