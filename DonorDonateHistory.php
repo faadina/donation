@@ -8,6 +8,14 @@ if (!isset($_SESSION['username'])) {
 }
 
 $donorID = $_SESSION['username'];
+$recordsPerPage = 10;
+
+// Get the current page number from the URL, default to 1 if not set
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$offset = ($page - 1) * $recordsPerPage;
+
+// Get the search query if set
+$search = isset($_GET['search']) ? $_GET['search'] : '';
 
 // Establish database connection
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -15,14 +23,42 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-// Prepare SQL statement to fetch donation history
-$stmt = $conn->prepare("
+// Prepare the base SQL query
+$sql = "
     SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.donationReceipt, a.allocationName 
     FROM Donation d 
     JOIN Allocation a ON d.allocationID = a.allocationID 
     WHERE d.donorID = ?
-");
-$stmt->bind_param('s', $donorID);
+";
+
+// Add search condition if a search query is provided
+if ($search) {
+    $sql .= " AND a.allocationName LIKE ?";
+}
+
+// Get the total number of donations
+$totalStmt = $conn->prepare("SELECT COUNT(*) as total FROM ($sql) as totalDonations");
+if ($search) {
+    $searchParam = "%$search%";
+    $totalStmt->bind_param('ss', $donorID, $searchParam);
+} else {
+    $totalStmt->bind_param('s', $donorID);
+}
+$totalStmt->execute();
+$totalResult = $totalStmt->get_result();
+$totalRow = $totalResult->fetch_assoc();
+$totalDonations = $totalRow['total'];
+$totalPages = ceil($totalDonations / $recordsPerPage);
+
+// Prepare SQL statement to fetch donation history with limit and offset
+$sql .= " ORDER BY d.donationID DESC LIMIT ? OFFSET ?";
+$stmt = $conn->prepare($sql);
+
+if ($search) {
+    $stmt->bind_param('ssii', $donorID, $searchParam, $recordsPerPage, $offset);
+} else {
+    $stmt->bind_param('sii', $donorID, $recordsPerPage, $offset);
+}
 $stmt->execute();
 
 // Get result set from the executed SQL query
@@ -30,7 +66,7 @@ $result = $stmt->get_result();
 
 // Initialize counter for accepted donations
 $acceptedCount = 0;
-$countDonation = $result->num_rows; // Total number of donations
+$countDonation = $result->num_rows; // Total number of donations on the current page
 
 // Iterate through donation records
 while ($row = $result->fetch_assoc()) {
@@ -40,6 +76,7 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -151,6 +188,32 @@ while ($row = $result->fetch_assoc()) {
             color: inherit;
             /* or any other styling you want for pending */
         }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .pagination a {
+            color: #333;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: background-color 0.3s;
+            margin: 0 2px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .pagination a.active {
+            background-color: #333;
+            color: white;
+            border: 1px solid #333;
+        }
+
+        .pagination a:hover:not(.active) {
+            background-color: #ddd;
+        }
     </style>
 </head>
 
@@ -161,10 +224,17 @@ while ($row = $result->fetch_assoc()) {
         <div class="titleTable">
             <h2>Donation History</h2>
         </div>
+        <form method="GET" action="" class="d-flex align-items-center">
+    <input type="text" name="search" class="form-control me-2" placeholder="Search Allocation Name" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+    <button type="submit" class="btn btn-outline-primary">
+        <i class="bi bi-search"></i>
+    </button>
+</form>
+
         <div class="headertable">
             <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3>
             <div style="background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%); color:white; border-radius:8px; padding:2px 9px;">
-                <p>Donations: <b><?php echo $countDonation; ?></b> | Accepted: <b><?php echo $acceptedCount; ?></b></p>
+                <p>Donations: <b><?php echo $totalDonations; ?></b> | Accepted: <b><?php echo $acceptedCount; ?></b></p>
             </div>
         </div>
 
@@ -216,6 +286,13 @@ while ($row = $result->fetch_assoc()) {
                     <?php endwhile; ?>
                 </tbody>
             </table>
+
+            <!-- Pagination Links -->
+            <div class="pagination">
+                <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
+                    <a href="?page=<?php echo $i; ?>" class="<?php echo ($i === $page) ? 'active' : ''; ?>"><?php echo $i; ?></a>
+                <?php endfor; ?>
+            </div>
         </div>
     </div>
 

@@ -11,29 +11,21 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 require_once("dbConnect.php");
 
 // Pagination variables
-$limit = 10; // Number of records per page
+$results_per_page = 10; // Number of records per page
+if (!isset($_GET['page'])) {
+    $page = 1;
+} else {
+    $page = $_GET['page'];
+}
+$start_from = ($page - 1) * $results_per_page;
 
-// Calculate total pages
-$countSql = "SELECT COUNT(*) as total FROM Donation";
-$countResult = $conn->query($countSql);
-$total_rows = $countResult->fetch_assoc()['total'];
-$total_pages = ceil($total_rows / $limit);
-
-// Current page calculation
-$current_page = isset($_GET['page']) ? $_GET['page'] : 1;
-$start = ($current_page - 1) * $limit;
-
-// Fetch donation records with pagination and sorting
+// Fetch donation records with sorting and pagination
 $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID
-        ORDER BY d.donationDate DESC
-        LIMIT $start, $limit";
+        ORDER BY d.donationID DESC
+        LIMIT $start_from, $results_per_page";
 $result = $conn->query($sql);
-
-// Fetch allocation names for the dropdown
-$allocationsSql = "SELECT allocationID, allocationName FROM Allocation";
-$allocationsResult = $conn->query($allocationsSql);
 
 // Fetch counts for filtering buttons
 $countSql = "SELECT 
@@ -44,13 +36,13 @@ $countSql = "SELECT
 $countResult = $conn->query($countSql);
 $counts = $countResult->fetch_assoc();
 
-// Fetch total count of donation records
-$total_rows = $counts['total'];
+// Fetch allocation names for the dropdown
+$allocationsSql = "SELECT allocationID, allocationName FROM Allocation";
+$allocationsResult = $conn->query($allocationsSql);
 ?>
 
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -145,7 +137,6 @@ $total_rows = $counts['total'];
         }
     </style>
 </head>
-
 <body>
     <?php include('staffHeader.php'); ?>
 
@@ -186,16 +177,16 @@ $total_rows = $counts['total'];
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
-                    $count = $start + 1;  // Initialize a counter
+                    $count = ($page - 1) * $results_per_page + 1; // Initialize a counter based on current page
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
-                        echo "<td>" . $count . "</td>"; // Display the row number
+                        echo "<td>" . $count . "</td>";
                         echo "<td>" . $row["donationID"] . "</td>";
                         echo "<td>" . $row["allocationName"] . "</td>";
                         echo "<td>" . $row["donationAmount"] . "</td>";
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
 
-                        // Check the donation status and display corresponding styles
+                        // Display status with color coding
                         $statusColor = '';
                         switch ($row["donationStatus"]) {
                             case 'pending':
@@ -213,8 +204,8 @@ $total_rows = $counts['total'];
                         }
                         echo "<td style='color: " . $statusColor . "; font-weight: bold;'>" . $row["donationStatus"] . "</td>";
 
-                        // Displaying receipt with a link to view PDF
-                        echo "<td style='text-align: center;'>"; // Center-align the content in the table cell
+                        // Display receipt with link to view PDF
+                        echo "<td style='text-align: center;'>";
                         if (!empty($row["donationReceipt"])) {
                             echo "<a href='" . htmlspecialchars($row["donationReceipt"]) . "' 
                             target='_blank' class='btn btn-primary btn-mini-column smaller-button'>⌞view⌝</a>";
@@ -223,12 +214,12 @@ $total_rows = $counts['total'];
                         }
                         echo "</td>";
 
-                        // Display actions based on donation status
+                        // Actions based on donation status
                         echo "<td colspan='2' style='text-align:center;'>";
                         switch ($row["donationStatus"]) {
                             case 'pending':
                                 echo "<a href='DonationAccept.php?donationID=" . $row["donationID"] . "'  
-                                class='btn btn-success btn-mini-column smaller-button btn-accept'>✓ Accept</a>";  //add alert this donationID is Accepted
+                                class='btn btn-success btn-mini-column smaller-button btn-accept'>✓ Accept</a>";
                                 break;
                             case 'Accepted':
                                 echo "<a href='DonationGenerateReceipt.php?donationID=" . $row["donationID"] . "' 
@@ -240,11 +231,11 @@ $total_rows = $counts['total'];
                         }
                         echo "</td>";
 
-                        // Add the update button here with adjusted width and icon
+                        // Update button
                         echo "<td colspan='2' style='text-align:center;'><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' 
                         class='btn btn-primary btn-update'><i class='bi bi-pencil'></i></a></td>";
                         echo "</tr>";
-                        $count++; // Increment the counter
+                        $count++; // Increment counter
                     }
                 } else {
                     echo "<tr><td colspan='10'>No donation records found</td></tr>";
@@ -253,20 +244,26 @@ $total_rows = $counts['total'];
             </tbody>
         </table>
 
-        <nav aria-label="Page navigation">
+        <!-- Pagination links -->
+        <nav aria-label="Page navigation example">
             <ul class="pagination justify-content-center">
-                <?php for ($page = 1; $page <= $total_pages; $page++) : ?>
-                    <li class="page-item <?php if ($page == $current_page) echo 'active'; ?>">
-                        <a class="page-link" href="?page=<?php echo $page; ?>"><?php echo $page; ?></a>
-                    </li>
-                <?php endfor; ?>
+                <?php
+                $total_pages = ceil($counts['total'] / $results_per_page);
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "'>" . $i . "</a></li>";
+                }
+                ?>
             </ul>
         </nav>
     </div>
 
+    <!-- JavaScript libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
-        // JavaScript functions for filtering donations
-        function showAccepted() {
+        
+ // JavaScript functions for filtering donations
+ function showAccepted() {
             filterByStatus('Accepted');
         }
 
@@ -291,28 +288,16 @@ $total_rows = $counts['total'];
             }
         }
 
-    
-        // JavaScript function to search donations by ID
         function searchByDonationID() {
-            var input = document.getElementById("donationIDInput").value.trim().toLowerCase();
-            var table = document.getElementById("donationTable");
-            var rows = table.getElementsByTagName("tr");
-
-            for (var i = 1; i < rows.length; i++) {
-                var idCell = rows[i].getElementsByTagName("td")[1];
-
-                if (idCell) {
-                    var textValue = idCell.textContent || idCell.innerText;
-
-                    if (input === "" || textValue.trim().toLowerCase() === input) {
-                        rows[i].style.display = "";
-                    } else {
-                        rows[i].style.display = "none";
-                    }
-                }
+            // Implement logic to search donation records by ID
+            // You can use AJAX if needed to update the table dynamically
+            let donationID = document.getElementById('donationIDInput').value.trim();
+            if (donationID !== '') {
+                alert('Search Donation ID: ' + donationID);
+            } else {
+                alert('Please enter a Donation ID');
             }
         }
     </script>
 </body>
-
 </html>

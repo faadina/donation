@@ -5,7 +5,6 @@ require_once("dbConnect.php");
 $username = $password = $name = $birthdate = $address = $phone = $email = "";
 $username_err = $password_err = $name_err = $birthdate_err = $address_err = $phone_err = $email_err = "";
 
-
 // Processing form data when form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate name
@@ -230,25 +229,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                 <div class="form-group">
-                    <input type="text" name="username" class="form-control" placeholder="Username" value="<?php echo $username; ?>">
+                    <label for="username">Username</label>
+                    <input type="text" name="username" id="username" class="form-control" value="<?php echo $username; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="password" name="password" class="form-control" placeholder="Password" value="<?php echo $password; ?>">
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="form-control"  value="<?php echo $password; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="text" name="name" class="form-control" placeholder="Full Name" value="<?php echo $name; ?>">
+                    <label for="name">Full Name</label>
+                    <input type="text" name="name" id="name" class="form-control"  value="<?php echo $name; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="date" name="birthdate" class="form-control" placeholder="Birthdate" value="<?php echo $birthdate; ?>">
+                    <label for="birthdate">Birthdate</label>
+                    <input type="date" name="birthdate" id="birthdate" class="form-control" placeholder="Birthdate" value="<?php echo $birthdate; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="text" name="address" class="form-control" placeholder="Address" value="<?php echo $address; ?>">
+                    <label for="address">Address</label>
+                    <input type="text" name="address" id="address" class="form-control"  value="<?php echo $address; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="tel" name="phone" class="form-control" placeholder="Phone Number" value="<?php echo $phone; ?>">
+                    <label for="phone">Phone Number</label>
+                    <input type="tel" name="phone" id="phone" class="form-control"  value="<?php echo $phone; ?>">
                 </div>
                 <div class="form-group">
-                    <input type="email" name="email" class="form-control" placeholder="Email" value="<?php echo $email; ?>">
+                    <label for="email">Email</label>
+                    <input type="email" name="email" id="email" class="form-control"  value="<?php echo $email; ?>">
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn-register">Register</button>
