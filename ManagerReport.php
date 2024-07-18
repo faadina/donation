@@ -1,6 +1,7 @@
 <?php
 session_start();
 
+// Check if user is logged in
 if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
     header("location: MainLogin.php");
     exit;
@@ -87,7 +88,8 @@ mysqli_close($conn);
         }
 
         .btn_report,
-        .btn_view {
+        .btn_view,
+        .btn_delete {
             text-decoration: none;
             color: #1f244a;
             background-color: #ffc107;
@@ -99,7 +101,8 @@ mysqli_close($conn);
         }
 
         .btn_report:hover,
-        .btn_view:hover {
+        .btn_view:hover,
+        .btn_delete:hover {
             background-color: #ffd000;
         }
 
@@ -170,67 +173,13 @@ mysqli_close($conn);
                     <td><?php echo htmlspecialchars($report['reportName']); ?></td>
                     <td>
                         <a href="ViewReport.php?reportID=<?php echo urlencode($report['reportID']); ?>" class="btn_view">View Report</a>
-                        <button class="btn btn-danger" onclick="showDeleteModal('<?php echo htmlspecialchars(json_encode($report['reportID'])); ?>')">Delete</button>
+                        <a href="deleteReport.php?reportID=<?php echo urlencode($report['reportID']); ?>" class="btn_delete" onclick="return confirm('Are you sure you want to delete this report?');">Delete</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 
-    <!-- Delete Modal -->
-    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Confirm Delete Report</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p>Are you sure you want to delete this report?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-danger" id="confirmDeleteButton">Delete</button>
-                </div>
-            </div>
-        </div>
-    </div>
-    <!-- Include Bootstrap JS for modal functionality -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-
-
-    <script>
-        function showDeleteModal(reportID) {
-            $('#confirmDeleteButton').data('reportid', reportID);
-            $('#deleteModal').modal('show');
-        }
-
-        $('#confirmDeleteButton').click(function() {
-            var reportID = $(this).data('reportid');
-
-            // AJAX call to deleteReport.php
-            $.ajax({
-                url: 'deleteReport.php',
-                type: 'POST',
-                data: { id: reportID },
-                success: function(response) {
-                    if (response === 'success') {
-                        $('#deleteModal').modal('hide');
-                        location.reload(); // Reload the page to update the report list
-                    } else {
-                        alert('Error deleting report.');
-                    }
-                },
-                error: function() {
-                    alert('Error deleting report.');
-                }
-            });
-        });
-    </script>
 </body>
 
 </html>
