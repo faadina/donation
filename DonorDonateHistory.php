@@ -268,7 +268,7 @@ while ($row = $result->fetch_assoc()) {
                     <tr>
                         <th>Donation ID</th>
                         <th>Allocation Name</th>
-                        <th>Donation Amount</th>
+                        <th>Donation Amount (RM)</th>
                         <th>Donation Date</th>
                         <th>Donation Status</th>
                         <th>Donation Receipt</th>
@@ -286,7 +286,7 @@ while ($row = $result->fetch_assoc()) {
                         echo '<td>' . htmlspecialchars($row['donationAmount']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['donationDate']) . '</td>';
                         echo '<td class="' . ($row['donationStatus'] === 'Accepted' ? 'accepted' : 'pending') . '">' . htmlspecialchars($row['donationStatus']) . '</td>';
-                        echo '<td class="center"><button class="view-receipt-btn" onclick="viewReceipt(\'' . htmlspecialchars($row['donationReceipt']) . '\')">View Receipt</button></td>';
+                        echo '<td class="center"><button class="view-receipt-btn" onclick="viewReceipt(\'' . htmlspecialchars($row['donationReceipt']) . '\')">⌞view⌝</button></td>';
                         echo '</tr>';
                     }
 

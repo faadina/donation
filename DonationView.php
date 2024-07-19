@@ -51,7 +51,6 @@ $allocationsResult = $conn->query($allocationsSql);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donation Records</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Include Bootstrap Icons library -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
         .image-preview {
@@ -92,6 +91,39 @@ $allocationsResult = $conn->query($allocationsSql);
             background-color: #f2f2f2;
         }
 
+        /* Column width adjustments */
+        .col-id {
+            width: 150px; /* Adjust width for Donation ID */
+        }
+
+        .col-allocation {
+            width: 200px; /* Adjust width for Allocation Name */
+        }
+
+        .col-amount {
+            width: 120px; /* Adjust width for Amount */
+        }
+
+        .col-date {
+            width: 150px; /* Adjust width for Date */
+        }
+
+        .col-status {
+            width: 100px; /* Adjust width for Status */
+        }
+
+        .col-receipt {
+            width: 150px; /* Adjust width for Receipt */
+        }
+
+        .col-actions {
+            width: 200px; /* Adjust width for Actions */
+        }
+
+        .col-update {
+            width: 80px; /* Adjust width for Update */
+        }
+
         .smaller-button {
             padding: 5px 10px;
             font-size: 0.9rem;
@@ -109,7 +141,6 @@ $allocationsResult = $conn->query($allocationsSql);
             font-weight: 800;
         }
 
-        /* Button styles */
         .btn-accept {
             background-color: green;
             background-image: linear-gradient(315deg, green 0%, darkgreen 74%);
@@ -125,7 +156,6 @@ $allocationsResult = $conn->query($allocationsSql);
             padding: 5px 5px;
         }
 
-        /* Adjustments for the back button */
         .btn-back {
             margin-bottom: 20px;
         }
@@ -138,6 +168,12 @@ $allocationsResult = $conn->query($allocationsSql);
             justify-content: center;
             align-items: center;
         }
+
+        .center-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -145,7 +181,6 @@ $allocationsResult = $conn->query($allocationsSql);
 
     <div class="container">
         <h2 class="page-title">Donation Records</h2>
-        <!-- Display donation records categorized by allocation names -->
 
         <!-- Buttons for filtering and dropdown for allocation -->
         <div class="mb-3 d-flex align-items-center justify-content-between">
@@ -166,21 +201,21 @@ $allocationsResult = $conn->query($allocationsSql);
         <table id="donationTable" class="table table-striped">
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th>Donation ID</th>
-                    <th>Allocation Name</th>
-                    <th>Amount (RM)</th>
-                    <th>Date</th>
-                    <th>Status</th>
-                    <th>Receipt</th>
-                    <th colspan='2' style="text-align:center;">Action</th>
-                    <th>Update</th>
+                    <th class="col-id">No</th>
+                    <th class="col-id">Donation ID</th>
+                    <th class="col-allocation">Allocation Name</th>
+                    <th class="col-amount">Amount (RM)</th>
+                    <th class="col-date">Date</th>
+                    <th class="col-status">Status</th>
+                    <th class="col-receipt">Bank Receipt</th>
+                    <th colspan='2' class="col-actions" style="text-align:center;">Action</th>
+                    <th class="col-update">Update</th>
                 </tr>
             </thead>
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
-                    $count = ($page - 1) * $results_per_page + 1; // Initialize a counter based on current page
+                    $count = ($page - 1) * $results_per_page + 1;
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
                         echo "<td>" . $count . "</td>";
@@ -235,10 +270,13 @@ $allocationsResult = $conn->query($allocationsSql);
                         echo "</td>";
 
                         // Update button
-                        echo "<td colspan='2' style='text-align:center;'><a href='DonationUpdate.php?donationID=" . $row["donationID"] . "' 
-                        class='btn btn-primary btn-update'><i class='bi bi-pencil'></i></a></td>";
+                        echo "<td class='center-btn' colspan='2'>
+                        <a href='DonationUpdate.php?donationID=" . htmlspecialchars($row["donationID"]) . "' class='btn btn-primary btn-update'>
+                            <i class='bi bi-pencil'></i>
+                        </a>
+                    </td>";
                         echo "</tr>";
-                        $count++; // Increment counter
+                        $count++;
                     }
                 } else {
                     echo "<tr><td colspan='10'>No donation records found</td></tr>";
