@@ -101,7 +101,7 @@ $allocationsResult = $conn->query($allocationsSql);
         }
 
         .col-amount {
-            width: 120px; /* Adjust width for Amount */
+            width: 200px; /* Adjust width for Amount */
         }
 
         .col-date {
@@ -121,7 +121,8 @@ $allocationsResult = $conn->query($allocationsSql);
         }
 
         .col-update {
-            width: 80px; /* Adjust width for Update */
+            width: 100px; /* Adjust width for Update */
+            vertical-align: middle; /* Ensure button is vertically centered */
         }
 
         .smaller-button {
@@ -159,14 +160,15 @@ $allocationsResult = $conn->query($allocationsSql);
         .btn-back {
             margin-bottom: 20px;
         }
-        
+
         .btn-update {
-            width: 30px;
-            height: 30px;
-            padding: 5px;
+            width: 30px; /* Adjust width for button */
+            height: px; /* Adjust height for button */
             display: flex;
             justify-content: center;
             align-items: center;
+            font-size: 1rem; /* Adjust font size */
+            padding: 0;
         }
 
         .center-btn {
@@ -204,7 +206,7 @@ $allocationsResult = $conn->query($allocationsSql);
                     <th class="col-id">No</th>
                     <th class="col-id">Donation ID</th>
                     <th class="col-allocation">Allocation Name</th>
-                    <th class="col-amount">Amount (RM)</th>
+                    <th class="col-amount">Donation Amount (RM)</th>
                     <th class="col-date">Date</th>
                     <th class="col-status">Status</th>
                     <th class="col-receipt">Bank Receipt</th>
@@ -270,11 +272,11 @@ $allocationsResult = $conn->query($allocationsSql);
                         echo "</td>";
 
                         // Update button
-                        echo "<td class='center-btn' colspan='2'>
-                        <a href='DonationUpdate.php?donationID=" . htmlspecialchars($row["donationID"]) . "' class='btn btn-primary btn-update'>
-                            <i class='bi bi-pencil'></i>
-                        </a>
-                    </td>";
+                        echo "<td class='col-update center-btn'>
+                            <a href='DonationUpdate.php?donationID=" . htmlspecialchars($row["donationID"]) . "' class='btn btn-primary btn-update'>
+                                <i class='bi bi-pencil'></i>
+                            </a>
+                        </td>";
                         echo "</tr>";
                         $count++;
                     }
