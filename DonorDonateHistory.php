@@ -10,18 +10,26 @@ if (!isset($_SESSION['username'])) {
 $donorID = $_SESSION['username'];
 $recordsPerPage = 10;
 
+// Establish database connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Fetch donor name based on donor ID
+$donorNameStmt = $conn->prepare("SELECT donorName FROM Donor WHERE donorID = ?");
+$donorNameStmt->bind_param('s', $donorID);
+$donorNameStmt->execute();
+$donorNameResult = $donorNameStmt->get_result();
+$donorNameRow = $donorNameResult->fetch_assoc();
+$donorName = $donorNameRow['donorName'];
+
 // Get the current page number from the URL, default to 1 if not set
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $offset = ($page - 1) * $recordsPerPage;
 
 // Get the search query if set
 $search = isset($_GET['search']) ? $_GET['search'] : '';
-
-// Establish database connection
-$conn = new mysqli($servername, $username, $password, $dbname);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Prepare the base SQL query
 $sql = "
@@ -76,7 +84,6 @@ while ($row = $result->fetch_assoc()) {
     }
 }
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -137,6 +144,7 @@ while ($row = $result->fetch_assoc()) {
             border: 1px solid #ccc;
             padding: 12px;
             text-align: left;
+            vertical-align: middle; /* Ensures vertical centering */
         }
 
         .donation-table th {
@@ -177,11 +185,19 @@ while ($row = $result->fetch_assoc()) {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            text-align: left;
+        }
+
+        .header-info {
+            background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%);
+            color: white;
+            border-radius: 8px;
+            padding: 2px 9px;
         }
 
         .accepted {
             color: green;
-            font-weight:700;
+            font-weight: 700;
         }
 
         .pending {
@@ -214,6 +230,11 @@ while ($row = $result->fetch_assoc()) {
         .pagination a:hover:not(.active) {
             background-color: #ddd;
         }
+        .donation-table td.center {
+        display: flex;
+        justify-content: center; /* Centers horizontally */
+        align-items: center; /* Centers vertically */
+    }
     </style>
 </head>
 
@@ -225,15 +246,18 @@ while ($row = $result->fetch_assoc()) {
             <h2>Donation History</h2>
         </div>
         <form method="GET" action="" class="d-flex align-items-center">
-    <input type="text" name="search" class="form-control me-2" placeholder="Search Allocation Name" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
-    <button type="submit" class="btn btn-outline-primary">
-        <i class="bi bi-search"></i>
-    </button>
-</form>
+            <input type="text" name="search" class="form-control me-2" placeholder="Search Allocation Name" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+            <button type="submit" class="btn btn-outline-primary">
+                <i class="bi bi-search"></i>
+            </button>
+        </form>
 
         <div class="headertable">
-            <h3>Donor ID: <?php echo htmlspecialchars($donorID); ?></h3>
-            <div style="background: radial-gradient(circle at 24.1% 68.8%, rgb(50, 50, 50) 0%, rgb(0, 0, 0) 99.4%); color:white; border-radius:8px; padding:2px 9px;">
+            <div>
+                <h4>ID: <?php echo htmlspecialchars($donorID); ?> <br><br>Name: <?php echo htmlspecialchars($donorName); ?></h4>
+            </div>
+            
+            <div class="header-info">
                 <p>Donations: <b><?php echo $totalDonations; ?></b> | Accepted: <b><?php echo $acceptedCount; ?></b></p>
             </div>
         </div>
@@ -244,98 +268,58 @@ while ($row = $result->fetch_assoc()) {
                     <tr>
                         <th>Donation ID</th>
                         <th>Allocation Name</th>
-                        <th>Donation Amount </th>
+                        <th>Donation Amount</th>
                         <th>Donation Date</th>
                         <th>Donation Status</th>
-                        <th>Bank Receipt</th>
                         <th>Donation Receipt</th>
                     </tr>
                 </thead>
                 <tbody>
                     <?php
-                    // Reset result pointer to start from the beginning
-                    $result->data_seek(0);
-                    while ($row = $result->fetch_assoc()) :
-                    ?>
-                        <tr>
-                            <td><?php echo htmlspecialchars($row['donationID']); ?></td>
-                            <td><?php echo htmlspecialchars($row['allocationName']); ?></td>
-                            <td>RM <?php echo number_format($row['donationAmount'], 2); ?></td>
-                            <td><?php echo htmlspecialchars($row['donationDate']); ?></td>
-                            <td style="text-align: center;" class="<?php echo strtolower($row['donationStatus']); ?>"><?php echo htmlspecialchars($row['donationStatus']); ?></td>
+                    $result->data_seek(0); // Reset result pointer to the beginning
 
-                            <td style="text-align: center;">
-                                <?php if (!empty($row['donationReceipt'])) : ?>
-                                    <button class="view-receipt-btn" data-receipt-url="<?php echo htmlspecialchars($row['donationReceipt']); ?>">⌞ Receipt ⌝</button>
-                                <?php else : ?>
-                                    No Receipt
-                                <?php endif; ?>
-                            </td>
-                            <td style="text-align: center;">
-                                <?php if ($row['donationStatus'] === 'Accepted') : ?>
-                                    <a href="DonationGenerateReceipt.php?donationID=<?php echo urlencode($row['donationID']); ?>">
-                                        <img src="images/download (1).png" alt="Generate Receipt" style="width: auto; height: 24px; cursor: pointer; background-image: linear-gradient(315deg, #2b4162 0%, #12100e 74%); color:white; padding: 6px; border-radius: 4px;">
-                                    </a>
-                                <?php elseif ($row['donationStatus'] === 'pending') : ?>
-                                    <div style="color: grey;">
-                                        <p>No action</p>
-                                    </div>
-                                <?php endif; ?>
-                            </td>
-                        </tr>
-                    <?php endwhile; ?>
+                    // Display donation records
+                    while ($row = $result->fetch_assoc()) {
+                        echo '<tr>';
+                        echo '<td>' . htmlspecialchars($row['donationID']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['allocationName']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['donationAmount']) . '</td>';
+                        echo '<td>' . htmlspecialchars($row['donationDate']) . '</td>';
+                        echo '<td class="' . ($row['donationStatus'] === 'Accepted' ? 'accepted' : 'pending') . '">' . htmlspecialchars($row['donationStatus']) . '</td>';
+                        echo '<td class="center"><button class="view-receipt-btn" onclick="viewReceipt(\'' . htmlspecialchars($row['donationReceipt']) . '\')">View Receipt</button></td>';
+                        echo '</tr>';
+                    }
+
+                    // Close statement and connection
+                    $stmt->close();
+                    $conn->close();
+                    ?>
                 </tbody>
             </table>
+        </div>
 
-            <!-- Pagination Links -->
-            <div class="pagination">
-                <?php for ($i = 1; $i <= $totalPages; $i++) : ?>
-                    <a href="?page=<?php echo $i; ?>" class="<?php echo ($i === $page) ? 'active' : ''; ?>"><?php echo $i; ?></a>
-                <?php endfor; ?>
-            </div>
+        <!-- Pagination -->
+        <div class="pagination">
+            <?php if ($page > 1): ?>
+                <a href="?page=<?php echo $page - 1; ?>&search=<?php echo urlencode($search); ?>">« Previous</a>
+            <?php endif; ?>
+            <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                <a href="?page=<?php echo $i; ?>&search=<?php echo urlencode($search); ?>" class="<?php echo $i == $page ? 'active' : ''; ?>"><?php echo $i; ?></a>
+            <?php endfor; ?>
+            <?php if ($page < $totalPages): ?>
+                <a href="?page=<?php echo $page + 1; ?>&search=<?php echo urlencode($search); ?>">Next »</a>
+            <?php endif; ?>
         </div>
     </div>
 
     <script>
-        // JavaScript for handling receipt viewing with SweetAlert
-        document.addEventListener('DOMContentLoaded', function() {
-            const receiptButtons = document.querySelectorAll('.view-receipt-btn');
-            receiptButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const receiptUrl = this.getAttribute('data-receipt-url');
-                    const fileExtension = receiptUrl.split('.').pop().toLowerCase();
-
-                    let titleText = 'View Receipt';
-                    let contentHtml = '';
-
-                    if (fileExtension === 'pdf') {
-                        contentHtml = '<iframe src="' + receiptUrl + '" class="receipt-iframe" frameborder="0"></iframe>';
-                    } else {
-                        contentHtml = '<img src="' + receiptUrl + '" class="receipt-image" alt="Receipt">';
-                    }
-
-                    Swal.fire({
-                        title: titleText,
-                        html: contentHtml,
-                        showCancelButton: true,
-                        confirmButtonText: "Print",
-                        cancelButtonText: "Close",
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            window.open(receiptUrl, '_blank');
-                        }
-                    });
-                });
+        function viewReceipt(receiptURL) {
+            Swal.fire({
+                title: 'Donation Receipt',
+                html: '<iframe class="receipt-iframe" src="' + receiptURL + '"></iframe>',
+                showCloseButton: true
             });
-        });
+        }
     </script>
-
 </body>
-
 </html>
-
-<?php
-// Close prepared statement and database connection
-$stmt->close();
-$conn->close();
-?>

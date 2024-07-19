@@ -12,20 +12,23 @@ require_once("dbConnect.php");
 
 // Pagination variables
 $results_per_page = 10; // Number of records per page
-if (!isset($_GET['page'])) {
-    $page = 1;
-} else {
-    $page = $_GET['page'];
-}
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_from = ($page - 1) * $results_per_page;
 
-// Fetch donation records with sorting and pagination
+// Get the filter status if set
+$status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+
+// Fetch donation records with sorting, pagination, and filtering
 $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID
+        WHERE (d.donationStatus = ? OR ? = '')
         ORDER BY d.donationID DESC
-        LIMIT $start_from, $results_per_page";
-$result = $conn->query($sql);
+        LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('ssii', $status_filter, $status_filter, $start_from, $results_per_page);
+$stmt->execute();
+$result = $stmt->get_result();
 
 // Fetch counts for filtering buttons
 $countSql = "SELECT 
@@ -147,9 +150,9 @@ $allocationsResult = $conn->query($allocationsSql);
         <!-- Buttons for filtering and dropdown for allocation -->
         <div class="mb-3 d-flex align-items-center justify-content-between">
             <div>
-                <button class="btn btn-primary" onclick="showAll()">☰ All (<?php echo $counts['total']; ?>)</button>
-                <button class="btn btn-success mx-2" onclick="showAccepted()">☰ Accepted (<?php echo $counts['accepted']; ?>)</button>
-                <button class="btn btn-warning mx-2" onclick="showPending()">☰ Pending (<?php echo $counts['pending']; ?>)</button>
+                <a href="?status=&page=1" class="btn btn-primary">☰ All (<?php echo $counts['total']; ?>)</a>
+                <a href="?status=Accepted&page=1" class="btn btn-success mx-2">☰ Accepted (<?php echo $counts['accepted']; ?>)</a>
+                <a href="?status=pending&page=1" class="btn btn-warning mx-2">☰ Pending (<?php echo $counts['pending']; ?>)</a>
             </div>
             <div class="d-flex">
                 <div class="d-flex">
@@ -183,7 +186,7 @@ $allocationsResult = $conn->query($allocationsSql);
                         echo "<td>" . $count . "</td>";
                         echo "<td>" . $row["donationID"] . "</td>";
                         echo "<td>" . $row["allocationName"] . "</td>";
-                        echo "<td>" . $row["donationAmount"] . "</td>";
+                        echo "<td>" . number_format($row["donationAmount"], 2) . "</td>";
                         echo "<td>" . date('d/m/y', strtotime($row["donationDate"])) . "</td>";
 
                         // Display status with color coding
@@ -226,7 +229,7 @@ $allocationsResult = $conn->query($allocationsSql);
                                 class='btn btn-secondary btn-mini-column smaller-button btn-generate'><i class='bi bi-file-earmark-text'></i> Generate Receipt</a>";
                                 break;
                             default:
-                                echo "N/A";
+                                echo "";
                                 break;
                         }
                         echo "</td>";
@@ -250,7 +253,7 @@ $allocationsResult = $conn->query($allocationsSql);
                 <?php
                 $total_pages = ceil($counts['total'] / $results_per_page);
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "'>" . $i . "</a></li>";
+                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "&status=" . htmlspecialchars($status_filter) . "'>" . $i . "</a></li>";
                 }
                 ?>
             </ul>
@@ -261,39 +264,10 @@ $allocationsResult = $conn->query($allocationsSql);
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
     <script>
-        
- // JavaScript functions for filtering donations
- function showAccepted() {
-            filterByStatus('Accepted');
-        }
-
-        function showPending() {
-            filterByStatus('pending');
-        }
-
-        function showAll() {
-            filterByStatus('');
-        }
-
-        function filterByStatus(status) {
-            var table = document.getElementById("donationTable");
-            var rows = table.getElementsByTagName("tr");
-            for (var i = 1; i < rows.length; i++) {
-                var statusCell = rows[i].getElementsByTagName("td")[5];
-                if (statusCell && status !== '' && statusCell.innerText.trim() !== status) {
-                    rows[i].style.display = "none";
-                } else {
-                    rows[i].style.display = "";
-                }
-            }
-        }
-
         function searchByDonationID() {
-            // Implement logic to search donation records by ID
-            // You can use AJAX if needed to update the table dynamically
-            let donationID = document.getElementById('donationIDInput').value.trim();
+            var donationID = document.getElementById('donationIDInput').value.trim();
             if (donationID !== '') {
-                alert('Search Donation ID: ' + donationID);
+                window.location.href = '?donationID=' + encodeURIComponent(donationID) + '&status=' + encodeURIComponent('<?php echo $status_filter; ?>') + '&page=1';
             } else {
                 alert('Please enter a Donation ID');
             }

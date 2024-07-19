@@ -13,14 +13,29 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
-// Fetch allocation records from the database
-$sql = "SELECT * FROM Allocation";
-$result = $conn->query($sql);
+// Pagination variables
+$results_per_page = 10; // Number of records per page
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$start_from = ($page - 1) * $results_per_page;
+
+// Fetch allocation records with pagination
+$sql = "SELECT * FROM Allocation ORDER BY allocationID LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$stmt->bind_param('ii', $start_from, $results_per_page);
+$stmt->execute();
+$result = $stmt->get_result();
+
+// Update allocationStatus if currentAmount >= targetAmount
+$update_sql = "UPDATE Allocation SET allocationStatus = 'Inactivate' WHERE currentAmount >= targetAmount";
+$conn->query($update_sql);
 
 // Fetch total number of allocation records
 $total_sql = "SELECT COUNT(*) AS total FROM Allocation";
 $total_result = $conn->query($total_sql);
 $total_rows = $total_result->fetch_assoc()['total'];
+
+// Calculate total pages
+$total_pages = ceil($total_rows / $results_per_page);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -133,7 +148,7 @@ $total_rows = $total_result->fetch_assoc()['total'];
             <tbody>
             <?php
             if ($result->num_rows > 0) {
-                $count = 1;
+                $count = $start_from + 1; // Initialize a counter based on current page
                 while ($row = $result->fetch_assoc()) {
                     $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
                     $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
@@ -158,6 +173,17 @@ $total_rows = $total_result->fetch_assoc()['total'];
             ?>
             </tbody>
         </table>
+        
+        <!-- Pagination links -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <?php
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "'>" . $i . "</a></li>";
+                }
+                ?>
+            </ul>
+        </nav>
     </div>
 
     <script>
@@ -211,5 +237,6 @@ $total_rows = $total_result->fetch_assoc()['total'];
 </html>
 
 <?php
+$stmt->close();
 $conn->close();
 ?>
