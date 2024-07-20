@@ -87,6 +87,13 @@ $counts = $countResult->fetch_assoc();
             display: flex;
             justify-content: center;
             align-items: center;
+            margin-bottom: 20px; /* Added margin for spacing */
+        }
+
+        .d-flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
     </style>
 </head>
@@ -96,8 +103,8 @@ $counts = $countResult->fetch_assoc();
     <div class="container">
         <h2 class="page-title">Report Management</h2>
 
-        <!-- Buttons for filtering -->
-        <div class="d-flex justify-content-between mb-3">
+        <!-- Buttons for filtering and Generate New Report button -->
+        <div class="d-flex-between mb-3">
             <div>
                 <a href="?reportType=&page=1" class="btn btn-primary btn-filter <?php echo $reportType_filter === '' ? 'active' : ''; ?>">All (<?php echo $counts['total']; ?>)</a>
                 <a href="?reportType=Donation Allocation Report&page=1" class="btn btn-success btn-filter <?php echo $reportType_filter === 'Donation Allocation Report' ? 'active' : ''; ?>">Donation Allocation (<?php echo $counts['donation']; ?>)</a>
@@ -107,6 +114,10 @@ $counts = $countResult->fetch_assoc();
                 <input type="text" class="form-control me-2" id="reportIDInput" placeholder="Search Report ID">
                 <button class="btn btn-primary" onclick="searchByReportID()"><i class="bi bi-search"></i></button>
             </div>
+        </div>
+
+        <div class="center-btn mb-3">
+            <a href="ManagerGenerateReport.php" class="btn btn-success btn-generate">Generate New Report</a>
         </div>
 
         <!-- Table for displaying report records -->
@@ -152,11 +163,6 @@ $counts = $countResult->fetch_assoc();
                 ?>
             </ul>
         </nav>
-
-        <!-- Button to generate new reports -->
-        <div class="center-btn">
-            <a href="ManagerGenerateReport.php" class="btn btn-success btn-generate">Generate New Report</a>
-        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
