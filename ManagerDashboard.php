@@ -12,7 +12,6 @@ require_once("dbConnect.php");
 // Get the current logged-in user's username from the session
 $username = $_SESSION['username'];
 
-
 // Fetch the user details from the database
 $sql = "SELECT managerID, managerName, managerPhoneNo, managerEmail FROM manager WHERE managerID = ?";
 if ($stmt = mysqli_prepare($conn, $sql)) {
@@ -93,8 +92,9 @@ mysqli_close($conn);
 
         .summary {
             display: flex;
-            justify-content: space-around;
+            justify-content: center;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
 
         .summary-box {
@@ -108,7 +108,8 @@ mysqli_close($conn);
             margin: 15px;
             padding: 20px;
             text-align: center;
-            width: 40%;
+            width: 80%;
+            max-width: 800px;
             transition: transform 0.3s, box-shadow 0.3s;
         }
 
@@ -127,7 +128,7 @@ mysqli_close($conn);
         }
 
         .summary-box h3 {
-            font-size: 1.25rem;
+            font-size: 1.5rem;
             color: #333;
             margin-bottom: 10px;
         }
@@ -152,13 +153,15 @@ mysqli_close($conn);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
-        #donationChart {
+        #donationChartContainer {
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             margin: 20px auto;
+            height: 400px; /* Adjust height as needed */
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
 </head>
 
 <body>
@@ -168,7 +171,6 @@ mysqli_close($conn);
         <img src="images/headerManager.png" alt="Manager Header Image">
     </div>
 
-
     <div class="summary">
         <div class="summary-box">
             <div>
@@ -177,16 +179,15 @@ mysqli_close($conn);
                     <canvas id="donationChart"></canvas>
                 </div>
             </div>
-            
         </div>
     </div>
 
     <script>
-    <?php
-    include 'dbConnect.php';
+        <?php
+        include 'dbConnect.php';
 
-    // Fetch monthly donations
-    $sql = "SELECT 
+        // Fetch monthly donations
+        $sql = "SELECT 
                 DATE_FORMAT(donationDate, '%M') AS month,
                 SUM(donationAmount) AS donationAmount
             FROM 
@@ -197,52 +198,88 @@ mysqli_close($conn);
                 month
             ORDER BY 
                 STR_TO_DATE(CONCAT('0001 ', month, ' 01'), '%Y %M %d')";
-    $result = $conn->query($sql);
+        $result = $conn->query($sql);
 
-    $months = [];
-    $amounts = [];
+        $months = [];
+        $amounts = [];
 
-    while ($row = $result->fetch_assoc()) {
-        $months[] = $row['month'];
-        $amounts[] = $row['donationAmount'];
-    }
-    ?>
+        while ($row = $result->fetch_assoc()) {
+            $months[] = $row['month'];
+            $amounts[] = $row['donationAmount'];
+        }
+        ?>
 
-const ctx = document.getElementById('donationChart').getContext('2d');
-    const donationChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?php echo json_encode($months); ?>,
-            datasets: [{
-                label: 'Donation Amount (RM)',
-                data: <?php echo json_encode($amounts); ?>,
-                backgroundColor: '#264d26',
-                borderColor: 'grey',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            scales: {
-                y: {
-                    ticks: {
-                        // Include only one tick value
-                        stepSize: <?php echo max($amounts); ?>, // Set step size to the max amount
-                        callback: function(value, index, values) {
-                            // Format the tick value as needed
-                            return value ; // Example formatting
+        const ctx = document.getElementById('donationChart').getContext('2d');
+        // Register the Chart.js datalabels plugin
+        Chart.register(ChartDataLabels);
+        const donationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: <?php echo json_encode($months); ?>,
+                datasets: [{
+                    label: 'Donation Amount (RM)',
+                    data: <?php echo json_encode($amounts); ?>,
+                    backgroundColor: '#264d26',
+                    borderColor: 'grey',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        color: 'green',
+                        font: {
+                            weight: 'bold',
+                        },
+                        formatter: function(value) {
+                            return value;
+                        }
+                    }
+                },
+                responsive: true,
+                maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        left: 1,
+                        right: 1,
+                        top: 26,
+                        bottom: 20
+                    }
+                },
+                scales: {
+                    x: {
+                        barPercentage: 0.8,
+                        categoryPercentage: 0.9,
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 50,
+                            minRotation: 45,
                         }
                     },
-                    title: {
-                        display: true,
-                        text: 'Donation Amount (RM)'
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: <?php echo max($amounts); ?>,
+                            callback: function(value) {
+                                return value;
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Donation Amount (RM)'
+                        },
+                        padding: {
+                            top: 17,
+                            bottom: 17,
+
+                        }
                     }
                 }
             }
-        }
-    });
-</script>
-
-
+        });
+    </script>
 </body>
 
 </html>
