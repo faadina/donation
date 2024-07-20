@@ -87,104 +87,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $donorEmail = $_POST["donorEmail"];
     $donorPassword = $_POST["donorPassword"];
 
-    // Validate name
-    if (empty(trim($_POST["name"]))) {
-        $name_err = "Please enter your name.";
-    } elseif (!preg_match("/^[a-zA-Z@. ]*$/", $_POST["name"])) {
-        $name_err = "Name can only contain letters, spaces, '.', and '@'.";
-    } elseif (preg_match("/\d/", $_POST["name"])) {
-        $name_err = "Name cannot contain numbers.";
-    } else {
-        $name = trim($_POST["name"]);
-    }
-
-    // Validate birthdate
-    if (empty(trim($_POST["birthdate"]))) {
-        $birthdate_err = "Please enter your birthdate.";
-    } else {
-        $birthdate = trim($_POST["birthdate"]);
-    }
-
-    // Validate address
-    if (empty(trim($_POST["address"]))) {
-        $address_err = "Please enter your address.";
-    } else {
-        $address = trim($_POST["address"]);
-    }
-
-    // Validate phone number
-    if (empty(trim($_POST["phone"]))) {
-        $phone_err = "Please enter your phone number.";
-    } elseif (!preg_match("/^[0-9-]*$/", $_POST["phone"])) {
-        $phone_err = "Phone number can only contain digits and hyphens (-).";
-    } else {
-        $phone = trim($_POST["phone"]);
-    }
-
-    // Validate email
-    if (empty(trim($_POST["email"]))) {
-        $email_err = "Please enter your email.";
-    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
-        $email_err = "Invalid email format.";
-    } else {
-        $email = trim($_POST["email"]);
-    }
-    // Validate email
-    if (empty(trim($_POST["email"]))) {
-        $email_err = "Please enter your email.";
-    } elseif (!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)) {
-        $email_err = "Invalid email format.";
-    } else {
-        $email = trim($_POST["email"]);
-
-        // Check if email already exists in staff table
-        $sql_donor = "SELECT donorID FROM donor WHERE donorEmail = ?";
-        $stmt_donor = mysqli_prepare($conn, $sql_donor);
-        if ($stmt_donor) {
-            mysqli_stmt_bind_param($stmt_donor, "s", $email);
-            mysqli_stmt_execute($stmt_donor);
-            mysqli_stmt_store_result($stmt_donor);
-            if (mysqli_stmt_num_rows($stmt_donor) > 0) {
-                $email_err = "This email is already registered.";
-            }
-            mysqli_stmt_close($stmt_donor);
-        } else {
-            echo "Something went wrong with the donor table query.";
-        }
-
-        // Check if email already exists in donor table
-        $sql_staff = "SELECT staffID FROM staff WHERE staffEmail = ?";
-        $stmt_staff = mysqli_prepare($conn, $sql_staff);
-        if ($stmt_staff) {
-            mysqli_stmt_bind_param($stmt_staff, "s", $email);
-            mysqli_stmt_execute($stmt_staff);
-            mysqli_stmt_store_result($stmt_staff);
-            if (mysqli_stmt_num_rows($stmt_staff) > 0) {
-                $email_err = "This email is already registered.";
-            }
-            mysqli_stmt_close($stmt_staff);
-        } else {
-            echo "Something went wrong with the staff table query.";
-        }
-
-   
-
-        // Check if email already exists in manager table
-        $sql_manager = "SELECT managerID FROM manager WHERE managerEmail = ?";
-        $stmt_manager = mysqli_prepare($conn, $sql_manager);
-        if ($stmt_manager) {
-            mysqli_stmt_bind_param($stmt_manager, "s", $email);
-            mysqli_stmt_execute($stmt_manager);
-            mysqli_stmt_store_result($stmt_manager);
-            if (mysqli_stmt_num_rows($stmt_manager) > 0) {
-                $email_err = "This email is already registered.";
-            }
-            mysqli_stmt_close($stmt_manager);
-        } else {
-            echo "Something went wrong with the manager table query.";
-        }
-    }
-
+    // Validate inputs in PHP (redundant but kept for server-side validation)
+    // You can add your server-side validation here
 
     // Prepare SQL statement for update
     $sql = "UPDATE Donor SET
@@ -198,11 +102,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     // Execute SQL statement
     if ($conn->query($sql) === TRUE) {
-        // Redirect to DonorView.php after successful update
-        header("Location: DonorView.php");
-        exit();
+        // No PHP success notification here
+        echo "<script>
+            window.location.href = 'DonorUpdate.php?success=true';
+        </script>";
     } else {
-        echo "Error updating record: " . $conn->error;
+        echo "<script>
+            window.location.href = 'DonorUpdate.php?error=true';
+        </script>";
     }
 
     $conn->close(); // Close database connection
@@ -229,7 +136,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         <h2 class="card-title">Update Donor</h2>
                     </div>
                     <div class="card-body">
-                        <form action="DonorUpdate.php" method="post">
+                        <form action="DonorUpdate.php" method="post" id="donorForm">
                             <input type="hidden" name="donorID" value="<?php echo $donorID; ?>">
                             <div class="mb-3">
                                 <label for="donorName" class="form-label">Donor Name</label>
@@ -265,25 +172,112 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-    const form = document.querySelector('form');
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        const error = urlParams.get('error');
 
-    form.addEventListener('submit', function(event) {
-        event.preventDefault(); // Prevent the default form submission
+        if (success === 'true') {
+            Swal.fire({
+                title: 'Success!',
+                text: 'Donor details updated successfully.',
+                icon: 'success'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = 'DonorView.php';
+                }
+            });
+        } else if (error === 'true') {
+            Swal.fire({
+                title: 'Error!',
+                text: 'Donor information is not updated. Try again later.',
+                icon: 'error'
+            });
+        }
 
-        Swal.fire({
-            title: 'Are you sure?',
-            text: "Do you really want to update the donor details?",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, update it!',
-            cancelButtonText: 'No, cancel!'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                form.submit(); // Submit the form if confirmed
+        const form = document.querySelector('form');
+
+        form.addEventListener('submit', function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Perform client-side validation
+            let isValid = true;
+            let errorMessage = "";
+
+            // Validate name
+            const name = document.getElementById("donorName").value.trim();
+            if (name === "") {
+                isValid = false;
+                errorMessage += "Please enter your name.\\n";
+            } else if (!/^[a-zA-Z@. ]*$/.test(name)) {
+                isValid = false;
+                errorMessage += "Name can only contain letters, spaces, '.', and '@'.";
+            } else if (/\d/.test(name)) {
+                isValid = false;
+                errorMessage += "Name cannot contain numbers.\\n";
             }
+
+            // Validate birthdate
+            const birthdate = document.getElementById("donorDOB").value.trim();
+            if (birthdate === "") {
+                isValid = false;
+                errorMessage += "Please enter your birthdate.\\n";
+            }
+
+            // Validate address
+            const address = document.getElementById("donorAddress").value.trim();
+            if (address === "") {
+                isValid = false;
+                errorMessage += "Please enter your address.\\n";
+            }
+
+            // Validate phone number
+            const phone = document.getElementById("donorPhoneNo").value.trim();
+            if (phone === "") {
+                isValid = false;
+                errorMessage += "Please enter your phone number.\\n";
+            } else if (!/^\d{3}[-]\d{7}$/.test(phone)) {
+                isValid = false;
+                errorMessage += "Phone number must be in the format: XXX-XXXXXXX.\\n";
+            }
+
+            // Validate email
+            const email = document.getElementById("donorEmail").value.trim();
+            if (email === "") {
+                isValid = false;
+                errorMessage += "Please enter your email.\\n";
+            } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                isValid = false;
+                errorMessage += "Please enter a valid email address.\\n";
+            }
+
+            // Validate password
+            const password = document.getElementById("donorPassword").value.trim();
+            if (password === "") {
+                isValid = false;
+                errorMessage += "Please enter your password.\\n";
+            }
+
+            // Display error message if the form is invalid
+            if (!isValid) {
+                Swal.fire({
+                    title: 'Error!',
+                    text: errorMessage,
+                    icon: 'error'
+                });
+                return;
+            }
+
+            // If the form is valid, show confirmation message and submit the form
+            Swal.fire({
+                title: 'Success!',
+                icon: 'success'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit(); // Submit the form programmatically
+                }
+            });
         });
     });
-});
-</script>
+    </script>
 </body>
 </html>

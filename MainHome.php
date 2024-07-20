@@ -12,6 +12,8 @@ $result = $conn->query($sql);
 ?>
 <!DOCTYPE html>
 <html lang="en">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
 
 <head>
     <meta charset="UTF-8">
@@ -306,8 +308,23 @@ $result = $conn->query($sql);
             // Call changeBackground every 8 seconds (adjust timing as needed)
             setInterval(changeBackground, 4000); // Change image every 8 seconds
         });
-    </script>
 
+        
+    </script>
+    <script>
+        // Check if logout message is set in session
+        <?php if (isset($_GET['logout']) && $_GET['logout'] == 'success') : ?>
+            Swal.fire({
+                title: 'Success!',
+                text: 'Logout successful. Redirecting to login page.',
+                icon: 'success',
+                timerProgressBar: true,
+                willClose: () => {
+                    window.location.href = 'MainHome.php'; // Redirect to your login page
+                }
+            });
+        <?php endif; ?>
+    </script>
 </body>
 
 </html>
