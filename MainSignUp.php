@@ -241,7 +241,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <input type="text" name="name" id="name" class="form-control"  value="<?php echo $name; ?>">
                 </div>
                 <div class="form-group">
-                    <label for="birthdate">Birthdate</label>
+                    <label for="birthdate">Birthdate| We will wish you happy birthday!</label>
                     <input type="date" name="birthdate" id="birthdate" class="form-control" placeholder="Birthdate" value="<?php echo $birthdate; ?>">
                 </div>
                 <div class="form-group">
