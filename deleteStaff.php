@@ -1,32 +1,23 @@
 <?php
-include 'dbConnect.php';
+require_once("dbConnect.php");
 
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id'])) {
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Get the staff ID from the POST request
     $staffID = $_POST['id'];
 
-    // SQL statement for deletion
-    $sql = "DELETE FROM staff WHERE staffID = ?";
+    // Prepare the SQL statement
+    $stmt = $conn->prepare("DELETE FROM staff WHERE staffID = ?");
+    $stmt->bind_param("s", $staffID);
 
-    // Prepare statement
-    if ($stmt = $conn->prepare($sql)) {
-        $stmt->bind_param("s", $staffID);
-        
-        // Execute the statement
-        if ($stmt->execute()) {
-            echo 'success';
-        } else {
-            echo 'error';
-        }
-
-        // Close statement
-        $stmt->close();
+    // Execute the statement
+    if ($stmt->execute()) {
+        echo 'success';
     } else {
         echo 'error';
     }
-} else {
-    echo 'error';
-}
 
-// Close database connection
-$conn->close();
+    // Close the statement and connection
+    $stmt->close();
+    $conn->close();
+}
 ?>

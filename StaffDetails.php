@@ -247,27 +247,31 @@ mysqli_close($conn);
         }
 
         $('#confirmDeleteButton').click(function() {
-            var staffID = $(this).data('staffid');
+    var staffID = $(this).data('staffid');
+    console.log("Deleting staffID: " + staffID); // Debug line
 
-            $.ajax({
-                url: 'deleteStaff.php',
-                type: 'POST',
-                data: {
-                    id: staffID
-                },
-                success: function(response) {
-                    if (response === 'success') {
-                        $('#deleteModal').modal('hide');
-                        location.reload();
-                    } else {
-                        alert('Error deleting staff.');
-                    }
-                },
-                error: function() {
-                    alert('Error deleting staff.');
-                }
-            });
-        });
+    $.ajax({
+        url: 'deleteStaff.php',
+        type: 'POST',
+        data: {
+            id: staffID
+        },
+        success: function(response) {
+            console.log("Response: " + response); // Debug line
+            if (response === 'success') {
+                $('#deleteModal').modal('hide');
+                location.reload();
+            } else {
+                alert('Error deleting staff.');
+            }
+        },
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.error("AJAX Error: " + textStatus + ": " + errorThrown); // Debug line
+            alert('Error deleting staff.');
+        }
+    });
+});
+
     </script>
 </body>
 

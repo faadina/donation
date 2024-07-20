@@ -55,6 +55,7 @@ $counts = $countResult->fetch_assoc();
     <title>Report Management</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <style>
         .page-title {
             margin-top: 20px;
@@ -112,6 +113,7 @@ $counts = $countResult->fetch_assoc();
         <table class="table table-striped">
             <thead>
                 <tr>
+                    <th>No.</th>
                     <th>Report ID</th>
                     <th>Report Name</th>
                     <th>Actions</th>
@@ -120,18 +122,20 @@ $counts = $countResult->fetch_assoc();
             <tbody>
                 <?php
                 if ($result->num_rows > 0) {
+                    $row_number = $start_from + 1; // Initialize row number
                     while ($row = $result->fetch_assoc()) {
                         echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row_number++) . "</td>"; // Display row number
                         echo "<td>" . htmlspecialchars($row["reportID"]) . "</td>";
                         echo "<td>" . htmlspecialchars($row["reportName"]) . "</td>";
                         echo "<td>";
                         echo "<a href='ViewReport.php?reportID=" . urlencode($row["reportID"]) . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i> View</a> ";
-                        echo "<a href='deleteReport.php?reportID=" . urlencode($row["reportID"]) . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this report?\");'><i class='bi bi-trash'></i> Delete</a>";
+                        echo "<button class='btn btn-danger btn-sm' onclick='confirmDelete(\"" . htmlspecialchars($row["reportID"]) . "\")'><i class='bi bi-trash'></i> Delete</button>";
                         echo "</td>";
                         echo "</tr>";
                     }
                 } else {
-                    echo "<tr><td colspan='3'>No report records found</td></tr>";
+                    echo "<tr><td colspan='4'>No report records found</td></tr>";
                 }
                 ?>
             </tbody>
@@ -155,6 +159,7 @@ $counts = $countResult->fetch_assoc();
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         function searchByReportID() {
@@ -164,6 +169,24 @@ $counts = $countResult->fetch_assoc();
             } else {
                 alert('Please enter a Report ID');
             }
+        }
+
+        function confirmDelete(reportID) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "You won't be able to revert this!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, cancel!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to the delete URL
+                    window.location.href = 'deleteReport.php?reportID=' + encodeURIComponent(reportID);
+                }
+            });
         }
     </script>
 </body>
