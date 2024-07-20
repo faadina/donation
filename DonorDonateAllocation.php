@@ -3,6 +3,7 @@ session_start();
 include 'dbConnect.php'; // Use the existing $conn variable for the connection
 $title = "Donation Page";
 include 'DonorHeader.php';
+require_once("birthdayNotificationCheck.php");
 
 // Check if the user is logged in; if not, redirect to the login page
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
@@ -19,12 +20,13 @@ if ($conn->connect_error) {
 $sql = "SELECT * FROM Allocation";
 $result = $conn->query($sql);
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title><?php echo $title; ?></title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -54,33 +56,33 @@ $result = $conn->query($sql);
         }
         .card img {
             width: 100%;
-            height: 150px; 
+            height: 150px;
             object-fit: cover;
         }
         .card-content {
-            padding: 15px; 
+            padding: 15px;
             flex: 1;
         }
         .card-content h2 {
             margin-top: 0;
             margin-bottom: 10px;
-            font-size: 1.25rem; /* Adjusted font size */
+            font-size: 1.25rem;
             color: #333;
         }
         .card-content p {
             margin: 0 0 10px;
             color: #555;
             line-height: 1.4;
-            font-size: 0.9rem; 
+            font-size: 0.9rem;
         }
         .card-content a {
             color: #007bff;
             text-decoration: none;
             font-weight: bold;
-            font-size: 0.9rem; 
+            font-size: 0.9rem;
         }
         .card-footer {
-            padding: 15px; 
+            padding: 15px;
             background-color: #fafafa;
             display: flex;
             flex-direction: column;
@@ -89,7 +91,7 @@ $result = $conn->query($sql);
         }
         .raised, .goal {
             margin: 0;
-            font-size: 0.9rem; 
+            font-size: 0.9rem;
             color: #777;
         }
         .progress-bar-container {
@@ -119,13 +121,13 @@ $result = $conn->query($sql);
         .donate-button, .closed-button {
             background-color: #28a745;
             color: white;
-            padding: 8px 16px; /* Adjusted padding */
+            padding: 8px 16px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
             text-decoration: none;
             margin-top: 10px;
-            font-size: 0.9rem; /* Adjusted font size */
+            font-size: 0.9rem;
             transition: background-color 0.3s ease;
         }
         .donate-button:hover {
@@ -137,48 +139,102 @@ $result = $conn->query($sql);
         .closed-button:hover {
             background-color: #c82333;
         }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgb(0,0,0);
+            background-color: rgba(0,0,0,0.4);
+            padding-top: 60px;
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+<?php if (isset($_SESSION["birthday_notification"]) && $_SESSION["birthday_notification"] == true): ?>
+    <div id="birthdayModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Happy Birthday!</h2>
+            <p>We have a special message for you.</p>
+            <iframe src="birthdayEmail.html" frameborder="0" style="width:100%; height:400px;"></iframe>
+        </div>
+    </div>
+    <script>
+        var modal = document.getElementById("birthdayModal");
+        var span = document.getElementsByClassName("close")[0];
 
-<div class="container">
-    <?php
-    if ($result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $progress = ($row["currentAmount"] / $row["targetAmount"]) * 100;
-            echo '<div class="card">';
-            echo '<img src="' . htmlspecialchars($row["allocationImage"]) . '" alt="' . htmlspecialchars($row["allocationName"]) . '">';
-            echo '<div class="card-content">';
-            echo '<h2>' . htmlspecialchars($row["allocationName"]) . '</h2>';
-            echo '<p>' . htmlspecialchars(substr($row["allocationDetails"], 0, 100)) . '...</p>';
-            echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '">Read More</a>';
-            echo '<p id="' . $row["allocationID"] . '-details" style="display: none;">' . htmlspecialchars($row["allocationDetails"]) . '</p>';
-            echo '</div>';
-            echo '<div class="card-footer">';
-            echo '<div class="raised">Raised: MYR ' . number_format($row["currentAmount"], 2) . '</div>';
-            echo '<div class="goal">Goal: MYR ' . ($row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite') . '</div>';
-            echo '<div class="progress-bar-container">';
-            echo '<div class="progress-bar" style="width:' . $progress . '%;"></div>';
-            echo '</div>';
+        modal.style.display = "block";
 
-            // Check if allocation is closed or inactive
-            if ($row["allocationStatus"] == 'Inactive' || $row["currentAmount"] >= $row["targetAmount"]) {
-                echo '<button class="closed-button" disabled>CLOSED</button>';
-                $sql_update = "UPDATE Allocation SET allocationStatus = 'Inactive' WHERE allocationID = '" . $row["allocationID"] . "'";
-
-            } else {
-                echo '<a href="DonationPayments.php?allocationID=' . htmlspecialchars($row["allocationID"]) . '" class="donate-button">Donate Now</a>';
-                $sql_update = "UPDATE Allocation SET allocationStatus = 'Active' WHERE allocationID = '" . $row["allocationID"] . "'";
-            }
-
-            echo '</div>'; // card-footer
-            echo '</div>'; // card
+        span.onclick = function() {
+            modal.style.display = "none";
         }
-    } else {
-        echo "<p>No allocations found</p>";
-    }
-    $conn->close();
-    ?>
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+    </script>
+    <?php unset($_SESSION["birthday_notification"]); ?>
+<?php endif; ?>
+<div class="container">
+    <?php if ($result->num_rows > 0): ?>
+        <?php while ($row = $result->fetch_assoc()): ?>
+            <?php $progress = ($row["currentAmount"] / $row["targetAmount"]) * 100; ?>
+            <div class="card">
+                <img src="<?php echo htmlspecialchars($row["allocationImage"]); ?>" alt="<?php echo htmlspecialchars($row["allocationName"]); ?>">
+                <div class="card-content">
+                    <h2><?php echo htmlspecialchars($row["allocationName"]); ?></h2>
+                    <p><?php echo htmlspecialchars(substr($row["allocationDetails"], 0, 100)); ?>...</p>
+                    <a href="DonationPayments.php?allocationID=<?php echo htmlspecialchars($row["allocationID"]); ?>">Read More</a>
+                    <p id="<?php echo $row["allocationID"]; ?>-details" style="display: none;"><?php echo htmlspecialchars($row["allocationDetails"]); ?></p>
+                </div>
+                <div class="card-footer">
+                    <div class="raised">Raised: MYR <?php echo number_format($row["currentAmount"], 2); ?></div>
+                    <div class="goal">Goal: MYR <?php echo $row["targetAmount"] > 0 ? number_format($row["targetAmount"], 2) : 'Infinite'; ?></div>
+                    <div class="progress-bar-container">
+                        <div class="progress-bar" style="width: <?php echo $progress; ?>%;"></div>
+                    </div>
+
+                    <?php if ($row["allocationStatus"] == 'Inactive' || $row["currentAmount"] >= $row["targetAmount"]): ?>
+                        <button class="closed-button" disabled>CLOSED</button>
+                        <?php $sql_update = "UPDATE Allocation SET allocationStatus = 'Inactive' WHERE allocationID = '" . $row["allocationID"] . "'"; ?>
+                    <?php else: ?>
+                        <a href="DonationPayments.php?allocationID=<?php echo htmlspecialchars($row["allocationID"]); ?>" class="donate-button">Donate Now</a>
+                        <?php $sql_update = "UPDATE Allocation SET allocationStatus = 'Active' WHERE allocationID = '" . $row["allocationID"] . "'"; ?>
+                    <?php endif; ?>
+                </div>
+            </div>
+        <?php endwhile; ?>
+    <?php else: ?>
+        <p>No allocations found</p>
+    <?php endif; ?>
+    <?php $conn->close(); ?>
 </div>
 
 <script>
