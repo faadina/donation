@@ -10,176 +10,161 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 // Include the database connection file
 require_once("dbConnect.php");
 
-// Get the current logged-in user's username from the session
-$username = $_SESSION['username'];
+// Pagination variables
+$results_per_page = 10; // Number of records per page
+$page = isset($_GET['page']) ? intval($_GET['page']) : 1;
+$start_from = ($page - 1) * $results_per_page;
 
-// Initialize an empty array to store report data
-$reportData = array();
+// Get the filter type and report ID if set
+$reportType_filter = isset($_GET['reportType']) ? $_GET['reportType'] : '';
+$reportID_search = isset($_GET['reportID']) ? $_GET['reportID'] : '';
 
-// Determine which type of report to fetch
-$reportType = isset($_GET['reportType']) ? $_GET['reportType'] : 'all';
+// Fetch report data with sorting, pagination, and filtering
+$sql = "SELECT reportID, reportName 
+        FROM report
+        WHERE (reportType = ? OR ? = '')
+        AND managerID = ?
+        AND (reportID LIKE ? OR ? = '')
+        ORDER BY reportID DESC
+        LIMIT ?, ?";
+$stmt = $conn->prepare($sql);
+$reportID_search_like = '%' . $reportID_search . '%';
+$stmt->bind_param('sssssis', $reportType_filter, $reportType_filter, $_SESSION['username'], $reportID_search_like, $reportID_search, $start_from, $results_per_page);
+$stmt->execute();
+$result = $stmt->get_result();
 
-// Fetch report data from the database based on the selected report type
-if ($reportType == 'donation') {
-    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ? AND reportType = 'Donation Allocation Report'";
-} elseif ($reportType == 'monthly') {
-    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ? AND reportType = 'Monthly Donation Report'";
-} else {
-    $sql = "SELECT reportID, reportName FROM report WHERE managerID = ?";
-}
+// Fetch counts for filtering buttons
+$countSql = "SELECT 
+                COUNT(*) as total,
+                SUM(CASE WHEN reportType = 'Donation Allocation Report' THEN 1 ELSE 0 END) as donation,
+                SUM(CASE WHEN reportType = 'Monthly Donation Report' THEN 1 ELSE 0 END) as monthly
+             FROM report WHERE managerID = ?";
+$countStmt = $conn->prepare($countSql);
+$countStmt->bind_param('s', $_SESSION['username']);
+$countStmt->execute();
+$countResult = $countStmt->get_result();
+$counts = $countResult->fetch_assoc();
 
-if ($stmt = mysqli_prepare($conn, $sql)) {
-    mysqli_stmt_bind_param($stmt, "s", $param_managerID);
-    $param_managerID = $username;
-
-    if (mysqli_stmt_execute($stmt)) {
-        $result = mysqli_stmt_get_result($stmt);
-
-        if ($result) {
-            while ($row = mysqli_fetch_assoc($result)) {
-                $reportData[] = $row;
-            }
-        } else {
-            echo "Error fetching reports.";
-            exit;
-        }
-    } else {
-        echo "Error executing statement.";
-        exit;
-    }
-
-    mysqli_stmt_close($stmt);
-}
-
-mysqli_close($conn);
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Manager Dashboard</title>
+    <title>Report Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css" rel="stylesheet">
     <style>
-        body {
-            background-color: whitesmoke;
-            color: #FFFFFF;
-            font-family: Arial, sans-serif;
-        }
-
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-        }
-
-        table,
-        th,
-        td {
-            border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f2f2f2;
-            color: black;
-        }
-
-        .btn_report,
-        .btn_view,
-        .btn_delete {
-            text-decoration: none;
-            color: #1f244a;
-            background-color: #ffc107;
-            padding: 5px 10px;
-            border-radius: 5px;
-            margin-top: 10px;
-            display: inline-block;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn_report:hover,
-        .btn_view:hover,
-        .btn_delete:hover {
-            background-color: #ffd000;
-        }
-
-        .generate-report {
-            text-align: right;
-            margin-right: 20px;
-            margin-top: 10px;
-        }
-
-        .filter-buttons {
+        .page-title {
+            margin-top: 20px;
+            margin-bottom: 30px;
             text-align: center;
+            color: #454B1B;
+            font-weight: 800;
+        }
+
+        .btn-filter {
+            margin: 0 5px;
+        }
+
+        .btn-filter.active {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .btn-generate {
+            font-size: 12px;
+            padding: 5px 5px;
+        }
+
+        .btn-back {
             margin-bottom: 20px;
         }
 
-        .filter-buttons a {
-            text-decoration: none;
-            color: white;
-            background-color: #1f244a;
-            padding: 10px 20px;
-            margin: 0 10px;
-            border-radius: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .filter-buttons a:hover {
-            background-color: #ffc107;
-            color: #1f244a;
+        .center-btn {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
     </style>
-    <!-- Ensure jQuery is included before any scripts -->
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-
-    <!-- Ensure Bootstrap CSS is included -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-
-    <!-- Ensure Popper.js and Bootstrap JS are included -->
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </head>
-
 <body>
     <?php include('managerHeader.php'); ?>
 
-    <h2 style="text-align: center;">REPORTS</h2>
+    <div class="container">
+        <h2 class="page-title">Report Management</h2>
 
-    <div class="generate-report">
-        <a href="ManagerGenerateReport.php" class="btn_report">Generate Report</a>
-    </div>
+        <!-- Buttons for filtering -->
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <a href="?reportType=&page=1" class="btn btn-primary btn-filter <?php echo $reportType_filter === '' ? 'active' : ''; ?>">All (<?php echo $counts['total']; ?>)</a>
+                <a href="?reportType=Donation Allocation Report&page=1" class="btn btn-success btn-filter <?php echo $reportType_filter === 'Donation Allocation Report' ? 'active' : ''; ?>">Donation Allocation (<?php echo $counts['donation']; ?>)</a>
+                <a href="?reportType=Monthly Donation Report&page=1" class="btn btn-warning btn-filter <?php echo $reportType_filter === 'Monthly Donation Report' ? 'active' : ''; ?>">Monthly Donation (<?php echo $counts['monthly']; ?>)</a>
+            </div>
+            <div class="d-flex">
+                <input type="text" class="form-control me-2" id="reportIDInput" placeholder="Search Report ID">
+                <button class="btn btn-primary" onclick="searchByReportID()"><i class="bi bi-search"></i></button>
+            </div>
+        </div>
 
-    <div class="filter-buttons">
-        <a href="?reportType=all">All Reports</a>
-        <a href="?reportType=donation">Donation Allocation Reports</a>
-        <a href="?reportType=monthly">Monthly Donation Reports</a>
-    </div>
-
-    <table>
-        <thead>
-            <tr>
-                <th>Report ID</th>
-                <th>Report Name</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($reportData as $report) : ?>
+        <!-- Table for displaying report records -->
+        <table class="table table-striped">
+            <thead>
                 <tr>
-                    <td><?php echo htmlspecialchars($report['reportID']); ?></td>
-                    <td><?php echo htmlspecialchars($report['reportName']); ?></td>
-                    <td>
-                        <a href="ViewReport.php?reportID=<?php echo urlencode($report['reportID']); ?>" class="btn_view">View Report</a>
-                        <a href="deleteReport.php?reportID=<?php echo urlencode($report['reportID']); ?>" class="btn_delete" onclick="return confirm('Are you sure you want to delete this report?');">Delete</a>
-                    </td>
+                    <th>Report ID</th>
+                    <th>Report Name</th>
+                    <th>Actions</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
+                        echo "<tr>";
+                        echo "<td>" . htmlspecialchars($row["reportID"]) . "</td>";
+                        echo "<td>" . htmlspecialchars($row["reportName"]) . "</td>";
+                        echo "<td>";
+                        echo "<a href='ViewReport.php?reportID=" . urlencode($row["reportID"]) . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i> View</a> ";
+                        echo "<a href='deleteReport.php?reportID=" . urlencode($row["reportID"]) . "' class='btn btn-danger btn-sm' onclick='return confirm(\"Are you sure you want to delete this report?\");'><i class='bi bi-trash'></i> Delete</a>";
+                        echo "</td>";
+                        echo "</tr>";
+                    }
+                } else {
+                    echo "<tr><td colspan='3'>No report records found</td></tr>";
+                }
+                ?>
+            </tbody>
+        </table>
 
+        <!-- Pagination links -->
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                <?php
+                $total_pages = ceil($counts['total'] / $results_per_page);
+                for ($i = 1; $i <= $total_pages; $i++) {
+                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "&reportType=" . urlencode($reportType_filter) . "'>" . $i . "</a></li>";
+                }
+                ?>
+            </ul>
+        </nav>
+
+        <!-- Button to generate new reports -->
+        <div class="center-btn">
+            <a href="ManagerGenerateReport.php" class="btn btn-success btn-generate">Generate New Report</a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function searchByReportID() {
+            var reportID = document.getElementById('reportIDInput').value.trim();
+            if (reportID !== '') {
+                window.location.href = '?reportID=' + encodeURIComponent(reportID) + '&reportType=' + encodeURIComponent('<?php echo $reportType_filter; ?>') + '&page=1';
+            } else {
+                alert('Please enter a Report ID');
+            }
+        }
+    </script>
 </body>
-
 </html>

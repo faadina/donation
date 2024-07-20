@@ -15,18 +15,21 @@ $results_per_page = 10; // Number of records per page
 $page = isset($_GET['page']) ? intval($_GET['page']) : 1;
 $start_from = ($page - 1) * $results_per_page;
 
-// Get the filter status if set
+// Get the filter status and donationID if set
 $status_filter = isset($_GET['status']) ? $_GET['status'] : '';
+$donationID_filter = isset($_GET['donationID']) ? $_GET['donationID'] : '';
 
 // Fetch donation records with sorting, pagination, and filtering
 $sql = "SELECT d.donationID, d.donationAmount, d.donationDate, d.donationStatus, d.allocationID, a.allocationName, d.donationReceipt
         FROM Donation d
         LEFT JOIN Allocation a ON d.allocationID = a.allocationID
         WHERE (d.donationStatus = ? OR ? = '')
+        AND (d.donationID LIKE ? OR ? = '')
         ORDER BY d.donationID DESC
         LIMIT ?, ?";
 $stmt = $conn->prepare($sql);
-$stmt->bind_param('ssii', $status_filter, $status_filter, $start_from, $results_per_page);
+$search_donationID = "%$donationID_filter%";
+$stmt->bind_param('ssssii', $status_filter, $status_filter, $search_donationID, $search_donationID, $start_from, $results_per_page);
 $stmt->execute();
 $result = $stmt->get_result();
 
@@ -291,7 +294,7 @@ $allocationsResult = $conn->query($allocationsSql);
                 <?php
                 $total_pages = ceil($counts['total'] / $results_per_page);
                 for ($i = 1; $i <= $total_pages; $i++) {
-                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "&status=" . htmlspecialchars($status_filter) . "'>" . $i . "</a></li>";
+                    echo "<li class='page-item " . ($i == $page ? 'active' : '') . "'><a class='page-link' href='?page=" . $i . "&status=" . htmlspecialchars($status_filter) . "&donationID=" . htmlspecialchars($donationID_filter) . "'>" . $i . "</a></li>";
                 }
                 ?>
             </ul>
