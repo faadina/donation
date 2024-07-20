@@ -12,7 +12,7 @@ include 'dbConnect.php'; // Include your database connection file
 // Function to handle file upload
 function uploadImage($file)
 {
-    $targetDir = "uploads/"; // Directory where uploaded images will be stored
+    $targetDir = "uploads/"; // Default directory, change as needed
     $targetFile = $targetDir . basename($file["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
@@ -27,17 +27,15 @@ function uploadImage($file)
     }
 
     // Check file size
-    if ($file["size"] > 500000) {
+    if ($file["size"] > 10000000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
-    // Allow certain file formats
-    if (
-        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-        && $imageFileType != "gif"
-    ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+    // Allow certain file formats (optional, adjust as needed)
+    $allowedTypes = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    if (!in_array($imageFileType, $allowedTypes)) {
+        echo "Sorry, only JPG, JPEG, PNG, GIF, & WEBP files are allowed.";
         $uploadOk = 0;
     }
 
@@ -57,7 +55,6 @@ function uploadImage($file)
 
 // Function to generate sequential allocationID like A001, A002, A003, ...
 function generateUniqueID() {
-    // Implement logic to get the latest allocationID from database and generate the next one
     global $conn;
 
     $sql = "SELECT MAX(allocationID) AS maxID FROM Allocation";
@@ -218,60 +215,33 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
 <script>
     document.getElementById('allocationForm').addEventListener('submit', function(event) {
         // Get form values
-        const allocationStartDate = new Date(document.getElementById('allocationStartDate').value);
-        const allocationEndDate = new Date(document.getElementById('allocationEndDate').value);
-        const targetAmount = parseFloat(document.getElementById('targetAmount').value);
-        
-        // Check if targetAmount is greater than 0
-        if (targetAmount <= 0) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Target Amount must be greater than 0.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            event.preventDefault();
-            return;
-        }
+        const allocationName = document.getElementById('allocationName').value;
+        const allocationStartDate = document.getElementById('allocationStartDate').value;
+        const allocationEndDate = document.getElementById('allocationEndDate').value;
+        const allocationStatus = document.querySelector('input[name="allocationStatus"]:checked').value;
+        const allocationDetails = document.getElementById('allocationDetails').value;
+        const targetAmount = document.getElementById('targetAmount').value;
 
-        // Check if allocationEndDate is after allocationStartDate
-        if (allocationEndDate <= allocationStartDate) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'End Date must be after Start Date.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
+        // Validate form inputs
+        if (!allocationName || !allocationStartDate || !allocationEndDate || !allocationStatus || !allocationDetails || !targetAmount) {
             event.preventDefault();
-            return;
-        }
-
-        // Ensure all required fields are filled
-        const form = event.target;
-        if (!form.checkValidity()) {
             Swal.fire({
-                title: 'Error!',
-                text: 'Please fill in all required fields.',
                 icon: 'error',
-                confirmButtonText: 'OK'
+                title: 'Oops...',
+                text: 'Please fill in all required fields!'
             });
-            event.preventDefault();
-            return;
+        } else {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: 'Allocation created successfully!'
+            }).then(function() {
+                // Form submission will be triggered after alert
+                document.getElementById('allocationForm').submit();
+            });
         }
     });
-
-    <?php if (isset($success) && $success) : ?>
-    Swal.fire({
-        title: 'Success!',
-        text: 'Allocation created successfully.',
-        icon: 'success',
-        confirmButtonText: 'OK'
-    }).then(() => {
-        window.location.href = 'AllocationView.php';
-    });
-    <?php endif; ?>
 </script>
 
 </body>
-
 </html>
