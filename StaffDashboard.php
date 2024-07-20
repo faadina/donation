@@ -186,7 +186,7 @@ $conn->close();
             <div>
                 <h3>Donations</h3>
                 <p><?php echo $acceptedDonationCount; ?></p>
-                <s>RM<?php echo number_format($totalAcceptedAmount, 2); ?> Collected</s>
+                <p style="font-size:15px;">RM<?php echo number_format($totalAcceptedAmount, 2); ?> Collected</p>
                 <a href="DonationView.php" class="btn btn-primary">View</a>
             </div>
         </div>
