@@ -51,7 +51,10 @@ $result = $conn->query($sql);
 
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $reportMonthOptions .= "<option value='{$row['reportMonth']}'>{$row['reportMonth']}</option>";
+        // Convert YYYY-MM to Month-Year
+        $dateObj = DateTime::createFromFormat('Y-m', $row['reportMonth']);
+        $formattedMonth = $dateObj->format('F-Y');
+        $reportMonthOptions .= "<option value='{$row['reportMonth']}'>{$formattedMonth}</option>";
     }
 }
 
@@ -199,7 +202,7 @@ $conn->close(); // Close database connection
                             </select>
                         </div>
 
-                        
+                    
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>

@@ -289,7 +289,7 @@
         </div>
         <?php echo $donationDetails; ?>
         <div class='text-center'>
-            <a href='staffDashboard.php' class='btn'>Back to Dashboard</a>
+            <a href='ManagerReport.php' class='btn'>Back to Dashboard</a>
         </div>
     </div>
 
