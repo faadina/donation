@@ -120,7 +120,6 @@ $conn->close(); // Close database connection
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -128,6 +127,8 @@ $conn->close(); // Close database connection
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <script>
         function toggleReportOptions() {
             const reportType = document.getElementById('reportType').value;
@@ -150,12 +151,47 @@ $conn->close(); // Close database connection
             }
         }
 
+        function validateForm() {
+            const reportName = document.getElementById('reportName').value;
+            const reportType = document.getElementById('reportType').value;
+            const reportMonth = document.getElementById('reportMonth') ? document.getElementById('reportMonth').value : '';
+            const allocationID = document.getElementById('allocationID') ? document.getElementById('allocationID').value : '';
+
+            if (reportType === 'Monthly Donation Report' && !reportMonth) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please select a report month for the Monthly Donation Report!',
+                });
+                return false;
+            }
+
+            if (reportType === 'Donation Allocation Report' && !allocationID) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'Please select an allocation ID for the Donation Allocation Report!',
+                });
+                return false;
+            }
+
+            if (reportName.trim() === '' || (reportName.includes("reportMonth") && !reportName.includes("Donation Report")) || (reportName.includes("allocationName") && !reportName.includes("Report"))) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Report Name',
+                    text: 'Please enter a valid report name!',
+                });
+                return false;
+            }
+
+            return true;
+        }
+
         document.addEventListener('DOMContentLoaded', function () {
             toggleReportOptions();
         });
     </script>
 </head>
-
 <body>
 
 <?php include('ManagerHeader.php'); ?>
@@ -173,7 +209,7 @@ $conn->close(); // Close database connection
                             <?php echo htmlspecialchars($message); ?>
                         </div>
                     <?php endif; ?>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" onsubmit="return validateForm()">
 
                         <div class="mb-3">
                             <label for="reportType" class="form-label">Report Type</label>
@@ -202,8 +238,6 @@ $conn->close(); // Close database connection
                             </select>
                         </div>
 
-                    
-
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>
                             <a href="ManagerReport.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Report Page</a>
@@ -216,5 +250,4 @@ $conn->close(); // Close database connection
 </div>
 
 </body>
-
 </html>
