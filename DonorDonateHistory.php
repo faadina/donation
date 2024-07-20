@@ -253,10 +253,10 @@ while ($row = $result->fetch_assoc()) {
         </form>
 
         <div class="headertable">
+           
             <div>
-                <h4>ID: <?php echo htmlspecialchars($donorID); ?> <br><br>Name: <?php echo htmlspecialchars($donorName); ?></h4>
+                <h4>Name: <?php echo htmlspecialchars($donorName); ?><br><br>ID: <?php echo htmlspecialchars($donorID); ?></h4>
             </div>
-            
             <div class="header-info">
                 <p>Donations: <b><?php echo $totalDonations; ?></b> | Accepted: <b><?php echo $acceptedCount; ?></b></p>
             </div>
