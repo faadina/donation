@@ -19,7 +19,7 @@ function uploadImage($file, $uploadDir = "uploads/")
     }
 
     // Check file size (limit to 5MB, adjust as needed)
-    if ($file["size"] > 100000000) {
+    if ($file["size"] > 5000000) { // 5MB limit
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
@@ -113,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssssdss", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $allocationImage, $allocationID);
         if ($stmt->execute()) {
             // Redirect to AllocationView.php after successful update
-            header("Location: AllocationView.php");
+            header("Location: AllocationView.php?status=success");
             exit();
         } else {
             echo "Error updating record: " . $stmt->error;
@@ -246,6 +246,54 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
+
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you really want to update the allocation details?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, update it!',
+            cancelButtonText: 'No, cancel!',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit(); // Submit the form if confirmed
+            }
+        });
+    });
+
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+
+    // Display SweetAlert2 notifications based on status
+    if (status === 'success') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Allocation updated successfully.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6'
+        });
+    } else if (status === 'error') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+        });
+    }
+});
+</script>
 </body>
 
 </html>
