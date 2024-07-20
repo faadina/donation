@@ -147,30 +147,32 @@ $total_pages = ceil($total_rows / $results_per_page);
             </thead>
             <tbody>
             <?php
-            if ($result->num_rows > 0) {
-                $count = $start_from + 1; // Initialize a counter based on current page
-                while ($row = $result->fetch_assoc()) {
-                    $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
-                    $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
-                    echo "<tr>";
-                    echo "<td>" . $count . "</td>";
-                    echo "<td>" . $row["allocationID"] . "</td>";
-                    echo "<td>" . $row["allocationName"] . "</td>";
-                    echo "<td>" . $startDate . "</td>";
-                    echo "<td>" . $endDate . "</td>";
-                    echo "<td>" . $row["allocationStatus"] . "</td>";
-                    echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
-                    echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
-                    echo "<td><a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i></a></td>";
-                    echo "<td><a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'><i class='bi bi-pencil'></i></a></td>";
-                    echo "<td><button class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'><i class='bi bi-trash'></i></button></td>";
-                    echo "</tr>";
-                    $count++;
-                }
-            } else {
-                echo "<tr><td colspan='10' class='text-center'>No allocation records found</td></tr>";
-            }
-            ?>
+if ($result->num_rows > 0) {
+    $count = $start_from + 1; // Initialize a counter based on current page
+    while ($row = $result->fetch_assoc()) {
+        $startDate = date('d/m/Y', strtotime($row["allocationStartDate"]));
+        $endDate = date('d/m/Y', strtotime($row["allocationEndDate"]));
+        echo "<tr>";
+        echo "<td>" . $count . "</td>";
+        // Adjust URL for allocationID
+        echo "<td><a href='DonationBasedAllocation.php?allocationID=" . $row["allocationID"] . "&donationStatus=Accepted'>" . $row["allocationID"] . "</a></td>";
+        echo "<td>" . $row["allocationName"] . "</td>";
+        echo "<td>" . $startDate . "</td>";
+        echo "<td>" . $endDate . "</td>";
+        echo "<td>" . $row["allocationStatus"] . "</td>";
+        echo "<td>" . number_format($row["targetAmount"], 2) . "</td>";
+        echo "<td>" . number_format($row["currentAmount"], 2) . "</td>";
+        echo "<td><a href='AllocationRead.php?allocationID=" . $row["allocationID"] . "' class='btn btn-info btn-sm'><i class='bi bi-eye'></i></a></td>";
+        echo "<td><a href='AllocationUpdate.php?allocationID=" . $row["allocationID"] . "' class='btn btn-primary btn-sm'><i class='bi bi-pencil'></i></a></td>";
+        echo "<td><button class='btn btn-danger btn-sm delete-allocation' data-id='" . $row["allocationID"] . "'><i class='bi bi-trash'></i></button></td>";
+        echo "</tr>";
+        $count++;
+    }
+} else {
+    echo "<tr><td colspan='11' class='text-center'>No allocation records found</td></tr>";
+}
+?>
+
             </tbody>
         </table>
         
