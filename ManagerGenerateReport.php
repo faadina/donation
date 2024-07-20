@@ -46,7 +46,7 @@ if ($result) {
 
 // Fetch distinct donation months from the Donation table for dropdown
 $reportMonthOptions = "";
-$sql = "SELECT DISTINCT DATE_FORMAT(donationDate, '%Y-%M') AS reportMonth FROM Donation ORDER BY reportMonth";
+$sql = "SELECT DISTINCT DATE_FORMAT(donationDate, '%Y-%m') AS reportMonth FROM Donation ORDER BY reportMonth";
 $result = $conn->query($sql);
 
 if ($result) {
@@ -74,7 +74,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Handle allocation ID based on report type
     if ($reportType === 'Monthly Donation Report') {
         // Fetch donation IDs for the selected report month
-        $sql = "SELECT donationID FROM Donation WHERE DATE_FORMAT(donationDate, '%Y-%M') = ?";
+        $sql = "SELECT donationID FROM Donation WHERE DATE_FORMAT(donationDate, '%Y-%m') = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $reportMonth);
         $stmt->execute();
@@ -93,14 +93,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Retrieve managerID from session
     $managerID = $_SESSION['username'];
 
-    // Get the current date
-    $reportDate = date('Y-m-d');
-
     // Prepare and execute the INSERT statement
     $sql = "INSERT INTO Report (reportID, reportType, reportName, reportDate, managerID, allocationID, reportMonth)
             VALUES (?, ?, ?, ?, ?, ?, ?)";
     $stmt = $conn->prepare($sql);
     if ($stmt) {
+        $reportDate = date('Y-m-d'); // Automatically set to current date
         $stmt->bind_param("sssssss", $reportID, $reportType, $reportName, $reportDate, $managerID, $allocationID, $reportMonth);
         if ($stmt->execute()) {
             // Report creation success
@@ -117,7 +115,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close(); // Close database connection
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -170,10 +167,10 @@ $conn->close(); // Close database connection
                 <div class="card-body">
                     <?php if (isset($message)): ?>
                         <div class="alert alert-info">
-                            <?php echo $message; ?>
+                            <?php echo htmlspecialchars($message); ?>
                         </div>
                     <?php endif; ?>
-                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post" enctype="multipart/form-data">
+                    <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
 
                         <div class="mb-3">
                             <label for="reportType" class="form-label">Report Type</label>
@@ -201,6 +198,8 @@ $conn->close(); // Close database connection
                                 <?php echo $allocationOptions; ?>
                             </select>
                         </div>
+
+                        
 
                         <div class="mb-3 text-center">
                             <button type="submit" class="btn btn-primary">Create</button>
