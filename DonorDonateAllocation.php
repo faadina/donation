@@ -175,7 +175,7 @@ $result = $conn->query($sql);
     </style>
 </head>
 <body>
-<?php if (isset($_SESSION["birthday_notification"]) && $_SESSION["birthday_notification"] == true): ?>
+<?php if (isset($_SESSION["birthday_notification"]) && $_SESSION["birthday_notification"] === true): ?>
     <div id="birthdayModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
@@ -188,7 +188,11 @@ $result = $conn->query($sql);
         var modal = document.getElementById("birthdayModal");
         var span = document.getElementsByClassName("close")[0];
 
-        modal.style.display = "block";
+        // Check session storage to see if the popup has been shown
+        if (!sessionStorage.getItem('birthdayPopupShown')) {
+            modal.style.display = "block";
+            sessionStorage.setItem('birthdayPopupShown', 'true'); // Set the flag in session storage
+        }
 
         span.onclick = function() {
             modal.style.display = "none";
