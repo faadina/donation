@@ -40,14 +40,15 @@ $sql = "
 ";
 
 // Add search condition if a search query is provided
+$searchParam = null;
 if ($search) {
     $sql .= " AND a.allocationName LIKE ?";
+    $searchParam = "%$search%";
 }
 
 // Get the total number of donations
 $totalStmt = $conn->prepare("SELECT COUNT(*) as total FROM ($sql) as totalDonations");
 if ($search) {
-    $searchParam = "%$search%";
     $totalStmt->bind_param('ss', $donorID, $searchParam);
 } else {
     $totalStmt->bind_param('s', $donorID);
@@ -74,7 +75,6 @@ $result = $stmt->get_result();
 
 // Initialize counter for accepted donations
 $acceptedCount = 0;
-$countDonation = $result->num_rows; // Total number of donations on the current page
 
 // Iterate through donation records
 while ($row = $result->fetch_assoc()) {
@@ -230,11 +230,12 @@ while ($row = $result->fetch_assoc()) {
         .pagination a:hover:not(.active) {
             background-color: #ddd;
         }
+        
         .donation-table td.center {
-        display: flex;
-        justify-content: center; /* Centers horizontally */
-        align-items: center; /* Centers vertically */
-    }
+            display: flex;
+            justify-content: center; /* Centers horizontally */
+            align-items: center; /* Centers vertically */
+        }
     </style>
 </head>
 
@@ -246,14 +247,13 @@ while ($row = $result->fetch_assoc()) {
             <h2>Donation History</h2>
         </div>
         <form method="GET" action="" class="d-flex align-items-center">
-            <input type="text" name="search" class="form-control me-2" placeholder="Search Allocation Name" value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>">
+            <input type="text" name="search" class="form-control me-2" placeholder="Search Allocation Name" value="<?php echo htmlspecialchars($search); ?>">
             <button type="submit" class="btn btn-outline-primary">
                 <i class="bi bi-search"></i>
             </button>
         </form>
 
         <div class="headertable">
-           
             <div>
                 <h4>Name: <?php echo htmlspecialchars($donorName); ?><br><br>ID: <?php echo htmlspecialchars($donorID); ?></h4>
             </div>
@@ -271,6 +271,7 @@ while ($row = $result->fetch_assoc()) {
                         <th>Donation Amount (RM)</th>
                         <th>Donation Date</th>
                         <th>Donation Status</th>
+                        <th>Bank Receipt</th>
                         <th>Donation Receipt</th>
                     </tr>
                 </thead>
@@ -286,7 +287,18 @@ while ($row = $result->fetch_assoc()) {
                         echo '<td>' . htmlspecialchars($row['donationAmount']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['donationDate']) . '</td>';
                         echo '<td class="' . ($row['donationStatus'] === 'Accepted' ? 'accepted' : 'pending') . '">' . htmlspecialchars($row['donationStatus']) . '</td>';
-                        echo '<td class="center"><button class="view-receipt-btn" onclick="viewReceipt(\'' . htmlspecialchars($row['donationReceipt']) . '\')">⌞view⌝</button></td>';
+                        echo '<td style="text-align: center;"><button class="view-receipt-btn" onclick="viewReceipt(\'' . htmlspecialchars($row['donationReceipt']) . '\')">⌞view⌝</button></td>';
+                        echo '<td style="text-align: center;">';
+                        if ($row['donationStatus'] === 'Accepted') {
+                            echo '<a href="DonationGenerateReceipt.php?donationID=' . urlencode($row['donationID']) . '">
+                                    <img src="images/download (1).png" alt="Generate Receipt" style="width: auto; height: 24px; cursor: pointer; background-image: linear-gradient(315deg, #2b4162 0%, #12100e 74%); color:white; padding: 6px; border-radius: 4px;">
+                                </a>';
+                        } else {
+                            echo '<div style="color: grey;">
+                                    <p></p>
+                                </div>';
+                        }
+                        echo '</td>';
                         echo '</tr>';
                     }
 

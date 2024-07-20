@@ -1,10 +1,10 @@
 <?php
 include 'dbConnect.php'; // Ensure this file includes your database connection details
 
-// Function to handle file upload (similar to the create script)
-function uploadImage($file)
+// Function to handle file upload
+function uploadImage($file, $uploadDir = "uploads/")
 {
-    $targetDir = "uploads/"; // Directory where uploaded images will be stored
+    $targetDir = $uploadDir; // Directory where uploaded images will be stored
     $targetFile = $targetDir . basename($file["name"]);
     $uploadOk = 1;
     $imageFileType = strtolower(pathinfo($targetFile, PATHINFO_EXTENSION));
@@ -18,18 +18,16 @@ function uploadImage($file)
         $uploadOk = 0;
     }
 
-    // Check file size
-    if ($file["size"] > 500000) {
+    // Check file size (limit to 5MB, adjust as needed)
+    if ($file["size"] > 5000000) { // 5MB limit
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
     }
 
-    // Allow certain file formats
-    if (
-        $imageFileType != "jpg" && $imageFileType != "png" && $imageFileType != "jpeg"
-        && $imageFileType != "gif"
-    ) {
-        echo "Sorry, only JPG, JPEG, PNG & GIF files are allowed.";
+    // Allow all image formats (you can modify this list if needed)
+    $allowedFormats = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'];
+    if (!in_array($imageFileType, $allowedFormats)) {
+        echo "Sorry, only JPG, JPEG, PNG, GIF, WEBP & BMP files are allowed.";
         $uploadOk = 0;
     }
 
@@ -115,7 +113,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $stmt->bind_param("sssssdss", $allocationName, $allocationStartDate, $allocationEndDate, $allocationStatus, $allocationDetails, $targetAmount, $allocationImage, $allocationID);
         if ($stmt->execute()) {
             // Redirect to AllocationView.php after successful update
-            header("Location: AllocationView.php");
+            header("Location: AllocationView.php?status=success");
             exit();
         } else {
             echo "Error updating record: " . $stmt->error;
@@ -223,26 +221,23 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
                         </div>
 
                         <div class="mb-3">
-                            <label for="targetAmount" class="form-label">Target Amount (RM)</label>
-                            <div class="input-group">
-                                <span class="input-group-text">RM</span>
-                                <input type="number" step="0.01" class="form-control" id="targetAmount" name="targetAmount" value="<?php echo htmlspecialchars($targetAmount); ?>" required>
-                            </div>
+                            <label for="targetAmount" class="form-label">Target Amount</label>
+                            <input type="number" class="form-control" id="targetAmount" name="targetAmount" step="0.01" value="<?php echo htmlspecialchars($targetAmount); ?>" required>
                         </div>
 
                         <div class="mb-3">
-                            <label for="allocationImage" class="form-label">Current Image</label><br>
-                            <?php if (!empty($allocationImage)): ?>
-                                <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" style="max-width: 300px; max-height: 300px;">
-                                <br><br>
+                            <label for="allocationImage" class="form-label">Upload Image</label>
+                            <input class="form-control" type="file" id="allocationImage" name="allocationImage">
+                            <?php if ($allocationImage): ?>
+                                <div class="mt-2">
+                                    <img src="<?php echo htmlspecialchars($allocationImage); ?>" alt="Current Image" class="img-thumbnail" style="max-width: 100%; height: auto;">
+                                </div>
                             <?php endif; ?>
-                            <input type="file" class="form-control" id="allocationImage" name="allocationImage">
                         </div>
 
-                        <div class="mb-3 text-center">
-                            <button type="submit" class="btn btn-primary">Update</button>
-                            <a href="AllocationView.php" class="btn btn-secondary"><i class="bi bi-arrow-left"></i> Back to Allocation Records</a>
-                        </div>
+                        <button type="submit" class="btn btn-primary">Update Allocation</button>
+                        <a href="AllocationView.php" class="btn btn-secondary">Cancel</a>
+
                     </form>
                 </div>
             </div>
@@ -250,73 +245,55 @@ include('StaffHeader.php'); // Assuming you have a header include file for your 
     </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('updateAllocationForm');
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.querySelector('form');
 
-    form.addEventListener('submit', function(event) {
+    form.addEventListener('submit', function (event) {
         event.preventDefault(); // Prevent the default form submission
 
-        // Get form values
-        const allocationStartDate = new Date(document.getElementById('allocationStartDate').value);
-        const allocationEndDate = new Date(document.getElementById('allocationEndDate').value);
-        const targetAmount = parseFloat(document.getElementById('targetAmount').value);
-        
-        // Check if targetAmount is greater than 0
-        if (targetAmount <= 0) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Target Amount must be greater than 0.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        // Check if allocationEndDate is after allocationStartDate
-        if (allocationEndDate <= allocationStartDate) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'End Date must be after Start Date.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        // Ensure all required fields are filled
-        if (!form.checkValidity()) {
-            Swal.fire({
-                title: 'Error!',
-                text: 'Please fill in all required fields.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-            return;
-        }
-
-        // If all validations pass, show confirmation dialog
         Swal.fire({
             title: 'Are you sure?',
             text: "Do you really want to update the allocation details?",
             icon: 'warning',
             showCancelButton: true,
             confirmButtonText: 'Yes, update it!',
-            cancelButtonText: 'No, cancel!'
+            cancelButtonText: 'No, cancel!',
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33'
         }).then((result) => {
             if (result.isConfirmed) {
                 form.submit(); // Submit the form if confirmed
             }
         });
     });
+
+    // Get the URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const status = urlParams.get('status');
+
+    // Display SweetAlert2 notifications based on status
+    if (status === 'success') {
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: 'Allocation updated successfully.',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#3085d6'
+        });
+    } else if (status === 'error') {
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong!',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#d33'
+        });
+    }
 });
 </script>
-
-<!-- Bootstrap JavaScript and dependencies (optional if not needed for your form interactions) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-
 
 </html>
