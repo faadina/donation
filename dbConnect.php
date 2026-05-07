@@ -1,10 +1,12 @@
 <?php
 
-$servername = getenv('DB_HOST') ?: 'localhost';
-$username   = getenv('DB_USER') ?: 'root';
-$password   = getenv('DB_PASS') ?: '';
-$dbname     = getenv('DB_NAME') ?: 'donationdb';
-$port       = (int)(getenv('DB_PORT') ?: 3306);
+// Railway MySQL plugin uses MYSQLHOST, MYSQLUSER, etc.
+// Fallback to DB_* vars for local development
+$servername = getenv('MYSQLHOST')     ?: getenv('DB_HOST') ?: 'localhost';
+$username   = getenv('MYSQLUSER')     ?: getenv('DB_USER') ?: 'root';
+$password   = getenv('MYSQLPASSWORD') ?: getenv('DB_PASS') ?: '';
+$dbname     = getenv('MYSQLDATABASE') ?: getenv('DB_NAME') ?: 'donationdb';
+$port       = (int)(getenv('MYSQLPORT') ?: getenv('DB_PORT') ?: 3306);
 
 $conn = new mysqli($servername, $username, $password, $dbname, $port);
 
