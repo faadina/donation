@@ -12,9 +12,11 @@ RUN apt-get update \
 COPY . /var/www/html/
 
 RUN chown -R www-data:www-data /var/www/html \
+    && echo "ServerName localhost" >> /etc/apache2/apache2.conf \
     && a2enmod rewrite
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 EXPOSE 80
+CMD ["/entrypoint.sh"]
