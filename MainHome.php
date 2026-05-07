@@ -255,7 +255,7 @@ $result = $conn->query($sql);
 
     <div class="container">
         <?php
-        if ($result->num_rows > 0) {
+        if ($result && $result->num_rows > 0) {
             while ($row = $result->fetch_assoc()) {
                 $progress = ($row["currentAmount"] / $row["targetAmount"]) * 100 . '%';
                 echo '<div class="card">';
