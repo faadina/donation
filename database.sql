@@ -1,0 +1,67 @@
+CREATE DATABASE IF NOT EXISTS donationdb;
+USE donationdb;
+
+CREATE TABLE IF NOT EXISTS Staff (
+    staffID VARCHAR(50) PRIMARY KEY NOT NULL,
+    staffName VARCHAR(100) NOT NULL,
+    staffPhoneNo VARCHAR(15),
+    staffEmail VARCHAR(100) UNIQUE NOT NULL,
+    staffPassword VARCHAR(250) NOT NULL,
+    role INT
+);
+
+CREATE TABLE IF NOT EXISTS Donor (
+    donorID VARCHAR(10) PRIMARY KEY NOT NULL,
+    donorName VARCHAR(100) NOT NULL,
+    donorPhoneNo VARCHAR(15),
+    donorDOB DATE,
+    donorAddress VARCHAR(255),
+    donorEmail VARCHAR(100) UNIQUE NOT NULL,
+    donorPassword VARCHAR(250) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS Manager (
+    managerID VARCHAR(10) PRIMARY KEY NOT NULL,
+    managerName VARCHAR(100) NOT NULL,
+    managerPhoneNo VARCHAR(15),
+    managerEmail VARCHAR(100) UNIQUE NOT NULL,
+    managerPassword VARCHAR(250) NOT NULL,
+    role INT
+);
+
+CREATE TABLE IF NOT EXISTS Allocation (
+    allocationID VARCHAR(10) PRIMARY KEY NOT NULL,
+    allocationName VARCHAR(50) NOT NULL,
+    allocationStartDate DATE NOT NULL,
+    allocationEndDate DATE NOT NULL,
+    allocationStatus VARCHAR(50) NOT NULL,
+    allocationDetails TEXT,
+    targetAmount DOUBLE NOT NULL,
+    currentAmount DOUBLE NOT NULL,
+    allocationImage VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Donation (
+    donationID VARCHAR(10) PRIMARY KEY NOT NULL,
+    donationAmount DECIMAL(10, 2) NOT NULL,
+    donationDate DATE NOT NULL,
+    donationMethod VARCHAR(50),
+    donationStatus VARCHAR(50),
+    donationReceipt VARCHAR(255),
+    donorID VARCHAR(10),
+    staffID VARCHAR(50),
+    allocationID VARCHAR(10),
+    FOREIGN KEY (donorID) REFERENCES Donor(donorID),
+    FOREIGN KEY (staffID) REFERENCES Staff(staffID),
+    FOREIGN KEY (allocationID) REFERENCES Allocation(allocationID)
+);
+
+CREATE TABLE IF NOT EXISTS Report (
+    reportID VARCHAR(10) PRIMARY KEY NOT NULL,
+    reportType VARCHAR(100) NOT NULL,
+    reportDate DATE NOT NULL,
+    managerID VARCHAR(10),
+    donationID VARCHAR(10),
+    FOREIGN KEY (managerID) REFERENCES Manager(managerID),
+    FOREIGN KEY (donationID) REFERENCES Donation(donationID)
+);
