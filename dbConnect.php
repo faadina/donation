@@ -14,6 +14,6 @@ $conn = mysqli_init();
 $conn->options(MYSQLI_OPT_CONNECT_TIMEOUT, 5);
 @$conn->real_connect($servername, $username, $password, $dbname, $port);
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error . "<br><br><b>RAILWAY USERS:</b> This usually means your Web App is not linked to your Database. Go to Railway Dashboard -> Web App -> Variables, and make sure MYSQLHOST, MYSQLUSER, MYSQLPASSWORD, MYSQLDATABASE, and MYSQLPORT are set!");
 }
 ?>
