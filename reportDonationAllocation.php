@@ -2,11 +2,7 @@
 include 'dbConnect.php';
 $title = "Donation Page";
 
-$conn = new mysqli($servername, $username, $password, $dbname);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
 
 // Fetch donations
 $sql = "SELECT * FROM allocation";
